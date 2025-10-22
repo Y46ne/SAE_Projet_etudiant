@@ -1,9 +1,9 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, HiddenField, SubmitField, FloatField, SelectField, DateField, TextAreaField
 from wtforms.validators import DataRequired, Email, EqualTo
-from hashlib import sha256 # Garder pour le hachage des mots de passe
+from hashlib import sha256 
 from .database import User
-from .app import db # Importer l'objet db pour la session
+from .app import db 
 
 class LoginForm(FlaskForm):
     Login = StringField('Identifiant', validators=[DataRequired()])
@@ -11,7 +11,6 @@ class LoginForm(FlaskForm):
     next = HiddenField()
 
     def get_authenticated_user(self):
-        # Utilisation de la syntaxe moderne de SQLAlchemy
         user = db.session.get(User, self.Login.data)
         if not user:
             return None
