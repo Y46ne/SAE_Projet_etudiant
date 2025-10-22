@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Connexion</title>
+</head>
+<body>
+  <h1>Connexion</h1>
+  <form method="POST" action="{{ url_for('login') }}">
+      {{ form.hidden_tag() }}
+      <div>
+          {{ form.Login.label }}<br>
+          {{ form.Login(size=30) }}
+      </div>
+      <div>
+          {{ form.Password.label }}<br>
+          {{ form.Password(size=30) }}
+      </div>
+      <br>
+      <input type="submit" value="Se connecter">
+  </form>
+</body>
+</html>

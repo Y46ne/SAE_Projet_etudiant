@@ -1,5 +1,4 @@
-from .app import app
+from .app import app, db # Importe app et db en une seule ligne
 import monApp.views
-from .app import app, db
 import monApp.commands
-import monApp.database # Importe le package database, qui expose les modèles via son __init__.py
+import monApp.database
