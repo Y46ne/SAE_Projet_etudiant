@@ -1,0 +1,49 @@
+{
+  "width": 770,
+  "height": 567,
+  "cx": [
+    [ "GERE", 61 ],
+    [ "ASSUREUR", 182 ],
+    [ "COMPOSE", 302 ],
+    [ "PIECE", 424 ],
+    [ "ASSURE", 61 ],
+    [ "POSSEDE", 182 ],
+    [ "LOGEMENT", 302 ],
+    [ "CONTIENT", 424 ],
+    [ "BIEN", 547 ],
+    [ "IMPACTE", 696 ],
+    [ "APPARTIENT", 547 ],
+    [ "SINISTRE", 696 ],
+    [ "JUSTIFICATIF", 547 ]
+  ],
+  "cy": [
+    [ "GERE", 85 ],
+    [ "ASSUREUR", 85 ],
+    [ "COMPOSE", 85 ],
+    [ "PIECE", 85 ],
+    [ "ASSURE", 254 ],
+    [ "POSSEDE", 254 ],
+    [ "LOGEMENT", 254 ],
+    [ "CONTIENT", 254 ],
+    [ "BIEN", 254 ],
+    [ "IMPACTE", 254 ],
+    [ "APPARTIENT", 406 ],
+    [ "SINISTRE", 406 ],
+    [ "JUSTIFICATIF", 507 ]
+  ],
+  "shift": [
+    [ "GERE,ASSUREUR,0", 0 ],
+    [ "GERE,ASSURE,0", 0 ],
+    [ "COMPOSE,LOGEMENT,0", 0 ],
+    [ "COMPOSE,PIECE,0", 0 ],
+    [ "POSSEDE,ASSURE,0", 0 ],
+    [ "POSSEDE,LOGEMENT,0", 0 ],
+    [ "CONTIENT,PIECE,0", 0 ],
+    [ "CONTIENT,BIEN,0", 0 ],
+    [ "IMPACTE,BIEN,0", 0 ],
+    [ "IMPACTE,SINISTRE,0", 0 ],
+    [ "APPARTIENT,BIEN,0", 0 ],
+    [ "APPARTIENT,JUSTIFICATIF,0", 0 ]
+  ],
+  "ratio": []
+}
