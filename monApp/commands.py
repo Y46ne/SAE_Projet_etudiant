@@ -4,7 +4,6 @@ from .app import app, db
 @app.cli.command()
 @click.argument('filename') 
 def loaddb(filename):
-    from .triggers.init_triggers import create_sinistre_montant_triggers
     import yaml
     from .database import User, Assure, Assureur, Logement, Piece, Bien, Sinistre, impacte
     from .app import db
@@ -31,7 +30,6 @@ def loaddb(filename):
 
     assures = []
     for a in data.get('assures', []):
-        # Assurez-vous que 'assureur_id' est présent dans votre fichier YAML pour les assurés
         assure = Assure(nom=a['nom'], prenom=a['prenom'], date_naissance=a['date_naissance'], email=a['user_login'], telephone=a['telephone'], id_assureur=a['id_assureur'])
         db.session.add(assure)
         assures.append(assure)
@@ -68,10 +66,7 @@ def loaddb(filename):
     conn = db.engine.connect()
     for i in data.get('impacte', []):
         conn.execute(impacte.insert().values(**i))
-    conn.close() # Il est préférable de fermer la connexion après utilisation
-
-    # Créer les triggers de base de données
-    create_sinistre_montant_triggers()
+    conn.close() 
 
     print("Base de données initialisée avec succès à partir de", filename)
 
@@ -90,7 +85,7 @@ def syncdb():
 @click.argument('login')
 @click.argument('pwd')
 def newuser (login, pwd):
-    '''Adds a new user''' # Garder le docstring
+    '''Adds a new user''' 
     from .database import User
     from hashlib import sha256
     m = sha256()
@@ -102,7 +97,7 @@ def newuser (login, pwd):
 
 import click
 from .app import db
-from hashlib import sha256 # Garder pour le hachage des mots de passe
+from hashlib import sha256 
 from .database import User
 
 @app.cli.command()
