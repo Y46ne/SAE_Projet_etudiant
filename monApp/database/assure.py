@@ -4,9 +4,9 @@ class Assure(db.Model):
     id_assure = db.Column(db.Integer, primary_key=True)
     nom = db.Column(db.String(100))
     prenom = db.Column(db.String(100))
-    date_naissance = db.Column(db.String(100))
+    date_naissance = db.Column(db.Date)
     email = db.Column(db.String(100), db.ForeignKey('user.Login'), unique=True)
-    id_assureur = db.Column(db.Integer, db.ForeignKey('assureur.id_assureur'), nullable=False) # Relation GÈRE
+    id_assureur = db.Column(db.Integer, db.ForeignKey('assureur.id_assureur'), nullable=False)
     telephone = db.Column(db.String(20))
     logements = db.relationship('Logement', backref='assure', lazy=True)
 
