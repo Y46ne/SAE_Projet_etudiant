@@ -1,7 +1,8 @@
 from monApp.database import Sinistre
+import datetime
 def test_sinistre_repr(db_session):
     sinistre  = Sinistre(
-        date_sinistre="2023-01-01",
+        date_sinistre=datetime.datetime(2020, 5, 17),
         type_sinistre="Sinistre de test",
         description="Description du sinistre",
         numero_sinistre="123456",

@@ -13,7 +13,7 @@ class Bien(db.Model):
     nom_bien = db.Column(db.String(255))
     description = db.Column(db.String(255))
     categorie = db.Column(db.String(100))
-    date_achat = db.Column(db.String(100))
+    date_achat = db.Column(db.Date)
     prix_achat = db.Column(db.Float)
     etat = db.Column(db.String(100))
     valeur_actuelle = db.Column(db.Float)
