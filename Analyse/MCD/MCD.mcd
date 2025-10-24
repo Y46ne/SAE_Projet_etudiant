@@ -1,27 +1,19 @@
-GÈRE, 1N ASSUREUR, 11 ASSURE
-ASSUREUR : id_assureur, nom, prenom, email, telephone, mot_de_passe, societe
-COMPOSE, 11 LOGEMENT, 1N PIECE
-PIECE : id_piece, nom_piece, type_piece, surface, etage
-:
-:
-
-ASSURE : id_assure, nom, prenom, date_naissance, email, telephone
-POSSEDE, 1N ASSURE, 11 LOGEMENT
-LOGEMENT : id_logement, adresse, type_logement, surface, description
-CONTIENT, 11 PIECE, 1N BIEN
-BIEN : id_bien, nom_bien, description, categorie, date_achat, prix_achat, etat, valeur_actuelle
-IMPACTE, 1N BIEN, 11 SINISTRE : id_bien, id_sinistre, degat_estime, description_degats, partie_impactee
-
-:
-:
-:
-:
 APPARTIENT, 1N BIEN, 11 JUSTIFICATIF
-SINISTRE : id_sinistre, date_sinistre, type_sinistre, description, montant_estime, numero_sinistre
-
-:
-:
-:
-:
 JUSTIFICATIF : id_justificatif, type_justificatif, chemin_fichier, date_ajout
+ASSUREUR : id_assureur, nom, prenom, email, telephone, mot_de_passe, societe
+GÈRE, 01 ASSUREUR, 0N ASSURE
+
+BIEN : id_bien, nom_bien, description, categorie, date_achat, prix_achat, etat, valeur_actuelle
+JUSTIFIE, 0N LOGEMENT, 0N JUSTIFICATIF
+COUVRE, 11 LOGEMENT, 11 ASSUREUR, 1N ASSURE: date_debut
+ASSURE : id_assure, nom, prenom, date_naissance, email, mdp_assure, telephone
+
+IMPACTE, 1N BIEN, 11 SINISTRE : degat_estime
+CONTIENT, 11 PIECE, 0N BIEN
+LOGEMENT : id_logement, adresse, type_logement, surface, description
+POSSEDE, 1N ASSURE, 0N LOGEMENT
+
+SINISTRE : id_sinistre, date_sinistre, type_sinistre, description, numero_sinistre
+PIECE : id_piece, nom_piece, type_piece, surface, etage
+COMPOSE, 11 LOGEMENT, 0N PIECE
 :
