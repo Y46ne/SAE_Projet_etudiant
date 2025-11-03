@@ -1,4 +1,5 @@
 from monApp.database import Assure, Assureur
+import datetime
 
 def test_assure_repr(db_session):
     assureur = Assureur(
@@ -14,7 +15,7 @@ def test_assure_repr(db_session):
     assure = Assure(
         nom="DAL",
         prenom="Cricri",
-        date_naissance="1990-01-01",
+        date_naissance=datetime.datetime(1990, 1, 1),
         email="cricri@dal.com",
         telephone="0123456789",
         id_assureur=assureur.id_assureur

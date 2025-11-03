@@ -8,6 +8,7 @@ class Logement(db.Model):
     description = db.Column(db.String(255))
     id_assure = db.Column(db.Integer, db.ForeignKey('assure.id_assure'), nullable=False)
     pieces = db.relationship('Piece', backref='logement', lazy=True)
+    sinistres = db.relationship('Sinistre', backref='logement', lazy=True)
 
     def __init__(self, adresse, type_logement, surface, description, id_assure):
         self.adresse = adresse
