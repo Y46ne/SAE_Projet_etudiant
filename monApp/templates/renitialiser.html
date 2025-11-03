@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Réinitialiser votre mot de passe</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/renitialiser.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h2>Réinitialiser votre mot de passe</h2>
+    <form>
+      <label for="email">Adresse e-mail</label>
+      <input type="email" id="email" placeholder="exemple@gmail.com" required>
+
+      <label for="password">Nouveau mot de passe</label>
+      <div class="password-field">
+        <input type="password" id="password" required>
+        <span class="eye" onclick="togglePassword('password')">👁️</span>
+      </div>
+
+      <label for="confirm">Confirmer mot de passe</label>
+      <div class="password-field">
+        <input type="password" id="confirm" required>
+        <span class="eye" onclick="togglePassword('confirm')">👁️</span>
+      </div>
+
+      <button type="submit" class="btn">Réinitialiser le mot de passe</button>
+      <a href="#" class="back-link">Retour à la connexion</a>
+    </form>
+  </div>
+
+  <script>
+    function togglePassword(id) {
+      const field = document.getElementById(id);
+      field.type = field.type === "password" ? "text" : "password";
+    }
+  </script>
+</body>
+</html>

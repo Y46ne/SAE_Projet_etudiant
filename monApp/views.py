@@ -29,6 +29,11 @@ def login():
 def dashboard():
     return "Vous etes sur le dashboard" 
 
+@app.route('/renitialiser/')
+@login_required
+def renitialiser():
+    return render_template('renitialiser.html')
+
 
 # ------------------- MAIN -------------------
 if __name__ == '__main__':
