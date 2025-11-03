@@ -1,6 +1,9 @@
 from ..app import db
+from . import impacte
+
 
 class Sinistre(db.Model):
+    __tablename__ = 'sinistre'
     id_sinistre = db.Column(db.Integer, primary_key=True)
     date_sinistre = db.Column(db.Date)
     type_sinistre = db.Column(db.String(100))
@@ -13,9 +16,8 @@ class Sinistre(db.Model):
         self.date_sinistre = date_sinistre
         self.type_sinistre = type_sinistre
         self.description = description
-        self.montant_estime = montant_estime
         self.numero_sinistre = numero_sinistre
         self.id_logement = id_logement
 
     def __repr__(self):
-        return "<Sinistre (%d) %s>" % (self.id_sinistre, self.numero_sinistre)
+        return f"<Sinistre {self.id_sinistre} {self.numero_sinistre}>"
