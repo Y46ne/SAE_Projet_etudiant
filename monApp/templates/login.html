@@ -1,23 +1,73 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <title>Connexion</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion à MobiList</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 <body>
-  <h1>Connexion</h1>
-  <form method="POST" action="{{ url_for('login') }}">
-      {{ form.hidden_tag() }}
-      <div>
-          {{ form.Login.label }}<br>
-          {{ form.Login(size=30) }}
-      </div>
-      <div>
-          {{ form.Password.label }}<br>
-          {{ form.Password(size=30) }}
-      </div>
-      <br>
-      <input type="submit" value="Se connecter">
-  </form>
+    <div class="login-container">
+        <h1>Connexion à MobiList</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('login') }}">
+            {{ form.hidden_tag() }}
+            
+            <div class="form-group">
+                {{ form.Login.label }}
+                {{ form.Login(placeholder="exemple@gmail.com") }}
+            </div>
+
+            <div class="form-group">
+                {{ form.Password.label }}
+                <div class="password-wrapper">
+                    {{ form.Password(placeholder="......", id="password") }}
+                    <button type="button" class="toggle-password" onclick="togglePassword()">
+                        👁️
+                    </button>
+                </div>
+            </div>
+
+            <div class="options">
+                <label class="remember-me">
+                    <input type="checkbox" name="remember">
+                    <span>Se souvenir de moi</span>
+                </label>
+                <a href="#" class="forgot-password">Mot de passe oublié ?</a>
+            </div>
+
+            <button type="submit" class="submit-btn">Se connecter</button>
+
+            <div class="signup-link">
+                Pas encore de compte ? <a href="#">Créer un compte</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+      <!--Début utilisation ia jusqu a l70-->
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = document.querySelector('.toggle-password');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁️';
+            }
+        }
+    </script>
 </body>
 </html>

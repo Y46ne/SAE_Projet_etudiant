@@ -10,7 +10,7 @@ from hashlib import sha256
 def load_user(user_id):
     return User.query.get(user_id)
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login/', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
