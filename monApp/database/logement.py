@@ -5,13 +5,15 @@ from . import possede, couvre, justifie
 class Logement(db.Model):
     __tablename__ = 'logement'
     id_logement = db.Column(db.Integer, primary_key=True)
-    adresse = db.Column(db.String(255), nullable=False)
-    type_logement = db.Column(db.String(50))
-    surface = db.Column(db.Numeric(10,2))
-    description = db.Column(db.Text)
+    adresse = db.Column(db.String(255))
+    type_logement = db.Column(db.String(255))
+    surface = db.Column(db.Integer)
+    description = db.Column(db.String(255))
+    id_assure = db.Column(db.Integer, db.ForeignKey('assure.id_assure'), nullable=False)
 
     # Relations
     pieces = db.relationship('Piece', backref='logement', lazy='subquery')
+    sinistres = db.relationship('Sinistre', backref='logement', lazy=True)
     justificatifs = db.relationship('Justificatif', secondary=justifie, backref=db.backref('logements', lazy='subquery'), lazy='subquery')
     assureurs = db.relationship('Assureur', secondary=couvre, backref=db.backref('logements', lazy='subquery'), lazy='subquery')
     proprietaires = db.relationship('Assure', secondary=possede, backref=db.backref('logements', lazy='subquery'), lazy='subquery')
