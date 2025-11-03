@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template  
 from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap5 import Bootstrap
 from flask_login import LoginManager
@@ -18,7 +18,7 @@ login_manager.login_view = "login"
 
 @app.route('/')
 def home():
-    return "Bienvenue!"
+    return render_template('base.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
