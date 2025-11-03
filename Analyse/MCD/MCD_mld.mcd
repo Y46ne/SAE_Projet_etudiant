@@ -2,7 +2,7 @@
 :::
 JUSTIFICATIF: id_justificatif, type_justificatif, chemin_fichier, date_ajout, #id_bien > BIEN > id_bien
 :
-ASSUREUR: id_assureur, nom, prenom, email, telephone, mot_de_passe, societe, #id_assure > ASSURE > id_assure
+ASSUREUR: id_assureur, nom, prenom, email, telephone, mot_de_passe, societe, #id_assure 1 > ASSURE > id_assure, #id_logement > LOGEMENT > id_logement, #id_assure 2 > ASSURE > id_assure, date_debut
 :::
 
 
@@ -18,7 +18,7 @@ ASSURE: id_assure, nom, prenom, date_naissance, email, mdp_assure, telephone
 :
 IMPACTE: #id_bien > BIEN > id_bien, _#id_sinistre > SINISTRE > id_sinistre, degat_estime
 :::
-LOGEMENT: id_logement, adresse, type_logement, surface, description, #id_assureur > ASSUREUR > id_assureur, #id_assure > ASSURE > id_assure, date_debut, #id_piece > PIECE > id_piece
+LOGEMENT: id_logement, adresse, type_logement, surface, description, #id_piece > PIECE > id_piece
 :
 POSSEDE: #id_assure > ASSURE > id_assure, _#id_logement > LOGEMENT > id_logement
 :

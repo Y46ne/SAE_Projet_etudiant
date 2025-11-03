@@ -5,7 +5,7 @@ GÈRE, 11 ASSUREUR, 0N ASSURE
 
 BIEN : id_bien, nom_bien, description, categorie, date_achat, prix_achat, etat, valeur_actuelle
 JUSTIFIE, 0N LOGEMENT, 0N JUSTIFICATIF
-COUVRE, 11 LOGEMENT, 11 ASSUREUR, 1N ASSURE: date_debut
+COUVRE, 1N LOGEMENT, 11 ASSUREUR, 1N ASSURE: date_debut
 ASSURE : id_assure, nom, prenom, date_naissance, email, mdp_assure, telephone
 
 IMPACTE, 1N BIEN, 0N SINISTRE : degat_estime

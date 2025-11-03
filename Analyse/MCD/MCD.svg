@@ -61,7 +61,7 @@
 		<text x="302" y="254.75" fill="#000000" font-family="Verdana" font-size="12">COUVRE</text>
 		<text x="293" y="279.8" fill="#000000" font-family="Verdana" font-size="12">date_debut</text>
 	</g>
-	<text x="333" y="355" fill="#4575b4" font-family="Verdana" font-size="12">1,1</text>
+	<text x="333" y="355" fill="#4575b4" font-family="Verdana" font-size="12">1,N</text>
 	<text x="333" y="178" fill="#4575b4" font-family="Verdana" font-size="12">1,1</text>
 	<text x="375" y="279" fill="#4575b4" font-family="Verdana" font-size="12">1,N</text>
 </g>
