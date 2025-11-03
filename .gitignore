@@ -1,5 +1,2 @@
-<<<<<<< HEAD
 *.pyc
-=======
-*.pyc
->>>>>>> test-BD
+.venv

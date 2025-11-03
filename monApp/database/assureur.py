@@ -1,10 +1,13 @@
+
 from ..app import db
-from . import couvre
+# Import explicite de couvre pour casser l'import circulaire
+from monApp.database.couvre import couvre
 
 
 class Assureur(db.Model):
     __tablename__ = 'assureur'
     id_assureur = db.Column(db.Integer, primary_key=True)
+    login = db.Column(db.String(100), db.ForeignKey('user.Login'), unique=True, nullable=True)
     nom = db.Column(db.String(100), nullable=False)
     prenom = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
@@ -25,3 +28,4 @@ class Assureur(db.Model):
 
     def __repr__(self):
         return f"<Assureur {self.id_assureur} {self.prenom} {self.nom}>"
+

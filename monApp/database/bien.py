@@ -1,5 +1,7 @@
+
 from ..app import db
-from . import impacte
+# Import explicite de impacte pour casser l'import circulaire
+from monApp.database.impacte import impacte
 
 
 class Bien(db.Model):
@@ -9,15 +11,11 @@ class Bien(db.Model):
     description = db.Column(db.Text)
     categorie = db.Column(db.String(100))
     date_achat = db.Column(db.Date)
-    prix_achat = db.Column(db.Float)
-    etat = db.Column(db.String(100))
-    valeur_actuelle = db.Column(db.Float)
+    prix_achat = db.Column(db.Numeric(10,2))
+    etat = db.Column(db.String(50))
+    valeur_actuelle = db.Column(db.Numeric(10,2))
     id_piece = db.Column(db.Integer, db.ForeignKey('piece.id_piece'), nullable=False)
-    id_justificatif = db.Column(db.Integer, db.ForeignKey('justificatif.id_justificatif'))
-
-    # Relations
-    justificatifs = db.relationship('Justificatif', backref='bien', lazy='subquery')
-    justificatif_principal = db.relationship('Justificatif', foreign_keys=[id_justificatif], uselist=False)
+    # plus de FK id_justificatif ni de relation directe vers Justificatif
     sinistres = db.relationship('Sinistre', secondary=impacte, lazy='subquery', backref=db.backref('biens', lazy='subquery'))
 
     def __init__(self, nom_bien, id_piece, description=None, categorie=None, date_achat=None, prix_achat=None, etat=None, valeur_actuelle=None, id_justificatif=None):
@@ -33,3 +31,5 @@ class Bien(db.Model):
 
     def __repr__(self):
         return "<Bien (%d) %s>" % (self.id_bien, self.nom_bien)
+
+

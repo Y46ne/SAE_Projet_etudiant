@@ -1,11 +1,12 @@
+
 from ..app import db
 from flask_login import UserMixin
 
 class User(db.Model, UserMixin):
     Login = db.Column(db.String(100), primary_key=True)
     Password = db.Column(db.String(100))
-    assure_profile = db.relationship('Assure', backref='user_account', uselist=False, cascade="all, delete-orphan")
-    assureur_profile = db.relationship('Assureur', backref='user_account', uselist=False, cascade="all, delete-orphan")
+    assure_profile = db.relationship('Assure', backref='user_account', uselist=False, cascade="all, delete-orphan", foreign_keys='Assure.email')
+    assureur_profile = db.relationship('Assureur', backref='user_account', uselist=False, cascade="all, delete-orphan", foreign_keys='Assureur.login')
  
     def __init__(self, Login, Password):
         self.Login = Login
