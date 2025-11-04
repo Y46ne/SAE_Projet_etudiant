@@ -35,11 +35,14 @@ def login():
 def reinitialiser():
     return render_template('reinitialiser.html')
 
+<<<<<<< HEAD
 
 
 @app.route('/tableauDeBord/')
 def tableau_de_bord():
     return render_template('tableauDeBord.html')
+=======
+>>>>>>> 6bf4a2b (vue tableau de bord)
 
 
 
@@ -128,6 +131,10 @@ def creer_compte():
             db.session.rollback()
             flash(f'Erreur lors de la création du compte : {e}', 'danger')
     return render_template('creeruncompte.html', form=form)
+    
+@app.route('/TableauDeBord/')
+def TableauDeBord():
+    return render_template('TableauDeBord.html')
 
 
 
