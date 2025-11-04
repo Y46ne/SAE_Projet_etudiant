@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Ajouter un Logement{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/logement_client.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <main class="main-content">
+        <header>
+            <h1>Ajouter un Logement</h1>
+            <p>Remplissez le formulaire ci-dessous pour enregistrer un nouveau logement.</p>
+        </header>
+
+        <section class="form-section">
+            <div class="card">
+                <form action="{{ url_for('logement_client') }}" method="POST" class="form">
+
+                    <div class="form-group">
+                        {{ form.adresse.label(class="form-label") }}
+                        {{ form.adresse(class="form-input", placeholder="Ex : 25 avenue Victor Hugo, Lyon") }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.type_logement.label(class="form-label") }}
+                        {{ form.type_logement(class="form-input") }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.surface.label(class="form-label") }}
+                        {{ form.surface(class="form-input", placeholder="Surface en m²") }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.description.label(class="form-label") }}
+                        {{ form.description(class="form-textarea", rows=4, placeholder="Décrivez le logement...") }}
+                    </div>
+
+                    <div class="form-actions">
+                        {{ form.submit(class="btn-primary") }}
+                        <a href="{{ url_for('tableau_de_bord') }}" class="btn-secondary">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}
