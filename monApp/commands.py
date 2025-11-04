@@ -5,7 +5,7 @@ from .app import app, db
 @click.argument('filename') 
 def loaddb(filename):
     import yaml
-    from .database import User, Assure, Assureur, Logement, Piece, Bien, Sinistre, impacte
+    from .database import Assure, Assureur, Bien, Justificatif, Logement, Piece, Sinistre, User, couvre, possede, justifie, impacte
     from .app import db
 
     db.drop_all()
@@ -14,59 +14,117 @@ def loaddb(filename):
     with open(filename, 'r', encoding='utf-8') as file:
         data = yaml.safe_load(file)
 
+    from datetime import datetime, date
+    from decimal import Decimal
+
     users = []
     for u in data.get('users', []):
-        user = User(**u)
+        user = User(
+            Login=u['Login'],
+            Password=u['Password']
+        )
         db.session.add(user)
         users.append(user)
     db.session.commit()
 
     assureurs = []
     for assr in data.get('assureurs', []):
-        assureur = Assureur(nom=assr['nom'], prenom=assr['prenom'], email=assr['user_login'], telephone=assr['telephone'], societe=assr['societe'])
-        db.session.add(assureur)
-        assureurs.append(assureur)
+        try:
+            assureur = Assureur(
+                nom=assr['nom'],
+                prenom=assr['prenom'],
+                email=assr['user_login'],
+                login=assr['user_login'],
+                mot_de_passe=assr['mot_de_passe'],
+                telephone=assr.get('telephone'),
+                societe=assr.get('societe')
+            )
+            db.session.add(assureur)
+            assureurs.append(assureur)
+        except Exception as e:
+            print(f"Erreur création Assureur: {e} avec données: {assr}")
     db.session.commit()
 
     assures = []
     for a in data.get('assures', []):
-        assure = Assure(nom=a['nom'], prenom=a['prenom'], date_naissance=a['date_naissance'], email=a['user_login'], telephone=a['telephone'], id_assureur=a['id_assureur'])
+        assure = Assure(
+            nom=a['nom'],
+            prenom=a['prenom'],
+            date_naissance=date.fromisoformat(a['date_naissance']) if a.get('date_naissance') else None,
+            email=a['user_login'],
+            mdp_assure=a['mdp_assure'],
+            telephone=a.get('telephone'),
+            id_assureur=a['id_assureur']
+        )
         db.session.add(assure)
         assures.append(assure)
     db.session.commit()
 
     logements = []
     for l in data.get('logements', []):
-        logement = Logement(**l)
+        logement = Logement(
+            adresse=l['adresse'],
+            type_logement=l.get('type_logement'),
+            surface=Decimal(str(l['surface'])) if l.get('surface') is not None else None,
+            description=l.get('description')
+        )
         db.session.add(logement)
         logements.append(logement)
     db.session.commit()
 
     pieces = []
     for p in data.get('pieces', []):
-        piece = Piece(**p)
+        piece = Piece(
+            nom_piece=p['nom_piece'],
+            type_piece=p.get('type_piece'),
+            surface=Decimal(str(p['surface'])) if p.get('surface') is not None else None,
+            etage=p.get('etage'),
+            id_logement=p['id_logement']
+        )
         db.session.add(piece)
         pieces.append(piece)
     db.session.commit()
 
     biens = []
     for b in data.get('biens', []):
-        bien = Bien(**b)
+        bien = Bien(
+            nom_bien=b['nom_bien'],
+            description=b.get('description'),
+            categorie=b.get('categorie'),
+            date_achat=date.fromisoformat(b['date_achat']) if b.get('date_achat') else None,
+            prix_achat=Decimal(str(b['prix_achat'])) if b.get('prix_achat') is not None else None,
+            etat=b.get('etat'),
+            valeur_actuelle=Decimal(str(b['valeur_actuelle'])) if b.get('valeur_actuelle') is not None else None,
+            id_piece=b['id_piece']
+        )
         db.session.add(bien)
         biens.append(bien)
     db.session.commit()
 
+    justificatifs = []
+    for j in data.get('justificatifs', []):
+        justificatif = Justificatif(
+            chemin_fichier=j['chemin_fichier'],
+            type_justificatif=j.get('type_justificatif'),
+            date_ajout=datetime.fromisoformat(j['date_ajout']) if j.get('date_ajout') else None
+        )
+        db.session.add(justificatif)
+        justificatifs.append(justificatif)
+    db.session.commit()
+
     sinistres = []
     for s in data.get('sinistres', []):
-        sinistre = Sinistre(**s)
+        sinistre = Sinistre(
+            date_sinistre=date.fromisoformat(s['date_sinistre']) if s.get('date_sinistre') else None,
+            type_sinistre=s.get('type_sinistre'),
+            description=s.get('description'),
+            montant_estime=Decimal(str(s['montant_estime'])) if s.get('montant_estime') is not None else None,
+            numero_sinistre=s['numero_sinistre'],
+            id_logement=s['id_logement']
+        )
         db.session.add(sinistre)
         sinistres.append(sinistre)
     db.session.commit()
-
-    conn = db.engine.connect()
-    for i in data.get('impacte', []):
-        conn.execute(impacte.insert().values(**i))
-    conn.close() 
 
     print("Base de données initialisée avec succès à partir de", filename)
 

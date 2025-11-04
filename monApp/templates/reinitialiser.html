@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Réinitialiser votre mot de passe</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/renitialiser.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/reinitialiser.css') }}">
 </head>
 <body>
   <div class="container">
@@ -26,7 +26,7 @@
       </div>
 
       <button type="submit" class="btn">Réinitialiser le mot de passe</button>
-      <a href="#" class="back-link">Retour à la connexion</a>
+      <a href="{{ url_for('login') }}" class="back-link">Retour à la connexion</a>
     </form>
   </div>
 

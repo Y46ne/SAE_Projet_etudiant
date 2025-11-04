@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MobiList - Tableau de Bord</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/tableauDeBord.css') }}" />
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2 class="logo">MobiList<br><span>Inventaire Assuré</span></h2>
+      <nav>
+        <ul>
+          <li class="active">🏠 Tableau de Bord</li>
+          <li>📋 Mes logements</li>
+          <hr />
+          <li>➕ Ajouter un logement</li>
+          <li>➕ Ajouter une pièce</li>
+          <li>➕ Ajouter un bien</li>
+          <hr />
+          <li>📑 Rapport</li>
+          <li>⚠️ Déclarer un sinistre</li>
+          <li>📜 Mes contrats</li>
+          <li>⚙️ Paramètres</li>
+        </ul>
+      </nav>
+      <button class="logout">Déconnexion</button>
+    </aside>
+    <main class="main-content">
+      <header>
+        <h1>Tableau de Bord</h1>
+        <p>Bienvenue dans MobiList - Gérez vos inventaires de biens mobiliers</p>
+        <button class="btn-primary">+ Nouveau logement</button>
+      </header>
+
+      <section class="stats">
+        <div class="card">
+          <p>📦 Logements :</p>
+          <h3>2</h3>
+        </div>
+        <div class="card">
+          <p>🏡 Nombre de Biens :</p>
+          <h3>73</h3>
+        </div>
+        <div class="card">
+          <p>💰 Valeur Totale des Biens :</p>
+          <h3>18 300 €</h3>
+        </div>
+      </section>
+
+      <section class="logements">
+        <h2>Mes Logements</h2>
+        <div class="logement-item">
+          <div>
+            <h3>Résidence Principale</h3>
+            <p>45 biens - Valeur : 12 500 € - Maj : 2024-10-15</p>
+          </div>
+          <a href="#">Consulter ></a>
+        </div>
+        <div class="logement-item">
+          <div>
+            <h3>Résidence Secondaire</h3>
+            <p>28 biens - Valeur : 5 800 € - Maj : 2024-09-20</p>
+          </div>
+          <a href="#">Consulter ></a>
+        </div>
+        <button class="btn-secondary">Voir plus</button>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

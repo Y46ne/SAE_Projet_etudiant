@@ -29,11 +29,32 @@ def login():
 def dashboard():
     return "Vous etes sur le dashboard" 
 
-@app.route('/renitialiser/')
-@login_required
-def renitialiser():
-    return render_template('renitialiser.html')
+@app.route('/reinitialiser/')
+def reinitialiser():
+    return render_template('reinitialiser.html')
 
+@app.route('/tableauDeBord/')
+def tableau_de_bord():
+    return render_template('tableauDeBord.html')
+
+@app.route('/creer-compte/', methods=['GET', 'POST'])
+def creer_compte():
+    form = SignUpForm()
+    if form.validate_on_submit():
+        try:
+            new_user = User(
+                Login=form.email.data,
+                Password=sha256(form.Password.data.encode()).hexdigest(),
+                role='client'
+            )
+            db.session.add(new_user)
+            db.session.commit()
+            flash('Votre compte a été créé avec succès ! Vous pouvez maintenant vous connecter.', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Erreur lors de la création du compte : {e}', 'danger')
+    return render_template('creeruncompte.html', form=form)
 
 # ------------------- MAIN -------------------
 if __name__ == '__main__':

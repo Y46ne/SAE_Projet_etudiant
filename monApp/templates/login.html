@@ -43,13 +43,13 @@
                     <input type="checkbox" name="remember">
                     <span>Se souvenir de moi</span>
                 </label>
-                <a href="#" class="forgot-password">Mot de passe oublié ?</a>
+                <a href="{{ url_for('reinitialiser') }}" class="forgot-password">Mot de passe oublié ?</a>
             </div>
 
             <button type="submit" class="submit-btn">Se connecter</button>
 
             <div class="signup-link">
-                Pas encore de compte ? <a href="#">Créer un compte</a>
+                Pas encore de compte ? <a href="{{ url_for('creer_compte') }}">Créer un compte</a>
             </div>
         </form>
     </div>

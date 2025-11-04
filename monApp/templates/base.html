@@ -5,12 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MobiList - Inventaire Assuré</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body class="bg-gray-50">
     <div class="flex h-screen">
@@ -49,7 +44,7 @@
                     {% endif %}
 
                     {% if current_user.role == 'client' or (current_user.role == 'insurer' and client_id) %}
-                    <a href="{{ url_for('index') }}" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg transition text-blue-100 hover:bg-blue-500"> {# Assuming /inventory is the index or a list of inventories #}
+                    <a href="{{ url_for('index') }}" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg transition text-blue-100 hover:bg-blue-500">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
                             <polyline points="14 2 14 8 20 8"></polyline>
@@ -59,7 +54,7 @@
 
                     <div class="my-2 border-t-2 border-blue-500"></div>
 
-                    <a href="{{ url_for('ajouter_logement', client_id=client_id if current_user.role == 'insurer' else None) }}" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg transition text-blue-100 hover:bg-blue-500"> {# Corrected link #}
+                    <a href="{{ url_for('ajouter_logement', client_id=client_id if current_user.role == 'insurer' else None) }}" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg transition text-blue-100 hover:bg-blue-500">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -67,7 +62,7 @@
                         <span class="font-medium">Ajouter un logement</span>
                     </a>
 
-                    <a href="{{ url_for('ajouter_piece', client_id=client_id if current_user.role == 'insurer' else None) }}" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg transition text-blue-100 hover:bg-blue-500"> {# Corrected link #}
+                    <a href="{{ url_for('ajouter_piece', client_id=client_id if current_user.role == 'insurer' else None) }}" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg transition text-blue-100 hover:bg-blue-500">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -111,7 +106,7 @@
                         <span class="font-medium">Paramètres</span>
                     </a>
                     {% endif %}
-                {% else %} {# Not authenticated #}
+                {% else %}
                     <a href="{{ url_for('login') }}" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg transition text-blue-100 hover:bg-blue-500">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -119,7 +114,7 @@
                         </svg>
                         <span class="font-medium">Tableau de bord</span>
                     </a>
-                {% endif %} {# End if current_user.is_authenticated #}
+                {% endif %}
             </nav>
 
             <div class="p-4 border-t border-blue-500">
