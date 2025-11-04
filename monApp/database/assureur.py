@@ -16,13 +16,15 @@ class Assureur(db.Model):
     # Relations
     logements_couverts = db.relationship('Logement', secondary=couvre, backref=db.backref('couverts_par', lazy='subquery'), lazy='subquery')
 
-    def __init__(self, nom, prenom, email, mot_de_passe, telephone=None, societe=None):
+    def __init__(self, nom, prenom, email, mot_de_passe, telephone=None, societe=None, login=None):
         self.nom = nom
         self.prenom = prenom
         self.email = email
         self.mot_de_passe = mot_de_passe
         self.telephone = telephone
         self.societe = societe
+        self.login = login
+
 
     def __repr__(self):
         return f"<Assureur {self.id_assureur} {self.prenom} {self.nom}>"

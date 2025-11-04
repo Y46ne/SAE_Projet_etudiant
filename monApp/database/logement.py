@@ -11,9 +11,6 @@ class Logement(db.Model):
     type_logement = db.Column(db.String(50))
     surface = db.Column(db.Numeric(10,2))
     description = db.Column(db.Text)
-    # plus de FK id_assure, la relation se fait via possede
-
-    # Relations
     pieces = db.relationship('Piece', backref='logement', lazy='subquery')
     sinistres = db.relationship('Sinistre', backref='logement', lazy=True)
     justificatifs = db.relationship('Justificatif', secondary=justifie, backref=db.backref('logements', lazy='subquery'), lazy='subquery')

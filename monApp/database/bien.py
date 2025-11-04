@@ -13,7 +13,6 @@ class Bien(db.Model):
     etat = db.Column(db.String(50))
     valeur_actuelle = db.Column(db.Numeric(10,2))
     id_piece = db.Column(db.Integer, db.ForeignKey('piece.id_piece'), nullable=False)
-    # plus de FK id_justificatif ni de relation directe vers Justificatif
     sinistres = db.relationship('Sinistre', secondary=impacte, lazy='subquery', backref=db.backref('biens', lazy='subquery'))
 
     def __init__(self, nom_bien, id_piece, description=None, categorie=None, date_achat=None, prix_achat=None, etat=None, valeur_actuelle=None, id_justificatif=None):

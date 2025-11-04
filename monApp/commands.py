@@ -1,51 +1,51 @@
-import click, logging as lg
+import click
 from .app import app, db
+import yaml
+from datetime import datetime, date
+from decimal import Decimal
+
+from .database import Assure, Assureur, Bien, Justificatif, Logement, Piece, Sinistre, User
+from .database.couvre import couvre
+from .database.possede import possede
+from .database.justifie import justifie
+from .database.impacte import impacte
 
 @app.cli.command()
-@click.argument('filename') 
+@click.argument('filename')
 def loaddb(filename):
-    import yaml
-    from .database import Assure, Assureur, Bien, Justificatif, Logement, Piece, Sinistre, User, couvre, possede, justifie, impacte
-    from .app import db
-
+    """Charge les données depuis un fichier YAML dans la base de données."""
+    
+    # Réinitialiser la base
     db.drop_all()
     db.create_all()
 
-    with open(filename, 'r', encoding='utf-8') as file:
-        data = yaml.safe_load(file)
+    with open(filename, 'r', encoding='utf-8') as f:
+        data = yaml.safe_load(f)
 
-    from datetime import datetime, date
-    from decimal import Decimal
-
-    users = []
+    # ---- USERS ----
     for u in data.get('users', []):
         user = User(
             Login=u['Login'],
             Password=u['Password']
         )
         db.session.add(user)
-        users.append(user)
     db.session.commit()
 
-    assureurs = []
+    # ---- ASSUREURS ----
     for assr in data.get('assureurs', []):
-        try:
-            assureur = Assureur(
-                nom=assr['nom'],
-                prenom=assr['prenom'],
-                email=assr['user_login'],
-                login=assr['user_login'],
-                mot_de_passe=assr['mot_de_passe'],
-                telephone=assr.get('telephone'),
-                societe=assr.get('societe')
-            )
-            db.session.add(assureur)
-            assureurs.append(assureur)
-        except Exception as e:
-            print(f"Erreur création Assureur: {e} avec données: {assr}")
+        assureur = Assureur(
+            nom=assr['nom'],
+            prenom=assr['prenom'],
+            email=assr['user_login'],  # email
+            login=assr['user_login'],  # login
+            mot_de_passe=assr['mot_de_passe'],
+            telephone=assr.get('telephone'),
+            societe=assr.get('societe')
+        )
+        db.session.add(assureur)
     db.session.commit()
 
-    assures = []
+    # ---- ASSURES ----
     for a in data.get('assures', []):
         assure = Assure(
             nom=a['nom'],
@@ -57,10 +57,9 @@ def loaddb(filename):
             id_assureur=a['id_assureur']
         )
         db.session.add(assure)
-        assures.append(assure)
     db.session.commit()
 
-    logements = []
+    # ---- LOGEMENTS ----
     for l in data.get('logements', []):
         logement = Logement(
             adresse=l['adresse'],
@@ -69,10 +68,9 @@ def loaddb(filename):
             description=l.get('description')
         )
         db.session.add(logement)
-        logements.append(logement)
     db.session.commit()
 
-    pieces = []
+    # ---- PIECES ----
     for p in data.get('pieces', []):
         piece = Piece(
             nom_piece=p['nom_piece'],
@@ -82,10 +80,9 @@ def loaddb(filename):
             id_logement=p['id_logement']
         )
         db.session.add(piece)
-        pieces.append(piece)
     db.session.commit()
 
-    biens = []
+    # ---- BIENS ----
     for b in data.get('biens', []):
         bien = Bien(
             nom_bien=b['nom_bien'],
@@ -98,10 +95,9 @@ def loaddb(filename):
             id_piece=b['id_piece']
         )
         db.session.add(bien)
-        biens.append(bien)
     db.session.commit()
 
-    justificatifs = []
+    # ---- JUSTIFICATIFS ----
     for j in data.get('justificatifs', []):
         justificatif = Justificatif(
             chemin_fichier=j['chemin_fichier'],
@@ -109,10 +105,9 @@ def loaddb(filename):
             date_ajout=datetime.fromisoformat(j['date_ajout']) if j.get('date_ajout') else None
         )
         db.session.add(justificatif)
-        justificatifs.append(justificatif)
     db.session.commit()
 
-    sinistres = []
+    # ---- SINISTRES ----
     for s in data.get('sinistres', []):
         sinistre = Sinistre(
             date_sinistre=date.fromisoformat(s['date_sinistre']) if s.get('date_sinistre') else None,
@@ -123,8 +118,28 @@ def loaddb(filename):
             id_logement=s['id_logement']
         )
         db.session.add(sinistre)
-        sinistres.append(sinistre)
     db.session.commit()
+
+    # Couvre
+    for c in data.get('couvre', []):
+        if 'date_debut' in c and isinstance(c['date_debut'], str):
+            c['date_debut'] = datetime.fromisoformat(c['date_debut']).date()
+        db.session.execute(couvre.insert().values(**c))
+
+    # Justifie
+    for j in data.get('justifie', []):
+        db.session.execute(justifie.insert().values(**j))
+
+    # Impacte
+    for i in data.get('impacte', []):
+        db.session.execute(impacte.insert().values(**i))
+
+    # Possede
+    for p in data.get('possede', []):
+        db.session.execute(possede.insert().values(**p))
+
+    db.session.commit()
+
 
     print("Base de données initialisée avec succès à partir de", filename)
 

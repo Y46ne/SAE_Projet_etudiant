@@ -1,6 +1,5 @@
 from ..app import db
 from datetime import date
-# Import explicite de possede pour casser l'import circulaire
 from monApp.database.possede import possede
 
 
