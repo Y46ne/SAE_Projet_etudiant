@@ -35,19 +35,16 @@ def login():
 def reinitialiser():
     return render_template('reinitialiser.html')
 
-<<<<<<< HEAD
 
 
 @app.route('/tableauDeBord/')
 def tableau_de_bord():
     return render_template('tableauDeBord.html')
-=======
->>>>>>> 6bf4a2b (vue tableau de bord)
 
 
 
 @app.route('/ajouter_logement/')
-def logement_client():
+def ajouter_logement():
     form = LogementForm()
     return render_template('ajouter_logement.html',form=form)
 
