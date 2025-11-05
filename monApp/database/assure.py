@@ -6,12 +6,11 @@ from monApp.database.possede import possede
 class Assure(db.Model):
     __tablename__ = 'assure'
     id_assure = db.Column(db.Integer, primary_key=True)
-    nom = db.Column(db.String(100), nullable=False)
-    prenom = db.Column(db.String(100), nullable=False)
-    date_naissance = db.Column(db.Date)
-    email = db.Column(db.String(255), db.ForeignKey('user.Login'), unique=True, nullable=False)
+    nom = db.Column(db.String(100))
+    prenom = db.Column(db.String(100))
+    date_naissance = db.Column(db.String(100))
+    email = db.Column(db.String(100), db.ForeignKey('user.Login'), unique=True)
     mdp_assure = db.Column(db.String(255), nullable=False)
-
     telephone = db.Column(db.String(20))
     id_assureur = db.Column(db.Integer, db.ForeignKey('assureur.id_assureur'), nullable=False)
 

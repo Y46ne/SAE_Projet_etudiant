@@ -13,6 +13,12 @@ def index():
     if len(request.args) == 0:
         return render_template("index.html")
 
+@app.route('/')
+@app.route('/index/')
+def index():
+    if len(request.args) == 0:
+        return render_template("index.html")
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)

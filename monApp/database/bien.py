@@ -9,9 +9,13 @@ class Bien(db.Model):
     description = db.Column(db.Text)
     categorie = db.Column(db.String(100))
     date_achat = db.Column(db.Date)
-    prix_achat = db.Column(db.Numeric(10,2))
-    etat = db.Column(db.String(50))
-    valeur_actuelle = db.Column(db.Numeric(10,2))
+    prix_achat = db.Column(db.Float)
+    etat = db.Column(db.String(100))
+    valeur_actuelle = db.Column(db.Float)
+    id_piece = db.Column(db.Integer, db.ForeignKey('piece.id_piece'), nullable=False)
+    justificatifs = db.relationship('Justificatif', backref='bien', lazy=True)
+    sinistres = db.relationship('Sinistre', secondary=impacte, lazy='subquery',
+                                backref=db.backref('biens', lazy=True))
 
     id_piece = db.Column(db.Integer, db.ForeignKey('piece.id_piece'), nullable=False)
     sinistres = db.relationship('Sinistre', secondary=impacte, lazy='subquery', backref=db.backref('biens', lazy='subquery'))
