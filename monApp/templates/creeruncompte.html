@@ -1,14 +1,18 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Créer un compte</title>
+{% extends "base.html" %}
+
+{% block title %}Créer un compte{% endblock %}
+
+{% block head %}
   <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/creeruncompte.css') }}">
-</head>
-<body>
-  <div class="container">
-    <h2>Créer un compte sur MobiList</h2>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <main class="main-content">
+    <header>
+      <h1>Créer un compte sur MobiList</h1>
+      <p>Remplissez le formulaire ci-dessous pour créer votre compte.</p>
+    </header>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -20,43 +24,61 @@
         {% endif %}
     {% endwith %}
 
-    <form method="POST" action="{{ url_for('creer_compte') }}">
-      {{ form.hidden_tag() }}
+    <section class="form-section">
+      <div class="card">
+        <form action="{{ url_for('creer_compte') }}" method="POST" class="form">
+          {{ form.hidden_tag() }}
 
-      {{ form.nom.label }}
-      {{ form.nom(placeholder="Votre nom") }}
+          <div class="form-group">
+            {{ form.nom.label(class="form-label") }}
+            {{ form.nom(class="form-input", placeholder="Votre nom") }}
+          </div>
 
-      {{ form.prenom.label }}
-      {{ form.prenom(placeholder="Votre prénom") }}
+          <div class="form-group">
+            {{ form.prenom.label(class="form-label") }}
+            {{ form.prenom(class="form-input", placeholder="Votre prénom") }}
+          </div>
 
-      {{ form.date_naissance.label }}
-      {{ form.date_naissance(placeholder="YYYY-MM-DD") }}
+          <div class="form-group">
+            {{ form.date_naissance.label(class="form-label") }}
+            {{ form.date_naissance(class="form-input", placeholder="YYYY-MM-DD") }}
+          </div>
 
-      {{ form.telephone.label }}
-      {{ form.telephone(placeholder="0612345678") }}
+          <div class="form-group">
+            {{ form.telephone.label(class="form-label") }}
+            {{ form.telephone(class="form-input", placeholder="0612345678") }}
+          </div>
 
-      {{ form.email.label }}
-      {{ form.email(placeholder="exemple@gmail.com") }}
+          <div class="form-group">
+            {{ form.email.label(class="form-label") }}
+            {{ form.email(class="form-input", placeholder="exemple@gmail.com") }}
+          </div>
 
-      {{ form.Password.label }}
-      <div class="password-field">
-        {{ form.Password(id="password") }}
-        <button type="button" class="eye" onclick="togglePassword('password')">👁️</button>
+          <div class="form-group">
+            {{ form.Password.label(class="form-label") }}
+            <div class="password-field">
+              {{ form.Password(class="form-input", id="password") }}
+              <button type="button" class="eye" onclick="togglePassword('password')">👁️</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            {{ form.confirm.label(class="form-label") }}
+            <div class="password-field">
+              {{ form.confirm(class="form-input", id="confirm") }}
+              <button type="button" class="eye" onclick="togglePassword('confirm')">👁️</button>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            {{ form.submit(class="btn-primary") }}
+            <a href="{{ url_for('login') }}" class="btn-secondary">Se connecter</a>
+          </div>
+        </form>
       </div>
+    </section>
+  </main>
+</div>
 
-      {{ form.confirm.label }}
-      <div class="password-field">
-        {{ form.confirm(id="confirm") }}
-        <button type="button" class="eye" onclick="togglePassword('confirm')">👁️</button>
-      </div>
-
-      {{ form.submit(class="btn") }}
-
-      <div class="login-link">
-        Déjà un compte ? <a href="{{ url_for('login') }}">Se connecter</a>
-      </div>
-    </form>
-  </div>
-  <script src="{{ url_for('static', filename='js/togglePassword.js') }}"></script>
-</body>
-</html>
+<script src="{{ url_for('static', filename='js/togglePassword.js') }}"></script>
+{% endblock %}

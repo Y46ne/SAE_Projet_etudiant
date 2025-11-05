@@ -46,7 +46,7 @@
                     <div class="logement-actions">
                         <a href="{{ url_for('voir_logement', id=logement.id) }}" class="btn-consulter">Consulter ></a>
                         <a href="{{ url_for('update_logement', id=logement.id) }}" class="btn-icon" title="Modifier">✏️ Modifier</a>
-                        <button class="btn-icon btn-delete" onclick="confirmerSuppression({{ logement.id }})" title="Supprimer">🗑️ Supprimer</button>
+                        <button class="btn-icon btn-delete" onclick="confirmerSuppression('{{ logement.id }}')" , title="Supprimer">🗑️ Supprimer</button>
                     </div>
                 </div>
                 {% endfor %}

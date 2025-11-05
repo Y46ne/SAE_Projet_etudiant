@@ -49,7 +49,7 @@ def ajouter_logement():
     return render_template('ajouter_logement.html',form=form)
 
 
-@app.route('/mes-logements/')
+@app.route('/mes_logements/')
 def mes_logements():
     logements = Logement.query.all()
     rows = []

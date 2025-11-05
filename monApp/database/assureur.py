@@ -12,8 +12,6 @@ class Assureur(db.Model):
     telephone = db.Column(db.String(20))
     mot_de_passe = db.Column(db.String(255), nullable=False)
     societe = db.Column(db.String(100))
-
-    # Relations
     logements_couverts = db.relationship('Logement', secondary=couvre, backref=db.backref('couverts_par', lazy='subquery'), lazy='subquery')
 
     def __init__(self, nom, prenom, email, mot_de_passe, telephone=None, societe=None, login=None):

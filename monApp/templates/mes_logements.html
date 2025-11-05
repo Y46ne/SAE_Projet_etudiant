@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 
-{% block main %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mes_logements.css') }}">
+{% endblock %}
+
+{% block content %}
 <h1>Mes logements</h1>
 
 <p><strong>Nombre total de logements : {{ logements|length }}</strong></p>
