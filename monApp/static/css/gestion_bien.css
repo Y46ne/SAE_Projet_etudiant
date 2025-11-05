@@ -1,143 +1,273 @@
-/* Reset basique */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
+/* En-tête de page */
+h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #1a1a1a;
+    margin-top: 0;
 }
 
-body {
-    display: flex;
-    min-height: 100vh;
-}
-
-/* Sidebar */
-.sidebar {
-    width: 220px;
-    background-color: #1565c0;
-    color: white;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-}
-
-.sidebar .logo {
-    font-weight: bold;
+h1 + p {
+    font-size: 16px;
+    color: #666;
     margin-bottom: 30px;
-}
-
-.sidebar .logo span {
-    font-weight: normal;
-    font-size: 0.9em;
-}
-
-.sidebar nav ul {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-}
-
-.sidebar nav ul li {
-    margin: 10px 0;
-}
-
-.sidebar nav ul li a {
-    color: white;
-    text-decoration: none;
-}
-
-.sidebar nav ul li.active a {
-    font-weight: bold;
-}
-
-.sidebar nav ul li a.logout {
-    margin-top: 20px;
+    margin-top: 0;
 }
 
 /* Main content */
-main {
-    flex: 1;
-    padding: 30px;
-    background-color: #f5f5f5;
+.main-content {
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
-main h1 {
-    margin-bottom: 5px;
-}
-
-main p {
-    margin-bottom: 20px;
-    color: #555;
-}
-
-/* Search and filter */
+/* Barre de recherche et filtres */
 .search-filter {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
+    align-items: center; 
 }
 
 .search-filter input {
-    flex: 1;
-    padding: 8px;
-    border: 2px solid #ccc;
-    border-radius: 4px;
+    flex: 1; 
+    padding: 12px 20px; 
+    border: 1px solid #ddd;
+    border-radius: 8px; 
+    font-size: 15px;
+    max-width: 450px;
+    outline: none;
+    transition: border-color 0.2s;
 }
 
-.search-filter button {
-    padding: 8px 12px;
-    border: none;
-    background-color: #ccc;
-    border-radius: 4px;
+.search-filter input:focus {
+    border-color: #0066ff;
+}
+
+.search-filter input::placeholder {
+    color: #999;
+}
+
+#filterBtn {
+    padding: 10px 20px; 
+    border: 1px solid #ddd; 
+    background-color: white; 
+    color: #333; 
+    border-radius: 6px;
     cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+#filterBtn:hover {
+    background-color: #f5f5f5;
+    border-color: #ccc;
 }
 
 /* Table */
-table {
+#biensTable {
     width: 100%;
     border-collapse: collapse;
     background-color: white;
-    border-radius: 8px;
-    overflow: hidden;
+    border-radius: 12px; 
+    overflow: hidden; 
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); 
 }
 
-table th, table td {
-    padding: 12px 15px;
+#biensTable th, 
+#biensTable td {
+    padding: 20px;
     text-align: left;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #f0f0f0;
 }
 
-table th {
-    background-color: #f0f0f0;
+#biensTable th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #666;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-/* Status badges */
+#biensTable tbody tr {
+    transition: background-color 0.2s;
+}
+
+#biensTable tbody tr:hover {
+    background-color: #fafafa;
+}
+
+#biensTable tbody tr:last-child td {
+    border-bottom: none;
+}
+
+#biensTable td {
+    font-size: 15px;
+    color: #333;
+}
+
+/* Badges État */
 .status {
-    padding: 4px 10px;
-    border-radius: 12px;
-    color: white;
-    font-weight: bold;
-    font-size: 0.85em;
+    padding: 6px 14px;
+    border-radius: 20px; 
+    font-weight: 600;
+    font-size: 13px;
+    display: inline-block;
+    text-align: center;
+    min-width: 80px; 
 }
 
 .status.bon {
-    background-color: #4caf50;
+    background-color: #d4edda;
+    color: #155724;
 }
 
 .status.acceptable {
-    background-color: #f0c14b;
-    color: black;
+    background-color: #fff3cd;
+    color: #856404;
 }
 
 .status.use {
-    background-color: #f44336;
+    background-color: #f8d7da;
+    color: #721c24;
 }
 
-/* Action buttons */
-button.view, button.edit, button.delete {
+/* Actions */
+#biensTable td:last-child {
+    white-space: nowrap; 
+}
+
+.view, 
+.edit, 
+.delete {
     border: none;
     background: none;
     cursor: pointer;
     margin-right: 5px;
-    font-size: 1em;
+    font-size: 20px; 
+    padding: 8px; 
+    text-decoration: none; 
+    transition: transform 0.2s;
+    display: inline-block;
+}
+
+.view:hover,
+.edit:hover {
+    transform: scale(1.2);
+}
+
+.view {
+    color: #0066ff;
+}
+
+.edit {
+    color: #ff9800;
+}
+
+.delete {
+    color: #f44336;
+    background-color: transparent;
+}
+
+.delete:hover {
+    transform: scale(1.2);
+}
+
+#biensTable form {
+    display: inline;
+}
+
+#biensTable button.delete {
+    font-size: 20px;
+    color: #f44336;
+    padding: 8px;
+}
+
+/* Messages d'alerte */
+.alert {
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+/* Message "Aucun bien trouvé" */
+#biensTable tbody tr td[colspan] {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+    font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 24px;
+    }
+
+    h1 + p {
+        font-size: 14px;
+    }
+
+    .search-filter {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-filter input {
+        max-width: 100%;
+    }
+
+    #biensTable {
+        font-size: 14px;
+    }
+
+    #biensTable th,
+    #biensTable td {
+        padding: 12px;
+    }
+
+    .status {
+        font-size: 11px;
+        padding: 4px 10px;
+        min-width: 60px;
+    }
+
+    .view,
+    .edit,
+    .delete {
+        font-size: 18px;
+        padding: 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 20px;
+    }
+
+    .main-content {
+        overflow-x: auto;
+    }
+
+    #biensTable {
+        min-width: 700px;
+    }
 }

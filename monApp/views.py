@@ -93,6 +93,7 @@ def ajouter_logement():
 def gestion_bien():
     form = LogementForm()
     return render_template('gestion_bien.html',form=form)
+    
 
 @app.route('/mes_logements/')
 def mes_logements():
