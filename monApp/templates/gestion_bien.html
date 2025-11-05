@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Mes Logements{% endblock %}
+{% block title %}Mes Biens{% endblock %}
 
 {% block head %}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/gestion_bien.css') }}">
@@ -8,10 +8,18 @@
 
 
 {% block content %}
-<div class="main-content">
-    <h1>Résidence principale - Salon</h1>
-    <p>Gérez les biens immobiliers de ce logement</p>
+<h1>Résidence principale - Salon</h1>
+<p>Gérez les biens immobiliers de ce logement</p>
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<div class="main-content">
     <div class="search-filter">
         <input type="text" placeholder="Rechercher un bien..." id="searchInput">
         <button id="filterBtn">Filtres</button>
@@ -23,66 +31,52 @@
                 <th>Nom du bien</th>
                 <th>Catégorie</th>
                 <th>Date d’achat</th>
-                <th>Valeur</th>
+                <th>Valeur (€)</th>
                 <th>État</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
+            {% for bien in biens %}
             <tr>
-                <td>TV</td>
-                <td>Électronique</td>
-                <td>13/02/2022</td>
-                <td>1200€</td>
-                <td><span class="status bon">Bon</span></td>
+                <td>{{ bien.nom }}</td>
+                <td>{{ bien.categorie }}</td>
+                <td>{{ bien.date_achat.strftime('%d/%m/%Y') }}</td>
+                <td>{{ bien.valeur }}</td>
                 <td>
-                    <button class="view" title="Voir">👁️</button>
-                    <button class="edit" title="Modifier">✏️</button>
-                    <button class="delete" title="Supprimer">🗑️</button>
+                    {% if bien.etat == 'Bon' %}
+                        <span class="status bon">Bon</span>
+                    {% elif bien.etat == 'Acceptable' %}
+                        <span class="status acceptable">Acceptable</span>
+                    {% else %}
+                        <span class="status use">Usé</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('voir_bien', bien_id=bien.id) }}" class="view" title="Voir">👁️</a>
+                    <a href="{{ url_for('modifier_bien', bien_id=bien.id) }}" class="edit" title="Modifier">✏️</a>
+                    <form action="{{ url_for('supprimer_bien', bien_id=bien.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="delete" title="Supprimer" onclick="return confirm('Supprimer ce bien ?')">🗑️</button>
+                    </form>
                 </td>
             </tr>
+            {% else %}
             <tr>
-                <td>Canapé</td>
-                <td>Mobilier</td>
-                <td>14/01/2021</td>
-                <td>500€</td>
-                <td><span class="status acceptable">Acceptable</span></td>
-                <td>
-                    <button class="view" title="Voir">👁️</button>
-                    <button class="edit" title="Modifier">✏️</button>
-                    <button class="delete" title="Supprimer">🗑️</button>
-                </td>
+                <td colspan="6" style="text-align:center;">Aucun bien trouvé pour ce logement.</td>
             </tr>
-            <tr>
-                <td>Réfrigérateur</td>
-                <td>Électroménager</td>
-                <td>01/08/2024</td>
-                <td>700€</td>
-                <td><span class="status use">Usé</span></td>
-                <td>
-                    <button class="view" title="Voir">👁️</button>
-                    <button class="edit" title="Modifier">✏️</button>
-                    <button class="delete" title="Supprimer">🗑️</button>
-                </td>
-            </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>
 
 <script>
-document.querySelectorAll('.view').forEach(btn => {
-    btn.addEventListener('click', () => alert('Voir le détail du bien'));
-});
-
-document.querySelectorAll('.edit').forEach(btn => {
-    btn.addEventListener('click', () => alert('Modifier le bien'));
-});
-
-document.querySelectorAll('.delete').forEach(btn => {
-    btn.addEventListener('click', () => {
-        if(confirm('Voulez-vous vraiment supprimer ce bien ?')) {
-            btn.closest('tr').remove();
-        }
+// Recherche dynamique (client-side)
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    let filter = this.value.toLowerCase();
+    let rows = document.querySelectorAll('#biensTable tbody tr');
+    rows.forEach(row => {
+        let text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
     });
 });
 </script>

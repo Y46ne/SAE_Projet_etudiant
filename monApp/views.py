@@ -18,7 +18,6 @@ def load_user(user_id):
     return User.query.get(user_id)
 
 
-
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
     unForm = LoginForm()
@@ -93,11 +92,16 @@ def ajouter_logement():
 def gestion_bien():
     form = LogementForm()
     return render_template('gestion_bien.html',form=form)
+    
 
 @app.route('/mes_logements/')
 def mes_logements():
-    logements = Logement.query.all()
+    logements = []
+    if current_user.assure_profile:
+        logements = current_user.assure_profile.logements
+
     rows = []
+
     for l in logements:
         nb_biens = 0
         valeur = 0.0

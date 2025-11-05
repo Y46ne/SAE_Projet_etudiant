@@ -31,6 +31,8 @@ class Assure(db.Model, UserMixin):
     def __repr__(self):
         return f"<Assure {self.id_assure} {self.prenom} {self.nom}>"
 
+    def get_id(self):
+        return str(self.id_assure)
 
 def get_tous_les_assures():
     return Assure.query.all()
