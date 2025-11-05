@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Ajouter un Bien{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/logement_client.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <main class="main-content">
+        <header>
+            <h1>Ajouter un Bien</h1>
+            <p>Remplissez le formulaire ci-dessous pour enregistrer un nouveau bien.</p>
+        </header>
+
+        <section class="form-section">
+            <div class="card">
+                <form action="{{ url_for('ajouter_bien') }}" method="POST" enctype="multipart/form-data" class="form">
+                    
+                    <div class="form-group">
+                        {{ form.nom_bien.label(class="form-label") }}
+                        {{ form.nom_bien(class="form-input", placeholder="Ex : Télévision 4K") }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.valeur.label(class="form-label") }}
+                        {{ form.valeur(class="form-input", placeholder="Valeur en €") }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.categorie.label(class="form-label") }}
+                        {{ form.categorie(class="form-input", placeholder="Ex : Électronique") }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.date_achat.label(class="form-label") }}
+                        {{ form.date_achat(class="form-input", type="date") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="etat" class="form-label">État</label>
+                        <select name="etat" id="etat" class="form-input" required>
+                            <option value="" disabled selected>Sélectionner un état</option>
+                            <option value="Excellent">Excellent</option>
+                            <option value="Bon">Bon</option>
+                            <option value="Acceptable">Acceptable</option>
+                            <option value="Usé">Usé</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="logement_id" class="form-label">Logement</label>
+                        <select name="logement_id" id="logement_id" class="form-input" required>
+                            <option value="" disabled selected>Sélectionner un logement</option>
+                            {% for logement in liste_logement %}
+                                <option value="{{ logement.id }}">{{ logement.nom or logement.adresse }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="piece_id" class="form-label">Pièce</label>
+                        <select name="piece_id" id="piece_id" class="form-input" required disabled>
+                            <option value="" disabled selected>Sélectionner d'abord un logement</option>
+                            {% for piece in liste_pieces %}
+                                <option value="{{ piece.id }}" data-logement-id="{{ piece.id_logement }}" class="piece-option">
+                                    {{ piece.nom_piece }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.facture.label(class="form-label") }}
+                        {{ form.facture(class="form-input-file") }}
+                        <small class="form-text">Joindre une facture pour prouver l'achat (PDF, JPG, PNG).</small>
+                    </div>
+
+
+                    <div class="form-actions">
+                        {{ form.submit(class="btn-primary") }}
+                        <a href="{{ url_for('tableau_de_bord') }}" class="btn-secondary">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const logementSelect = document.getElementById('logement_id');
+        const pieceSelect = document.getElementById('piece_id');
+        // Stocke toutes les options de pièces
+        const allPieceOptions = pieceSelect.querySelectorAll('.piece-option');
+
+        logementSelect.addEventListener('change', function() {
+            const selectedLogementId = this.value;
+            
+            // Réinitialise le menu des pièces
+            pieceSelect.innerHTML = '<option value="" disabled selected>Sélectionner une pièce</option>';
+            pieceSelect.disabled = false;
+
+            // Ajoute seulement les pièces qui correspondent au logement choisi
+            allPieceOptions.forEach(function(option) {
+                if (option.dataset.logementId === selectedLogementId) {
+                    pieceSelect.appendChild(option.cloneNode(true));
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

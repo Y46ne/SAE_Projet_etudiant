@@ -1,11 +1,12 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, HiddenField, SubmitField, FloatField, SelectField, DateField, TextAreaField
-from wtforms.validators import DataRequired, Email, EqualTo, Length
+from wtforms import StringField, PasswordField, HiddenField, SubmitField, FloatField, SelectField, DateField, TextAreaField, DecimalField
+from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
 from hashlib import sha256 
 from .database import User
 from .app import db 
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField
 from monApp.database.assure import get_tous_les_assures
+from flask_wtf.file import FileField, FileAllowed
 
 class LoginForm(FlaskForm):
     Login = StringField('Identifiant', validators=[DataRequired()])
@@ -113,3 +114,50 @@ class ChangePasswordForm(FlaskForm):
     )
     
     submit = SubmitField('Changer le mot de passe')
+
+class AjouterBienForm(FlaskForm):
+    nom_bien = StringField(
+        "Nom du bien", 
+        validators=[DataRequired(message="Le nom est requis.")]
+    )
+    valeur = DecimalField(
+        "Valeur (€)", 
+        validators=[DataRequired(message="La valeur est requise.")]
+    )
+    categorie = StringField(
+        "Catégorie", 
+        validators=[DataRequired(message="La catégorie est requise.")]
+    )
+    date_achat = DateField(
+        "Date d'achat", 
+        validators=[DataRequired(message="La date est requise.")]
+    )
+    etat = SelectField(
+        "État",
+        choices=[
+            ("", "Sélectionner un état"),
+            ("Excellent", "Excellent"),
+            ("Bon", "Bon"),
+            ("Acceptable", "Acceptable"),
+            ("Usé", "Usé")
+        ],
+        validators=[DataRequired(message="L'état est requis.")]
+    )
+    logement_id = SelectField(
+        "Logement", 
+        coerce=int, 
+        validators=[DataRequired(message="Le logement est requis.")]
+    )
+    piece_id = SelectField(
+        "Pièce", 
+        coerce=int, 
+        validators=[DataRequired(message="La pièce est requise.")]
+    )
+    facture = FileField(
+        "Joindre une facture (Facture, Preuve d'achat...)",
+        validators=[
+            Optional(), # Le champ est optionnel
+            FileAllowed(['pdf', 'png', 'jpg', 'jpeg'], 'Seuls les images et PDF sont autorisés!')
+        ]
+    )
+    submit = SubmitField("Enregistrer le bien")
