@@ -36,23 +36,39 @@ def reinitialiser():
     return render_template('reinitialiser.html')
 
 
-
 @app.route('/tableauDeBord/')
 def tableau_de_bord():
     return render_template('tableauDeBord.html')
 
 
 
-@app.route('/ajouter_logement/')
+@app.route('/ajouter_logement/', methods=['GET', 'POST'])
 def ajouter_logement():
     form = LogementForm()
-    return render_template('ajouter_logement.html',form=form)
+    if form.validate_on_submit():
+
+        liste_objets_assures = form.assures.data
+
+        insertedLogement = Logement(
+            adresse=form.adresse.data,
+            type_logement=form.type_logement.data,
+            surface=form.surface.data, 
+            description=form.description.data
+        )
+
+        insertedLogement.assures = liste_objets_assures
+
+        db.session.add(insertedLogement)
+        db.session.commit()
+        
+        return redirect(url_for('mes_logements'))
+
+    return render_template('ajouter_logement.html', form=form)
 
 @app.route('/gestion_bien/')
 def gestion_bien():
     form = LogementForm()
     return render_template('gestion_bien.html',form=form)
-
 
 @app.route('/mes-logements/')
 def mes_logements():
