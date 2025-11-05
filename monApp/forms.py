@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, HiddenField, SubmitField, FloatField, SelectField, DateField, TextAreaField
-from wtforms.validators import DataRequired, Email, EqualTo
+from wtforms.validators import DataRequired, Email, EqualTo, Length
 from hashlib import sha256 
 from .database import User
 from .app import db 
@@ -86,3 +86,30 @@ class SinistreForm(FlaskForm):
 
 class DeleteForm(FlaskForm):
     submit = SubmitField('Supprimer')
+
+class ChangePasswordForm(FlaskForm):
+    """
+    Formulaire pour changer le mot de passe
+    """
+    old_password = PasswordField(
+        'Ancien mot de passe', 
+        validators=[DataRequired(message="Champ requis.")]
+    )
+    
+    new_password = PasswordField(
+        'Nouveau mot de passe', 
+        validators=[
+            DataRequired(message="Champ requis."),
+            Length(min=8, message="Le mot de passe doit faire au moins 8 caractères.")
+        ]
+    )
+    
+    confirm_password = PasswordField(
+        'Confirmer le nouveau mot de passe', 
+        validators=[
+            DataRequired(message="Champ requis."),
+            EqualTo('new_password', message='Les mots de passe ne correspondent pas.')
+        ]
+    )
+    
+    submit = SubmitField('Changer le mot de passe')

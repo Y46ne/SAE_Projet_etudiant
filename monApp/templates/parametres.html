@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/paramtres.css') }}">
+{% endblock %}
+
+{% block main %}
+<h1>Paramètres du compte</h1>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title">Mes informations</h5>
+        
+        <form action="{{ url_for('parametres') }}" method="POST" class="settings-form">
+            
+            <div class="mb-3">
+                <label for="nom" class="form-label">Nom</label>
+                <input type="text" class="form-control" id="nom" name="nom" value="{{ profile.nom }}">
+            </div>
+            
+            <div class="mb-3">
+                <label for="prenom" class="form-label">Prénom</label>
+                <input type="text" class="form-control" id="prenom" name="prenom" value="{{ profile.prenom }}">
+            </div>
+            
+            <div class="mb-3">
+                <label for="email" class="form-label">Email (identifiant)</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email }}" readonly>
+                <div class="form-text">Votre email sert d'identifiant et ne peut pas être modifié.</div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="telephone" class="form-label">Téléphone</label>
+                <input type="tel" class="form-control" id="telephone" name="telephone" value="{{ profile.telephone or '' }}">
+            </div>
+
+            <hr>
+            
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">Annuler</a>
+                <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm mt-4">
+    <div class="card-body">
+        <h5 class="card-title">Sécurité</h5>
+        <p>Changez votre mot de passe en cliquant sur le bouton ci-dessous.</p>
+        <a href="{{ url_for('changer_mot_de_passe') }}" class="btn btn-outline-danger">Changer mon mot de passe</a>
+    </div>
+</div>
+
+{% endblock %}

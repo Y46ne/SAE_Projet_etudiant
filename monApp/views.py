@@ -163,6 +163,67 @@ def creer_compte():
 def TableauDeBord():
     return render_template('TableauDeBord.html')
 
+@app.route('/parametres/', methods=['GET', 'POST'])
+def parametres():
+    """
+    Affiche la page des paramètres et gère la mise à jour
+    des informations du profil (nom, prenom, telephone).
+    """
+    
+    # Récupère le bon profil (Assure ou Assureur)
+    # Note: 'assure' et 'assureur' sont les noms des relations
+    # définies dans ton modèle User.
+    profile = current_user.assure or current_user.assureur
+    
+    if profile is None:
+        flash("Erreur : Profil utilisateur introuvable.", "danger")
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        # C'est une soumission de formulaire pour ENREGISTRER
+        try:
+            profile.nom = request.form.get('nom')
+            profile.prenom = request.form.get('prenom')
+            profile.telephone = request.form.get('telephone')
+            
+            db.session.commit()
+            flash('Vos informations ont été mises à jour avec succès.', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Erreur lors de la mise à jour : {e}', 'danger')
+        
+        # Redirige vers la même page pour voir les changements
+        return redirect(url_for('parametres'))
+
+    # Si c'est un GET, on affiche simplement la page
+    return render_template('parametres.html', profile=profile)
+
+
+@app.route('/changer-mot-de-passe/', methods=['GET', 'POST'])
+def changer_mot_de_passe():
+    """
+    Affiche et traite le formulaire de changement de mot de passe.
+    """
+    form = ChangePasswordForm()
+    
+    if form.validate_on_submit():
+        # 1. Vérifier l'ancien mot de passe
+        if not current_user.check_password(form.old_password.data):
+            flash("L'ancien mot de passe est incorrect.", "danger")
+            return redirect(url_for('changer_mot_de_passe'))
+        
+        # 2. Mettre à jour avec le nouveau mot de passe
+        try:
+            current_user.set_password(form.new_password.data)
+            db.session.commit()
+            flash('Votre mot de passe a été changé avec succès.', 'success')
+            return redirect(url_for('parametres')) # Retourne aux paramètres
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Erreur lors du changement de mot de passe : {e}', 'danger')
+
+    return render_template('changer_mot_de_passe.html', form=form)
+
 
 
 
