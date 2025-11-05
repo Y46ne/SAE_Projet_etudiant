@@ -17,7 +17,7 @@
         <section class="form-section">
             <div class="card">
                 <form action="{{ url_for('ajouter_logement') }}" method="POST" class="form">
-
+                    {{ form.hidden_tag() }}
                     <div class="form-group">
                         {{ form.adresse.label(class="form-label") }}
                         {{ form.adresse(class="form-input", placeholder="Ex : 25 avenue Victor Hugo, Lyon") }}

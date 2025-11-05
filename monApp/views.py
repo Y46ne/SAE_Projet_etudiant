@@ -73,8 +73,11 @@ def ajouter_logement():
         db.session.add(insertedLogement)
         db.session.commit()
         
+        print("-------------------------logement ajoute----------------------")
+
         return redirect(url_for('mes_logements'))
 
+    print("-------------------------probleme----------------------")
     return render_template('ajouter_logement.html', form=form)
 
 @app.route('/gestion_bien/')
