@@ -7,6 +7,7 @@ assureurs:
   - nom: "Max"
     prenom: "Assur"
     email: "assureur.pro@example.com"
+    mot_de_passe: "hashed_pwd1"
     telephone: "0123456789"
     user_id: "assureur.pro@example.com"
 
@@ -15,6 +16,7 @@ assures:
     prenom: "Jean"
     date_naissance: "1985-04-12"
     email: "jean.dupont@example.com"
+    mdp_assure: "hashed_pwd2"
     telephone: "0601020304"
     user_login: "jean.dupont@example.com"
     id_assureur: 1
@@ -23,29 +25,37 @@ assures:
     prenom: "Marie"
     date_naissance: "1992-07-25"
     email: "marie.durand@example.com"
+    mdp_assure: "hashed_pwd3"
     telephone: "0611121314"
     user_login: "marie.durand@example.com"
+    id_assureur: 1
 
   - nom: "Lefebvre"
     prenom: "Luc"
     date_naissance: "1978-02-09"
     email: "luc.lefebvre@example.com"
+    mdp_assure: "hashed_pwd4"
     telephone: "0622232425"
     user_login: "luc.lefebvre@example.com"
+    id_assureur: 1
 
   - nom: "Moreau"
     prenom: "Emma"
     date_naissance: "1998-10-03"
     email: "emma.moreau@example.com"
+    mdp_assure: "hashed_pwd5"
     telephone: "0633343536"
     user_login: "emma.moreau@example.com"
+    id_assureur: 1
 
   - nom: "Martin"
     prenom: "Paul"
     date_naissance: "1990-01-15"
     email: "paul.martin@example.com"
+    mdp_assure: "hashed_pwd6"
     telephone: "0644454647"
     user_login: "paul.martin@example.com"
+    id_assureur: 1
 
 logements:
   - adresse: "12 rue des Fleurs, Blois"
@@ -162,6 +172,7 @@ sinistres:
     montant_estime: 1200
     numero_sinistre: "SIN-001"
     id_assure: 1
+    id_logement: 1
 
   - date_sinistre: "2023-12-01"
     type_sinistre: "Vol"
@@ -169,6 +180,7 @@ sinistres:
     montant_estime: 950
     numero_sinistre: "SIN-002"
     id_assure: 2
+    id_logement: 2
 
   - date_sinistre: "2022-09-18"
     type_sinistre: "Incendie"
@@ -176,14 +188,13 @@ sinistres:
     montant_estime: 5000
     numero_sinistre: "SIN-003"
     id_assure: 3
+    id_logement: 3
 
 impacte:
   - id_bien: 3
     id_sinistre: 2
     degat_estime: 900
-    description_degats: "Ordinateur volé pendant cambriolage"
 
   - id_bien: 5
     id_sinistre: 1
     degat_estime: 400
-    description_degats: "Machine endommagée par l’eau"

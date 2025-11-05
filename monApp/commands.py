@@ -23,10 +23,21 @@ def loaddb(filename):
         data = yaml.safe_load(f)
 
     # ---- USERS ----
-    for u in data.get('users', []):
+    for a in data.get('assureurs', []):
+        m = sha256()
+        m.update(a['mot_de_passe'].encode())
         user = User(
-            Login=u['Login'],
-            Password=u['Password']
+            Login=a['email'],
+            Password=m.hexdigest()
+        )
+        db.session.add(user)
+    db.session.commit()
+    for a in data.get('assures', []):
+        m = sha256()
+        m.update(a['mdp_assure'].encode())
+        user = User(
+            Login=a['user_login'],
+            Password=m.hexdigest()
         )
         db.session.add(user)
     db.session.commit()
@@ -36,11 +47,10 @@ def loaddb(filename):
         assureur = Assureur(
             nom=assr['nom'],
             prenom=assr['prenom'],
-            email=assr['user_login'],  # email
-            login=assr['user_login'],  # login
+            email=assr['email'],  # email
             mot_de_passe=assr['mot_de_passe'],
             telephone=assr.get('telephone'),
-            societe=assr.get('societe')
+            societe=assr.get('societe'),
         )
         db.session.add(assureur)
     db.session.commit()
@@ -157,7 +167,7 @@ def syncdb():
 @app.cli.command()
 @click.argument('login')
 @click.argument('pwd')
-def newuser (login, pwd):
+def newuser(login, pwd):
     '''Adds a new user''' 
     from .database import User
     from hashlib import sha256
