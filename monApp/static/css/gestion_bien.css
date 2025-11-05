@@ -1,4 +1,4 @@
-/* En-tête de page */
+
 h1 {
     font-size: 32px;
     font-weight: 700;
@@ -14,13 +14,13 @@ h1 + p {
     margin-top: 0;
 }
 
-/* Main content */
+
 .main-content {
     max-width: 1400px;
     margin: 0 auto;
 }
 
-/* Barre de recherche et filtres */
+
 .search-filter {
     display: flex;
     gap: 10px;
@@ -110,7 +110,7 @@ h1 + p {
     color: #333;
 }
 
-/* Badges État */
+
 .status {
     padding: 6px 14px;
     border-radius: 20px; 
@@ -136,7 +136,7 @@ h1 + p {
     color: #721c24;
 }
 
-/* Actions */
+
 #biensTable td:last-child {
     white-space: nowrap; 
 }
@@ -187,7 +187,7 @@ h1 + p {
     padding: 8px;
 }
 
-/* Messages d'alerte */
+
 .alert {
     padding: 15px 20px;
     margin-bottom: 20px;
@@ -208,7 +208,7 @@ h1 + p {
     border-color: #f5c6cb;
 }
 
-/* Message "Aucun bien trouvé" */
+
 #biensTable tbody tr td[colspan] {
     text-align: center;
     padding: 40px;
@@ -216,7 +216,7 @@ h1 + p {
     font-style: italic;
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
     h1 {
         font-size: 24px;
