@@ -1,19 +1,24 @@
-from flask import Flask
-app = Flask(__name__)
-
-# Config options - Make sure you created a 'config.py' file.
-app.config.from_object('config')
-# To get one variable, tape app.config['MY_VARIABLE']
-
-
-# Create database connection object
+from flask import Flask, render_template  
 from flask_sqlalchemy import SQLAlchemy
+from flask_bootstrap5 import Bootstrap
+from flask_login import LoginManager
+
+app = Flask(__name__, 
+            static_folder='static',
+            template_folder='templates')
+app.config.from_object('config')
+
 db = SQLAlchemy()
 db.init_app(app)
 
-from flask_bootstrap5 import Bootstrap
 Bootstrap(app)
 
-from flask_login import LoginManager
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
+
+@app.route('/')
+def home():
+    return render_template('base.html')
+
+if __name__ == "__main__":
+    app.run(debug=True)

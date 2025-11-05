@@ -1,19 +1,28 @@
 from ..app import db
+from monApp.database.couvre import couvre
+
 
 class Assureur(db.Model):
+    __tablename__ = 'assureur'
     id_assureur = db.Column(db.Integer, primary_key=True)
-    nom = db.Column(db.String(100))
-    prenom = db.Column(db.String(100))
-    email = db.Column(db.String(100), db.ForeignKey('user.Login'), unique=True)
+    login = db.Column(db.String(100), db.ForeignKey('user.Login'), unique=True, nullable=True)
+    nom = db.Column(db.String(100), nullable=False)
+    prenom = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(255), unique=True, nullable=False)
     telephone = db.Column(db.String(20))
+    mot_de_passe = db.Column(db.String(255), nullable=False)
     societe = db.Column(db.String(100))
+    logements_couverts = db.relationship('Logement', secondary=couvre, backref=db.backref('couverts_par', lazy='subquery'), lazy='subquery')
 
-    def __init__(self, nom, prenom, email, telephone, societe):
+    def __init__(self, nom, prenom, email, mot_de_passe, telephone=None, societe=None, login=None):
         self.nom = nom
         self.prenom = prenom
         self.email = email
+        self.mot_de_passe = mot_de_passe
         self.telephone = telephone
         self.societe = societe
+        self.login = login
+
 
     def __repr__(self):
-        return "<Assureur (%d) %s %s>" % (self.id_assureur, self.prenom, self.nom)
+        return f"<Assureur {self.id_assureur} {self.prenom} {self.nom}>"

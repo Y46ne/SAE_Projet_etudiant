@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Tableau de Bord{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tableauDeBord.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <main class="main-content">
+        <header> 
+            <h1>Tableau de Bord</h1>
+            <p>Bienvenue dans MobiList - Gérez vos inventaires de biens mobiliers</p>
+            <a href="{{ url_for('ajouter_logement') }}" class="btn-primary">+ Nouveau logement</a>
+        </header>
+
+        <section class="stats">
+            <div class="card">
+                <p>📦 Logements :</p>
+                <h3>{{ nb_logements }}</h3>
+            </div>
+            <div class="card">
+                <p>🏡 Nombre de Biens :</p>
+                <h3>{{ nb_biens }}</h3>
+            </div>
+            <div class="card">
+                <p>💰 Valeur Totale des Biens :</p>
+                <h3>{{ valeur_totale }} €</h3>
+            </div>
+        </section>
+
+        <section class="logements">
+            <h2>Mes Logements</h2>
+            {% if logements %}
+                {% for logement in logements %}
+                <div class="logement-item">
+                    <div class="logement-info">
+                        <h3>{{ logement.nom }}</h3>
+                        <p>
+                            {{ logement.nb_pieces }} pièces - 
+                            {{ logement.nb_biens }} biens - 
+                            Valeur : {{ logement.valeur|round(2) }} € - 
+                            Maj : {{ logement.date_maj.strftime('%d/%m/%Y') if logement.date_maj else 'N/A' }}
+                        </p>
+                    </div>
+                    <div class="logement-actions">
+                        <a href="{{ url_for('voir_logement', id=logement.id) }}" class="btn-consulter">Consulter ></a>
+                        <a href="{{ url_for('update_logement', id=logement.id) }}" class="btn-icon" title="Modifier">✏️ Modifier</a>
+                        <button class="btn-icon btn-delete" onclick="confirmerSuppression('{{ logement.id }}')" , title="Supprimer">🗑️ Supprimer</button>
+                    </div>
+                </div>
+                {% endfor %}
+
+                {% if logements|length > 5 %}
+                <button class="btn-secondary" onclick="afficherPlus()">Voir plus</button>
+                {% endif %}
+
+            {% else %}
+                <div class="aucun-logement">
+                    <p>Vous n'avez pas encore de logement enregistré.</p>
+                    <a href="{{ url_for('ajouter_logement') }}" class="btn-primary">+ Ajouter mon premier logement</a>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+</div>
+
+<script>
+function confirmerSuppression(logementId) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce logement ?')) {
+        fetch(`{{ url_for('delete_logement', id=0) }}`.replace('0', logementId), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Erreur lors de la suppression');
+            }
+        });
+    }
+}
+
+function afficherPlus() {
+    window.location.href = "{{ url_for('mes_logements') }}";
+}
+</script>
+{% endblock %}

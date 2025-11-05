@@ -4,8 +4,8 @@ users:
     role: "assureur"
 
 assureurs:
-  - nom: "Assur"
-    prenom: "Max"
+  - nom: "Max"
+    prenom: "Assur"
     email: "assureur.pro@example.com"
     telephone: "0123456789"
     user_id: "assureur.pro@example.com"

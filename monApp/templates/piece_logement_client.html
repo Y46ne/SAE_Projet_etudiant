@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}MobiList - Résidence principale{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/residence_principale.css') }}">
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <main class="main-content">
+    <header class="page-header">
+      <h1>Résidence principale</h1>
+      <p>Gérez les pièces de ce logement</p>
+    </header>
+
+    <section class="search-section">
+      <div class="search-bar">
+        <div class="search-input">
+          <i class="fa fa-search"></i>
+          <input type="text" placeholder="Rechercher une pièce..." />
+        </div>
+        <button class="btn-filter"><i class="fa fa-filter"></i> Filtres</button>
+      </div>
+    </section>
+
+    <section class="table-section">
+      <div class="card">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Nom de la pièce</th>
+              <th>Valeur</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Salle à manger</td>
+              <td>2100€</td>
+              <td class="actions">
+                <a href="#" class="view" title="Voir"><i class="fa fa-eye"></i></a>
+                <a href="#" class="edit" title="Modifier"><i class="fa fa-pen"></i></a>
+                <a href="#" class="delete" title="Supprimer"><i class="fa fa-trash"></i></a>
+              </td>
+            </tr>
+            <tr>
+              <td>Chambre</td>
+              <td>1000€</td>
+              <td class="actions">
+                <a href="#" class="view" title="Voir"><i class="fa fa-eye"></i></a>
+                <a href="#" class="edit" title="Modifier"><i class="fa fa-pen"></i></a>
+                <a href="#" class="delete" title="Supprimer"><i class="fa fa-trash"></i></a>
+              </td>
+            </tr>
+            <tr>
+              <td>Cuisine</td>
+              <td>2400€</td>
+              <td class="actions">
+                <a href="#" class="view" title="Voir"><i class="fa fa-eye"></i></a>
+                <a href="#" class="edit" title="Modifier"><i class="fa fa-pen"></i></a>
+                <a href="#" class="delete" title="Supprimer"><i class="fa fa-trash"></i></a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+{% endblock %}
