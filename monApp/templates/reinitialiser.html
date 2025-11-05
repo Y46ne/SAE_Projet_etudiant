@@ -1,59 +1,40 @@
-{% extends "base.html" %}
-
-{% block title %}Réinitialiser votre mot de passe{% endblock %}
-
-{% block head %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Réinitialiser votre mot de passe</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/reinitialiser.css') }}">
-{% endblock %}
+</head>
+<body>
+  <div class="container">
+    <h2>Réinitialiser votre mot de passe</h2>
+    <form>
+      <label for="email">Adresse e-mail</label>
+      <input type="email" id="email" placeholder="exemple@gmail.com" required>
 
-{% block content %}
-<div class="container">
-  <main class="main-content">
-    <header>
-      <h1>Réinitialiser votre mot de passe</h1>
-      <p>Entrez votre adresse e-mail et votre nouveau mot de passe.</p>
-    </header>
-
-    <section class="form-section">
-      <div class="card">
-        <form action="{{ url_for('reinitialiser') }}" method="POST" class="form">
-          {{ form.hidden_tag() }}
-
-          <div class="form-group">
-            {{ form.email.label(class="form-label") }}
-            {{ form.email(class="form-input", placeholder="exemple@gmail.com", required=True) }}
-          </div>
-
-          <div class="form-group">
-            {{ form.password.label(class="form-label") }}
-            <div class="password-field">
-              {{ form.password(class="form-input", id="password", required=True) }}
-              <span class="eye" onclick="togglePassword('password')">👁️</span>
-            </div>
-          </div>
-
-          <div class="form-group">
-            {{ form.confirm.label(class="form-label") }}
-            <div class="password-field">
-              {{ form.confirm(class="form-input", id="confirm", required=True) }}
-              <span class="eye" onclick="togglePassword('confirm')">👁️</span>
-            </div>
-          </div>
-
-          <div class="form-actions">
-            {{ form.submit(class="btn-primary", value="Réinitialiser le mot de passe") }}
-            <a href="{{ url_for('login') }}" class="btn-secondary">Retour à la connexion</a>
-          </div>
-        </form>
+      <label for="password">Nouveau mot de passe</label>
+      <div class="password-field">
+        <input type="password" id="password" required>
+        <span class="eye" onclick="togglePassword('password')">👁️</span>
       </div>
-    </section>
-  </main>
-</div>
 
-<script>
-  function togglePassword(id) {
+      <label for="confirm">Confirmer mot de passe</label>
+      <div class="password-field">
+        <input type="password" id="confirm" required>
+        <span class="eye" onclick="togglePassword('confirm')">👁️</span>
+      </div>
+
+      <button type="submit" class="btn">Réinitialiser le mot de passe</button>
+      <a href="{{ url_for('login') }}" class="back-link">Retour à la connexion</a>
+    </form>
+  </div>
+
+  <script>
+    function togglePassword(id) {
       const field = document.getElementById(id);
       field.type = field.type === "password" ? "text" : "password";
-  }
-</script>
-{% endblock %}
+    }
+  </script>
+</body>
+</html>
