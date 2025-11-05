@@ -7,6 +7,12 @@ from flask_login import login_user, logout_user, login_required, current_user
 from hashlib import sha256
 from flask import abort
 
+@app.route('/')
+@app.route('/index/')
+def index():
+    if len(request.args) == 0:
+        return render_template("index.html")
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)

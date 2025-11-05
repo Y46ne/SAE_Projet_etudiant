@@ -1,89 +1,82 @@
 users:
   - Login: "assureur.pro@example.com"
-    Password: "pbkdf2:sha256:600000$zJpGq9bL8dKjR3sT$c8a2b6e3e4f5a09b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b"
-  - Login: "jean.dupont@example.com"
-    Password: "pbkdf2:sha256:600000$abc$1234567890abcdef"
-  - Login: "marie.durand@example.com"
-    Password: "pbkdf2:sha256:600000$def$abcdef1234567890"
-  - Login: "luc.lefebvre@example.com"
-    Password: "pbkdf2:sha256:600000$ghi$fedcba0987654321"
-  - Login: "emma.moreau@example.com"
-    Password: "pbkdf2:sha256:600000$jkl$0123456789abcdef"
-  - Login: "paul.martin@example.com"
-    Password: "pbkdf2:sha256:600000$mno$abcdef9876543210"
+    Password: "pbkdf2:sha256:600000$zJpGq9bL8dKjR3sT$c8a2b6e3e4f5a09b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b" # mdp: password
+    role: "assureur"
 
 assureurs:
-  - nom: "Assur"
-    prenom: "Max"
-    user_login: "assureur.pro@example.com"
+  - nom: "Max"
+    prenom: "Assur"
     email: "assureur.pro@example.com"
     telephone: "0123456789"
-    societe: "AXA"
-    mot_de_passe: "hashed_pwd1"
+    user_id: "assureur.pro@example.com"
 
 assures:
   - nom: "Dupont"
     prenom: "Jean"
-    user_login: "jean.dupont@example.com"
     date_naissance: "1985-04-12"
     email: "jean.dupont@example.com"
     telephone: "0601020304"
-    mdp_assure: "hashed_pwd2"
+    user_login: "jean.dupont@example.com"
     id_assureur: 1
+
   - nom: "Durand"
     prenom: "Marie"
-    user_login: "marie.durand@example.com"
     date_naissance: "1992-07-25"
     email: "marie.durand@example.com"
     telephone: "0611121314"
-    mdp_assure: "hashed_pwd3"
-    id_assureur: 1
+    user_login: "marie.durand@example.com"
+
   - nom: "Lefebvre"
     prenom: "Luc"
-    user_login: "luc.lefebvre@example.com"
     date_naissance: "1978-02-09"
     email: "luc.lefebvre@example.com"
     telephone: "0622232425"
-    mdp_assure: "hashed_pwd4"
-    id_assureur: 1
+    user_login: "luc.lefebvre@example.com"
+
   - nom: "Moreau"
     prenom: "Emma"
-    user_login: "emma.moreau@example.com"
     date_naissance: "1998-10-03"
     email: "emma.moreau@example.com"
     telephone: "0633343536"
-    mdp_assure: "hashed_pwd5"
-    id_assureur: 1
+    user_login: "emma.moreau@example.com"
+
   - nom: "Martin"
     prenom: "Paul"
-    user_login: "paul.martin@example.com"
     date_naissance: "1990-01-15"
     email: "paul.martin@example.com"
     telephone: "0644454647"
-    mdp_assure: "hashed_pwd6"
-    id_assureur: 1
+    user_login: "paul.martin@example.com"
 
 logements:
   - adresse: "12 rue des Fleurs, Blois"
     type_logement: "Appartement"
     surface: 70
     description: "Appartement T3 lumineux avec balcon"
+    id_assure: 1
+
   - adresse: "5 avenue de la Liberté, Tours"
     type_logement: "Maison"
     surface: 120
     description: "Maison familiale avec jardin"
+    id_assure: 2
+
   - adresse: "8 impasse des Lilas, Orléans"
     type_logement: "Studio"
     surface: 30
     description: "Petit studio bien situé en centre-ville"
+    id_assure: 3
+
   - adresse: "22 boulevard Victor Hugo, Blois"
     type_logement: "Appartement"
     surface: 80
     description: "Appartement rénové, proche des commerces"
+    id_assure: 4
+
   - adresse: "17 rue de la Paix, Paris"
     type_logement: "Maison"
     surface: 140
     description: "Maison moderne avec terrasse"
+    id_assure: 5
 
 pieces:
   - nom_piece: "Salon"
@@ -91,21 +84,25 @@ pieces:
     surface: 25
     etage: 1
     id_logement: 1
+
   - nom_piece: "Cuisine"
     type_piece: "Cuisine"
     surface: 10
     etage: 1
     id_logement: 1
+
   - nom_piece: "Chambre principale"
     type_piece: "Chambre"
     surface: 14
     etage: 1
     id_logement: 2
+
   - nom_piece: "Salle de bain"
     type_piece: "Salle d’eau"
     surface: 8
     etage: 1
     id_logement: 2
+
   - nom_piece: "Bureau"
     type_piece: "Bureau"
     surface: 12
@@ -121,6 +118,7 @@ biens:
     etat: "Neuf"
     valeur_actuelle: 750
     id_piece: 1
+
   - nom_bien: "Canapé IKEA"
     description: "Canapé 3 places gris"
     categorie: "Mobilier"
@@ -129,6 +127,7 @@ biens:
     etat: "Bon"
     valeur_actuelle: 500
     id_piece: 1
+
   - nom_bien: "Ordinateur portable HP"
     description: "Laptop 15 pouces"
     categorie: "Informatique"
@@ -137,6 +136,7 @@ biens:
     etat: "Excellent"
     valeur_actuelle: 850
     id_piece: 5
+
   - nom_bien: "Table en chêne"
     description: "Table de salle à manger"
     categorie: "Mobilier"
@@ -145,6 +145,7 @@ biens:
     etat: "Bon"
     valeur_actuelle: 400
     id_piece: 2
+
   - nom_bien: "Machine à laver Bosch"
     description: "7 kg, A+++"
     categorie: "Électroménager"
@@ -154,78 +155,35 @@ biens:
     valeur_actuelle: 450
     id_piece: 4
 
-justificatifs:
-  - type_justificatif: "Facture"
-    chemin_fichier: "factures/tv.pdf"
-    date_ajout: "2022-03-16T10:00:00"
-  - type_justificatif: "Garantie"
-    chemin_fichier: "garanties/canape.pdf"
-    date_ajout: "2021-06-11T14:30:00"
-
 sinistres:
   - date_sinistre: "2024-03-10"
     type_sinistre: "Dégât des eaux"
     description: "Fuite dans la salle de bain"
     montant_estime: 1200
     numero_sinistre: "SIN-001"
-    id_logement: 1
+    id_assure: 1
+
   - date_sinistre: "2023-12-01"
     type_sinistre: "Vol"
     description: "Ordinateur portable volé"
     montant_estime: 950
     numero_sinistre: "SIN-002"
-    id_logement: 2
+    id_assure: 2
+
   - date_sinistre: "2022-09-18"
     type_sinistre: "Incendie"
     description: "Feu de cuisine"
     montant_estime: 5000
     numero_sinistre: "SIN-003"
-    id_logement: 3
-
-possede:
-  - id_assure: 1
-    id_logement: 1
-  - id_assure: 2
-    id_logement: 2
-  - id_assure: 3
-    id_logement: 3
-  - id_assure: 4
-    id_logement: 4
-  - id_assure: 5
-    id_logement: 5
-
-justifie:
-  - id_logement: 1
-    id_justificatif: 1
-  - id_logement: 2
-    id_justificatif: 2
+    id_assure: 3
 
 impacte:
   - id_bien: 3
-    id_sinistre: 1
+    id_sinistre: 2
     degat_estime: 900
+    description_degats: "Ordinateur volé pendant cambriolage"
+
   - id_bien: 5
     id_sinistre: 1
     degat_estime: 400
-
-couvre:
-  - id_logement: 1
-    id_assureur: 1
-    id_assure: 1
-    date_debut: "2022-01-01"
-  - id_logement: 2
-    id_assureur: 1
-    id_assure: 2
-    date_debut: "2022-01-01"
-  - id_logement: 3
-    id_assureur: 1
-    id_assure: 3
-    date_debut: "2022-01-01"
-  - id_logement: 4
-    id_assureur: 1
-    id_assure: 4
-    date_debut: "2022-01-01"
-  - id_logement: 5
-    id_assureur: 1
-    id_assure: 5
-    date_debut: "2022-01-01"
+    description_degats: "Machine endommagée par l’eau"

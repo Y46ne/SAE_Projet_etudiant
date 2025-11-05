@@ -11,6 +11,7 @@ class Assure(db.Model):
     date_naissance = db.Column(db.Date)
     email = db.Column(db.String(255), db.ForeignKey('user.Login'), unique=True, nullable=False)
     mdp_assure = db.Column(db.String(255), nullable=False)
+
     telephone = db.Column(db.String(20))
     id_assureur = db.Column(db.Integer, db.ForeignKey('assureur.id_assureur'), nullable=False)
 

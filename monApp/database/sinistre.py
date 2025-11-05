@@ -10,6 +10,7 @@ class Sinistre(db.Model):
     description = db.Column(db.Text)
     montant_estime = db.Column(db.Numeric(10,2))
     numero_sinistre = db.Column(db.String(50), unique=True, nullable=False)
+
     id_logement = db.Column(db.Integer, db.ForeignKey('logement.id_logement'), nullable=False)
 
     def __init__(self, date_sinistre, type_sinistre, description, numero_sinistre, id_logement, montant_estime=None):

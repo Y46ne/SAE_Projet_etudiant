@@ -12,6 +12,7 @@ class Bien(db.Model):
     prix_achat = db.Column(db.Numeric(10,2))
     etat = db.Column(db.String(50))
     valeur_actuelle = db.Column(db.Numeric(10,2))
+
     id_piece = db.Column(db.Integer, db.ForeignKey('piece.id_piece'), nullable=False)
     sinistres = db.relationship('Sinistre', secondary=impacte, lazy='subquery', backref=db.backref('biens', lazy='subquery'))
 
