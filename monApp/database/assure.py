@@ -1,9 +1,10 @@
 from ..app import db
 from datetime import date
 from monApp.database.possede import possede
+from flask_login import UserMixin
 
 
-class Assure(db.Model):
+class Assure(db.Model, UserMixin):
     __tablename__ = 'assure'
     id_assure = db.Column(db.Integer, primary_key=True)
     nom = db.Column(db.String(100))
@@ -25,6 +26,7 @@ class Assure(db.Model):
         self.mdp_assure = mdp_assure
         self.telephone = telephone
         self.id_assureur = id_assureur
+
 
     def __repr__(self):
         return f"<Assure {self.id_assure} {self.prenom} {self.nom}>"
