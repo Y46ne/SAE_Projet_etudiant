@@ -41,7 +41,10 @@ def logout():
     logout_user()
     return redirect ( url_for ('login'))
 
-
+@app.route('/info_bien/')
+def info_bien(id):
+    bien = Bien.query.get_or_404(id)
+    return render_template('info_bien.html', bien=bien)
 
 
 @app.route('/reinitialiser/')
@@ -52,6 +55,11 @@ def reinitialiser():
 @app.route('/tableauDeBord/')
 def tableau_de_bord():
     return render_template('tableauDeBord.html')
+
+@app.route('/modifier_bien/')
+def modifier_bien():
+    return render_template('modifier_bien.html')
+
 
 
 
