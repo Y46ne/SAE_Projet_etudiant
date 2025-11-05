@@ -13,14 +13,19 @@ class LoginForm(FlaskForm):
     next = HiddenField()
 
     def get_authenticated_user(self):
-        user = db.session.get(User, self.Login.data)
-        if not user:
+        unUser = User.query.get(self.Login.data)
+
+        if unUser is None:
             return None
+
         m = sha256()
         m.update(self.Password.data.encode())
-        hashed = m.hexdigest()
-        return user if user.Password == hashed else None
+        passwd_input_hache = m.hexdigest()
+        print(passwd_input_hache)
 
+        if passwd_input_hache == unUser.Password:
+            return unUser 
+        return None
 
 class SignUpForm(FlaskForm):
     nom = StringField('Nom', validators=[DataRequired()])

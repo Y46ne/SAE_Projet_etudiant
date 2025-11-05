@@ -21,18 +21,25 @@ def load_user(user_id):
 
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = form.get_authenticated_user()
+    unForm = LoginForm()
+    user=None
+    if not unForm.is_submitted():
+        unForm.next.data = request.args.get('next')
+    elif unForm.validate_on_submit():
+        user = unForm.get_authenticated_user()
         if user:
             login_user(user)
             flash('Connexion réussie.', 'success')
-            # rediriger vers le tableau de bord existant
             next_page = request.args.get('next') or url_for('tableau_de_bord')
             return redirect(next_page)
         else:
             flash('Identifiant ou mot de passe incorrect.', 'danger')
-    return render_template('login.html', form=form)
+    return render_template('login.html', form=unForm)
+
+@app.route ("/logout/")
+def logout():
+    logout_user()
+    return redirect ( url_for ('login'))
 
 
 
