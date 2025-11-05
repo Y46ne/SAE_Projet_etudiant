@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block content %}
+<div class="p-8">
 <h1>Mes logements</h1>
 
 <p><strong>Nombre total de logements : {{ logements|length }}</strong></p>
@@ -31,21 +32,19 @@
             <td>
                 <div class="task-controls">
                     <a href="{{ url_for('view_logement_pieces', id=row.logement.id_logement) }}" class="btn btn-info" title="Voir les pièces">
-                        <i class="fas fa-eye"></i>
+                        Voir les pièces<i class="fas fa-eye"></i>
                     </a>
-                    {% if current_user.is_authenticated %}
                     <a href="{{ url_for('update_logement', id=row.logement.id_logement) }}" class="btn btn-warning" title="Modifier">
-                        <i class="fas fa-pen"></i>
+                        Modifier<i class="fas fa-pen"></i>
                     </a>
                     <a href="{{ url_for('delete_logement', id=row.logement.id_logement) }}" class="btn btn-danger" title="Supprimer" onclick="return confirm('Confirmer la suppression du logement ?');">
-                        <i class="fas fa-trash"></i>
+                        Supprimer<i class="fas fa-trash"></i>
                     </a>
-                    {% endif %}
                 </div>
             </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
-
+</div>
 {% endblock %}

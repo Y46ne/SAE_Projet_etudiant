@@ -105,7 +105,6 @@ def view_logement_pieces(id):
 
 
 @app.route('/logement/<int:id>/delete', methods=['GET', 'POST'])
-@login_required
 def delete_logement(id):
     logement = Logement.query.get_or_404(id)
     try:
@@ -119,7 +118,6 @@ def delete_logement(id):
 
 
 @app.route('/logement/<int:id>/edit', methods=['GET', 'POST'])
-@login_required
 def update_logement(id):
     logement = Logement.query.get_or_404(id)
     form = LogementForm(obj=logement)

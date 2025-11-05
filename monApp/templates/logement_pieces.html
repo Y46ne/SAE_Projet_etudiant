@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 
-{% block main %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mes_logements.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="p-8">
+
 <h1>Pièces du logement</h1>
 
 <h3>{{ logement.adresse }}</h3>
@@ -29,5 +35,5 @@
 </table>
 
 <a href="{{ url_for('mes_logements') }}" class="btn btn-secondary">Retour</a>
-
+</div>
 {% endblock %}
