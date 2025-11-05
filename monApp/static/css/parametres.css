@@ -1,81 +1,145 @@
-/* monApp/static/css/parametres.css */
-/* Styles pour les pages "Paramètres" et "Changer mot de passe" */
-
-/* --- Styles Généraux --- */
-
-/* Appliqué au block 'main' pour centrer le contenu */
-.settings-container {
-    max-width: 700px; /* Limite la largeur pour une meilleure lisibilité */
-    margin: 2rem auto; /* Centre le conteneur */
+body {
+    background-color: #f7fafc;
 }
 
 h1 {
-    color: #0d6efd; /* Bleu principal (similaire aux maquettes) */
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
-    margin-bottom: 1.5rem;
-    font-weight: bold;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2563eb;
+    margin-bottom: 2rem;
 }
 
-/* --- Style des Cartes (utilisées sur les deux pages) --- */
-.card.shadow-sm {
+.card {
+    background: #fff;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    margin-bottom: 2rem;
     border: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    border-radius: 8px; /* Bords arrondis */
 }
 
 .card-title {
-    color: #0d6efd; /* Bleu principal */
-    font-weight: bold;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
     margin-bottom: 1rem;
 }
 
-/* --- Styles de Formulaire (communs aux deux pages) --- */
 .form-label {
-    font-weight: bold;
-    color: #555;
+    font-weight: 500;
+    color: #374151;
 }
 
-/* Style pour les messages d'aide (ex: email non modifiable) */
+.form-control {
+    border-radius: 0.5rem;
+    border: 1px solid #cbd5e1;
+    padding: 0.75rem;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    background: #f1f5f9;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    border-color: #2563eb;
+    background: #fff;
+    outline: none;
+}
+
 .form-text {
-    font-size: 0.85rem;
-    color: #6c757d;
-}
-
-/* --- Page: "parametres.html" --- */
-
-/* Style pour le champ email non-modifiable */
-input[readonly].form-control {
-    background-color: #e9ecef; /* Fond gris clair */
-    cursor: not-allowed;
-    color: #6c757d;
-}
-
-/* --- Page: "changer_mot_de_passe.html" --- */
-
-/* Style pour les messages d'erreur de validation (via _formhelpers.html) */
-.invalid-feedback {
-    font-weight: bold;
     font-size: 0.9rem;
+    color: #64748b;
 }
 
-/* --- Boutons (communs aux deux pages) --- */
-
-/* Conteneur pour les boutons "Annuler" / "Enregistrer" */
-.form-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem; /* Espace entre les boutons */
-    margin-top: 1.5rem;
-}
-
-/* Style uniforme pour les boutons */
-.form-buttons .btn {
-    font-weight: 500;
+.btn-primary {
+    background-color: #2563eb;
+    border: none;
+    color: #fff;
     padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: background 0.2s;
 }
 
-/* Bouton "Changer mon mot de passe" sur la page de paramètres */
+.btn-primary:hover {
+    background-color: #1d4ed8;
+}
+
+.btn-secondary {
+    background-color: #64748b;
+    border: none;
+    color: #fff;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: #475569;
+}
+
 .btn-outline-danger {
+    border: 2px solid #dc2626;
+    color: #dc2626;
+    background: transparent;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: background 0.2s, color 0.2s;
+    margin-top: 1rem;
+}
+
+.btn-outline-danger:hover {
+    background: #dc2626;
+    color: #fff;
+    margin-top: 1rem;
+
+}
+
+.alert {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
     font-weight: 500;
+}
+
+.alert-success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.alert-danger {
+    background: #fee2e2;
+    color: #991b1b;
+    margin-top: 1rem;   ;
+}
+
+.alert-warning {
+    background: #fef9c3;
+    color: #92400e;
+}
+
+.settings-form {
+    margin-top: 1rem;
+}
+
+hr {
+    margin: 2rem 0 1rem 0;
+    border: none;
+    border-top: 1px solid #e5e7eb;
+}
+
+.value-bubble {
+    display: inline-block;
+    background: #e0e7ff;
+    color: #3730a3;
+    border-radius: 1.5em;
+    padding: 0.3em 1em;
+    font-size: 1rem;
+    font-weight: 500;
+    margin-left: 0.5em;
+    min-width: 2em;
+    max-width: 100%;
+    word-break: break-word;
+    vertical-align: middle;
 }
