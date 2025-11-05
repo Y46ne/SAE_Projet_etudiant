@@ -146,7 +146,13 @@ def loaddb(filename):
 
     # Possede
     for p in data.get('possede', []):
-        db.session.execute(possede.insert().values(**p))
+        assure = Assure.query.get(p['id_assure'])
+        logement = Logement.query.get(p['id_logement'])
+
+        if assure and logement:
+            assure.logements.append(logement)
+        else:
+            print(f"Assure {p['id_assure']} ou Logement {p['id_logement']} n'existe pas.")
 
     db.session.commit()
 

@@ -62,31 +62,45 @@ logements:
     type_logement: "Appartement"
     surface: 70
     description: "Appartement T3 lumineux avec balcon"
-    id_assure: 1
 
   - adresse: "5 avenue de la Liberté, Tours"
     type_logement: "Maison"
     surface: 120
     description: "Maison familiale avec jardin"
-    id_assure: 2
 
   - adresse: "8 impasse des Lilas, Orléans"
     type_logement: "Studio"
     surface: 30
     description: "Petit studio bien situé en centre-ville"
-    id_assure: 3
 
   - adresse: "22 boulevard Victor Hugo, Blois"
     type_logement: "Appartement"
     surface: 80
     description: "Appartement rénové, proche des commerces"
-    id_assure: 4
 
   - adresse: "17 rue de la Paix, Paris"
     type_logement: "Maison"
     surface: 140
     description: "Maison moderne avec terrasse"
-    id_assure: 5
+
+possede:
+  - id_assure: 1
+    id_logement: 1
+
+  - id_assure: 2
+    id_logement: 1
+  
+  - id_assure: 2
+    id_logement: 2
+  
+  - id_assure: 3
+    id_logement: 3
+  
+  - id_assure: 4
+    id_logement: 4
+
+  - id_assure: 1
+    id_logement: 5
 
 pieces:
   - nom_piece: "Salon"
