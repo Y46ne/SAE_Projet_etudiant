@@ -177,7 +177,7 @@ def parametres():
     # Récupère le bon profil (Assure ou Assureur)
     # Note: 'assure' et 'assureur' sont les noms des relations
     # définies dans ton modèle User.
-    profile = current_user.assure or current_user.assureur
+    profile = current_user.assure_profile
     
     if profile is None:
         flash("Erreur : Profil utilisateur introuvable.", "danger")

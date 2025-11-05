@@ -22,22 +22,22 @@
             {{ form.hidden_tag() }}
             
             <div class="mb-3">
-                {{ render_field(form.old_password, class="form-control") }}
+                {{ render_field(form.old_password) }}
             </div>
             
             <div class="mb-3">
-                {{ render_field(form.new_password, class="form-control") }}
+                {{ render_field(form.new_password) }}
             </div>
             
             <div class="mb-3">
-                {{ render_field(form.confirm_password, class="form-control") }}
+                {{ render_field(form.confirm_password) }}
             </div>
 
             <hr>
             
             <div class="d-flex justify-content-end gap-2 mt-4">
                 <a href="{{ url_for('parametres') }}" class="btn btn-secondary">Annuler</a>
-                {{ render_field(form.submit, class="btn btn-danger") }}
+                {{ render_field(form.submit) }}
             </div>
         </form>
     </div>
