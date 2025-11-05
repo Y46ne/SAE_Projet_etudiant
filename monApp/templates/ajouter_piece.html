@@ -16,7 +16,7 @@
 
         <section class="form-section">
             <div class="card">
-                <form action="{{ url_for('logement_pieces') }}" method="POST" class="form">
+                <form action="{{ url_for('ajouter_piece') }}" method="POST" class="form">
 
                     <div class="form-group">
                         {{ form.nom_piece.label(class="form-label") }}
@@ -31,7 +31,7 @@
                     <div class="form-group">
                         <label for="logement_id" class="form-label">Logement</label>
                         <select name="logement_id" id="logement_id" class="form-input" required>
-                            <option value="" disabled selected>Séléctionner un logement</option>
+                            <option value="" disabled selected>Sélectionner un logement</option>
                             {% for logement in liste_logement %}
                                 <option value="{{ logement.id }}">{{ logement.nom or logement.adresse or logement }}</option>
                             {% endfor %}

@@ -222,6 +222,11 @@ def changer_mot_de_passe():
 
     return render_template('changer_mot_de_passe.html', form=form)
 
+@app.route('/ajouter_piece/', methods=['GET', 'POST'])
+def ajouter_piece():
+    form = PieceForm()
+    return render_template('ajouter_piece.html', form=form)
+
 
 
 
