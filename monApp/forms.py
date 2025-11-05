@@ -4,6 +4,8 @@ from wtforms.validators import DataRequired, Email, EqualTo
 from hashlib import sha256 
 from .database import User
 from .app import db 
+from wtforms_sqlalchemy.fields import QuerySelectMultipleField
+from monApp.database.assure import get_tous_les_assures
 
 class LoginForm(FlaskForm):
     Login = StringField('Identifiant', validators=[DataRequired()])
@@ -43,6 +45,12 @@ class LogementForm(FlaskForm):
     type_logement = StringField('Type de logement (Appartement, Maison...)', validators=[DataRequired()])
     surface = FloatField('Surface (m²)', validators=[DataRequired()])
     description = StringField('Description')
+    assures = QuerySelectMultipleField(
+        'Assures',
+        query_factory=get_tous_les_assures,
+        get_label='nom',            
+        allow_blank=False            
+    )
     submit = SubmitField('Ajouter le logement')
 
 

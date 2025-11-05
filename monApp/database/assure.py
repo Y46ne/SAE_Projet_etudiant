@@ -28,3 +28,7 @@ class Assure(db.Model):
 
     def __repr__(self):
         return f"<Assure {self.id_assure} {self.prenom} {self.nom}>"
+
+
+def get_tous_les_assures():
+    return Assure.query.all()
