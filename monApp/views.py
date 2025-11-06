@@ -62,7 +62,13 @@ def tableau_de_bord():
 def modifier_bien():
     return render_template('modifier_bien.html')
 
+@app.route('/modifier_pièce/')
+def modifier_piece():
+    return render_template('modifier_pièce.html')
 
+@app.route('/supprimer_pièce/')
+def supprimer_piece():
+    return render_template('supprimer_pièce.html')
 
 
 @app.route('/ajouter_logement/', methods=['GET', 'POST'])
@@ -339,6 +345,13 @@ def ajouter_bien():
         liste_logement=liste_logement_pour_template, 
         liste_pieces=liste_pieces_pour_template
     )
+
+@app.route('/bien/<int:bien_id>/')
+@login_required
+def voir_bien(bien_id):
+    bien = Bien.query.get_or_404(bien_id)
+    return render_template('info_bien.html', bien=bien)
+
 
 # ------------------- MAIN -------------------
 if __name__ == '__main__':

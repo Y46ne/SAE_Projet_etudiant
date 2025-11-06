@@ -20,6 +20,7 @@
             <th>Type</th>
             <th>Surface</th>
             <th>Nombre de biens</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -29,11 +30,18 @@
             <td>{{ piece.type_piece or "-" }}</td>
             <td>{{ piece.surface or "-" }}</td>
             <td>{{ piece.biens|length }}</td>
+            <td>
+                <a href="{{ url_for('gestion_bien', piece_id=piece.id) }}" title="Voir les biens" class="btn btn-info">Voir biens</a>
+                <a href="{{ url_for('modifier_piece', piece_id=piece.id) }}" title="Modifier la pièce" class="btn btn-sm btn-warning">Modifier</a>
+                <form action="{{ url_for('supprimer_piece', piece_id=piece.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-danger" title="Supprimer la pièce" onclick="return confirm('Supprimer cette pièce ?')">Supprimer</button>
+                </form>
+            </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
-<a href="{{ url_for('mes_logements') }}" class="btn btn-secondary">Retour</a>
+<a href="{{ url_for('mes_logements') }}" class="btn btn-secondary mt-3">Retour</a>
 </div>
 {% endblock %}
