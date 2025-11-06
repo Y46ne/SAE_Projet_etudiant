@@ -59,7 +59,13 @@ def tableau_de_bord():
 def modifier_bien():
     return render_template('modifier_bien.html')
 
+@app.route('/modifier_pièce/')
+def modifier_piece():
+    return render_template('modifier_pièce.html')
 
+@app.route('/supprimer_pièce/')
+def supprimer_piece():
+    return render_template('supprimer_pièce.html')
 
 
 @app.route('/ajouter_logement/', methods=['GET', 'POST'])
