@@ -129,8 +129,6 @@ def ajouter_logement():
     form = LogementForm()
     if form.validate_on_submit():
 
-        liste_objets_assures = form.assures.data
-
         insertedLogement = Logement(
             adresse=form.adresse.data,
             type_logement=form.type_logement.data,
@@ -138,7 +136,8 @@ def ajouter_logement():
             description=form.description.data
         )
 
-        insertedLogement.assures = liste_objets_assures
+        assure_connecte = current_user.assure_profile
+        insertedLogement.assures.append(assure_connecte)
 
         db.session.add(insertedLogement)
         db.session.commit()

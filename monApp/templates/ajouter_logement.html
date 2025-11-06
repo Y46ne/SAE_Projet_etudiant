@@ -38,11 +38,6 @@
                         {{ form.description(class="form-textarea", rows=4, placeholder="Décrivez le logement...") }}
                     </div>
 
-                    <div class="form-group">
-                        {{ form.assures.label(class="form-label") }}
-                        {{ form.assures(class="form-input") }}
-                    </div>
-
                     <div class="form-actions">
                         {{ form.submit(class="btn-primary") }}
                         <a href="{{ url_for('tableau_de_bord') }}" class="btn-secondary">Annuler</a>
