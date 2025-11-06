@@ -46,7 +46,7 @@ label {
 }
 
 input[type="email"],
-input[type="password"] {
+input[type="password"], input[type="text"] {
     width: 100%;
     padding: 14px 16px;
     border: 1px solid #e5e7eb;
@@ -57,7 +57,7 @@ input[type="password"] {
 }
 
 input[type="email"]:focus,
-input[type="password"]:focus {
+input[type="password"]:focus, input[type="text"]:focus {
     outline: none;
     border-color: #2563eb;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
