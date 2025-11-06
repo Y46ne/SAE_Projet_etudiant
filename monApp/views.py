@@ -107,24 +107,20 @@ def ajouter_logement():
 @app.route('/mes_logements/')
 @login_required
 def mes_logements():
-    logements = []
-    if current_user.assure_profile:
-        logements = current_user.assure_profile.logements
-
+    logements = current_user.assure_profile.logements
     rows = []
-
-    for l in logements:
+    for logement in logements:
+        valeur_totale = 0
         nb_biens = 0
-        valeur = 0.0
-        for p in l.pieces:
-            nb_biens += len(getattr(p, 'biens', []))
-            for b in getattr(p, 'biens', []):
-                try:
-                    if b.valeur_actuelle is not None:
-                        valeur += float(b.valeur_actuelle)
-                except Exception:
-                    pass
-        rows.append({'logement': l, 'nb_biens': nb_biens, 'valeur': valeur})
+        for piece in logement.pieces:
+            for bien in piece.biens:
+                valeur_totale += bien.prix_achat or 0
+                nb_biens += 1
+        rows.append({
+            'logement': logement,
+            'nb_biens': nb_biens,
+            'valeur': valeur_totale
+        })
     return render_template('mes_logements.html', logements=rows)
 
 

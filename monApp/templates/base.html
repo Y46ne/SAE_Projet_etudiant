@@ -19,7 +19,7 @@
                     <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
                         <span class="text-blue-600 font-bold">M</span>
                     </div>
-                    MobiList
+                    <span class="text-white">MobiList</span>
                 </h1>
                 <p class="text-blue-100 text-sm mt-1">Inventaire Assuré</p>
             </div>
@@ -138,6 +138,16 @@
             </div>
             {% endblock %}
         </div>
+    </div>
+
+    <div class="p-4">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
     </div>
 </body>
 </html>
