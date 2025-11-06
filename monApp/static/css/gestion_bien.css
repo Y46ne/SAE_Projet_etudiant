@@ -6,8 +6,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #ffffff;
-    min-height: 100vh;
+    background-color: #f5f6fa;
     color: #1f2937;
 }
 
@@ -16,10 +15,10 @@ h1 {
     font-weight: 700;
     color: #2563eb;
     text-align: center;
-    margin: 0 0 20px 0;
+    margin-bottom: 8px;
 }
 
-h1 + p {
+p {
     font-size: 16px;
     color: #374151;
     text-align: center;
@@ -27,7 +26,7 @@ h1 + p {
 }
 
 .main-content {
-    max-width: 1600px;
+    max-width: 1750px;
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -47,32 +46,25 @@ h1 + p {
     font-size: 15px;
     outline: none;
     transition: border-color 0.2s;
-    max-width: 450px;
 }
 
 .search-filter input:focus {
     border-color: #2563eb;
 }
 
-.search-filter input::placeholder {
-    color: #999;
-}
-
 #filterBtn {
     padding: 10px 18px;
     border: 1px solid #ddd;
-    background-color: white;
+    background-color: #fff;
     color: #333;
     border-radius: 12px;
     font-weight: 600;
-    font-size: 15px;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 #filterBtn:hover {
-    background-color: #f3f4f6;
-    border-color: #ccc;
+    background-color: #f0f0f0;
 }
 
 #biensTable {
@@ -80,12 +72,12 @@ h1 + p {
     border-collapse: collapse;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
-    background-color: white;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    background-color: #fff;
 }
 
 #biensTable th, #biensTable td {
-    padding: 14px 16px;
+    padding: 16px 20px;
     text-align: left;
     font-size: 15px;
 }
@@ -99,7 +91,7 @@ h1 + p {
 }
 
 #biensTable tbody tr:nth-child(even) {
-    background-color: #f3f4f6;
+    background-color: #f8f9fa;
 }
 
 #biensTable tbody tr:hover {
@@ -113,6 +105,45 @@ h1 + p {
 
 #biensTable td:last-child {
     white-space: nowrap;
+}
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.btn-info {
+    background-color: #2563eb;
+    color: #fff;
+}
+
+.btn-info:hover {
+    background-color: #1d4ed8;
+}
+
+.btn-warning {
+    background-color: #facc15;
+    color: #1f2937;
+}
+
+.btn-warning:hover {
+    background-color: #eab308;
+}
+
+.btn-danger {
+    background-color: #ef4444;
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
 }
 
 .status {
@@ -140,46 +171,9 @@ h1 + p {
     color: #721c24;
 }
 
-.view, .edit, .delete {
-    border: none;
-    background: none;
-    cursor: pointer;
-    margin-right: 5px;
-    font-size: 20px;
-    padding: 8px;
-    text-decoration: none;
-    transition: transform 0.2s;
-    display: inline-block;
-}
-
-.view {
-    color: #2563eb;
-}
-
-.view:hover {
-    transform: scale(1.2);
-}
-
-.edit {
-    color: #facc15;
-}
-
-.edit:hover {
-    transform: scale(1.2);
-}
-
-.delete {
-    color: #ef4444;
-}
-
-.delete:hover {
-    transform: scale(1.2);
-}
-
 .alert {
     padding: 15px 20px;
     margin-bottom: 20px;
-    border: 1px solid transparent;
     border-radius: 12px;
     font-size: 14px;
 }
@@ -187,13 +181,11 @@ h1 + p {
 .alert-success {
     color: #155724;
     background-color: #d4edda;
-    border-color: #c3e6cb;
 }
 
 .alert-danger {
     color: #721c24;
     background-color: #f8d7da;
-    border-color: #f5c6cb;
 }
 
 #biensTable tbody tr td[colspan] {
@@ -204,45 +196,29 @@ h1 + p {
 }
 
 @media (max-width: 768px) {
-    h1 {
-        font-size: 26px;
-    }
-
-    h1 + p {
-        font-size: 14px;
-    }
-
     .search-filter {
         flex-direction: column;
         align-items: stretch;
     }
 
-    .search-filter input {
-        max-width: 100%;
-    }
-
     #biensTable th, #biensTable td {
-        padding: 10px;
+        padding: 12px 10px;
         font-size: 14px;
     }
 
-    .status {
-        font-size: 11px;
-        padding: 4px 10px;
-        min-width: 60px;
+    .btn {
+        font-size: 13px;
+        padding: 6px 12px;
     }
 
-    .view, .edit, .delete {
-        font-size: 18px;
-        padding: 6px;
+    .status {
+        font-size: 12px;
+        padding: 4px 10px;
+        min-width: 60px;
     }
 }
 
 @media (max-width: 480px) {
-    h1 {
-        font-size: 20px;
-    }
-
     .main-content {
         overflow-x: auto;
     }
@@ -250,31 +226,4 @@ h1 + p {
     #biensTable {
         min-width: 700px;
     }
-}
-
-.btn-info {
-    background: #3b82f6;
-    color: #fff;
-}
-
-.btn-info:hover {
-    background: #2563eb;
-}
-
-.btn-warning {
-    background: #facc15;
-    color: #1f2937;
-}
-
-.btn-warning:hover {
-    background: #eab308;
-}
-
-.btn-danger {
-    background: #ef4444;
-    color: #fff;
-}
-
-.btn-danger:hover {
-    background: #dc2626;
 }
