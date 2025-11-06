@@ -329,6 +329,13 @@ def ajouter_bien():
         form=form, 
     )
 
+@app.route('/bien/<int:bien_id>/')
+@login_required
+def voir_bien(bien_id):
+    bien = Bien.query.get_or_404(bien_id)
+    return render_template('info_bien.html', bien=bien)
+
+
 # ------------------- MAIN -------------------
 if __name__ == '__main__':
     app.run(debug=True)
