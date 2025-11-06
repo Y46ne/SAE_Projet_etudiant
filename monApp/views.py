@@ -70,6 +70,10 @@ def modifier_piece():
 def supprimer_piece():
     return render_template('supprimer_pièce.html')
 
+@app.route('/supprimer_bien/')
+def supprimer_bien():
+    return render_template('supprimer_bien.html')
+
 
 @app.route('/ajouter_logement/', methods=['GET', 'POST'])
 @login_required
@@ -170,6 +174,12 @@ def update_logement(id):
     return render_template('logement_client.html', form=form)
 
 
+@app.route('/piece/<int:piece_id>/biens/')
+@login_required
+def gestion_bien(piece_id):
+    piece = Piece.query.get_or_404(piece_id)
+    biens = Bien.query.filter_by(id_piece=piece.id_piece).all()
+    return render_template('gestion_bien.html', piece=piece, biens=biens)
 
 
 @app.route('/creer-compte/', methods=['GET', 'POST'])
