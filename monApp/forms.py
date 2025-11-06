@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, HiddenField, SubmitField, FloatField, SelectField, DateField, TextAreaField, DecimalField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
 from hashlib import sha256 
-from .database import User
+from .database import *
 from .app import db 
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField
 from monApp.database.assure import get_tous_les_assures
@@ -94,9 +94,6 @@ class DeleteForm(FlaskForm):
     submit = SubmitField('Supprimer')
 
 class ChangePasswordForm(FlaskForm):
-    """
-    Formulaire pour changer le mot de passe
-    """
     old_password = PasswordField(
         'Ancien mot de passe', 
         validators=[DataRequired(message="Champ requis.")]
@@ -161,8 +158,36 @@ class AjouterBienForm(FlaskForm):
     facture = FileField(
         "Joindre une facture (Facture, Preuve d'achat...)",
         validators=[
-            Optional(), # Le champ est optionnel
+            Optional(),
             FileAllowed(['pdf', 'png', 'jpg', 'jpeg'], 'Seuls les images et PDF sont autorisés!')
         ]
     )
     submit = SubmitField("Enregistrer le bien")
+
+class DeclarerSinistre(FlaskForm):
+    date_sinistre = DateField(
+        "Date du sinistre",
+        format="%Y-%m-%d",
+        validators=[DataRequired(message="Veuillez entrer une date valide.")]
+    )
+
+    type_sinistre = SelectField(
+        "Type de sinistre",
+        choices=[
+            ("incendie", "Incendie"),
+            ("degat_eau", "Dégât des eaux"),
+            ("vol", "Vol"),
+            ("tempete", "Tempête"),
+            ("bris_glace", "Bris de glace"),
+        ],
+        validators=[DataRequired(message="Veuillez sélectionner un type de sinistre.")]
+    )
+
+    biens_selectionnes = QuerySelectMultipleField(
+        "Biens sélectionnés",
+        query_factory=lambda: Bien.query.all(),
+        get_label="nom",
+        allow_blank=True
+    )
+
+    submit = SubmitField("Générer l'état financier des biens")

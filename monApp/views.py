@@ -67,6 +67,11 @@ def modifier_piece():
 def supprimer_piece():
     return render_template('supprimer_pièce.html')
 
+@app.route('/declarer_sinstre')
+def declarer_sinistre():
+    form = DeclarerSinistre()
+    return render_template('declarer_sinistre.html', form=form)
+
 
 @app.route('/ajouter_logement/', methods=['GET', 'POST'])
 def ajouter_logement():
