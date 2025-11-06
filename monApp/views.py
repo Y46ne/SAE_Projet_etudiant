@@ -17,9 +17,11 @@ from monApp.database import (
 )
 from monApp.forms import *
 
-# ======================================================================
-#                           LOGIN MANAGER
-# ======================================================================
+@app.route('/')
+def index():
+    if current_user.is_authenticated:
+        return redirect(url_for('tableau_de_bord'))
+    return redirect(url_for('login'))
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -38,27 +40,21 @@ def index():
 
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
-    form = LoginForm()
-
-    if not form.is_submitted():
-        form.next.data = request.args.get('next')
-
-    elif form.validate_on_submit():
-        user = form.get_authenticated_user()
+    unForm = LoginForm()
+    user=None
+    if unForm.validate_on_submit():
+        user = unForm.get_authenticated_user()
         if user:
             login_user(user)
             flash('Connexion réussie.', 'success')
-
-            next_page = request.args.get('next') or url_for('tableau_de_bord')
+            next_page = url_for('tableau_de_bord')
             return redirect(next_page)
 
         else:
             flash('Identifiant ou mot de passe incorrect.', 'danger')
 
-    return render_template('login.html', form=form)
-
-
-@app.route("/logout/")
+@app.route ("/logout/")
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
@@ -148,6 +144,27 @@ def ajouter_logement():
             flash(f"Erreur : {e}", "danger")
 
     return render_template('ajouter_logement.html', form=form)
+
+    
+
+@app.route('/mes_logements/')
+@login_required
+def mes_logements():
+    logements = current_user.assure_profile.logements
+    rows = []
+    for logement in logements:
+        valeur_totale = 0
+        nb_biens = 0
+        for piece in logement.pieces:
+            for bien in piece.biens:
+                valeur_totale += bien.prix_achat or 0
+                nb_biens += 1
+        rows.append({
+            'logement': logement,
+            'nb_biens': nb_biens,
+            'valeur': valeur_totale
+        })
+    return render_template('mes_logements.html', logements=rows)
 
 
 @app.route('/logement/<int:id>/pieces/')

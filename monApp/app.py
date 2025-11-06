@@ -16,9 +16,4 @@ Bootstrap(app)
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
 
-@app.route('/')
-def home():
-    return render_template('base.html')
 
-if __name__ == "__main__":
-    app.run(debug=True)
