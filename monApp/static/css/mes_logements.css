@@ -154,3 +154,40 @@ p {
         padding: 10px 14px;
     }
 }
+
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #fff;
+}
+
+.btn:hover {
+    opacity: 0.85;
+}
+
+.btn-info { background-color: #0d6efd; }
+.btn-warning { background-color: #ffc107; color: #212529; }
+.btn-danger { background-color: #dc3545; }
+
+.btn i {
+    margin-left: 10px;
+    
+    border-left: 1px solid rgba(255, 255, 255, 0.5);
+    
+    padding-left: 10px;
+    
+    line-height: 1; 
+}
+
+.btn-warning i {
+    border-left-color: rgba(0, 0, 0, 0.25);
+}

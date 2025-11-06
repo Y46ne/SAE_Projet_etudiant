@@ -4,6 +4,7 @@
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mes_logements.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 {% endblock %}
 
 {% block content %}
@@ -31,15 +32,9 @@
             <td>{{ "%.2f"|format(row.valeur) }}</td>
             <td>
                 <div class="task-controls">
-                    <a href="{{ url_for('view_logement_pieces', id=row.logement.id_logement) }}" class="btn btn-info" title="Voir les pièces">
-                        Voir les pièces<i class="fas fa-eye"></i>
-                    </a>
-                    <a href="{{ url_for('update_logement', id=row.logement.id_logement) }}" class="btn btn-warning" title="Modifier">
-                        Modifier<i class="fas fa-pen"></i>
-                    </a>
-                    <a href="{{ url_for('delete_logement', id=row.logement.id_logement) }}" class="btn btn-danger" title="Supprimer" onclick="return confirm('Confirmer la suppression du logement ?');">
-                        Supprimer<i class="fas fa-trash"></i>
-                    </a>
+                    <a href="{{ url_for('view_logement_pieces', id=row.logement.id_logement) }}" class="btn btn-info" title="Voir les pièces">Consulter<i class="fas fa-eye"></i></a>
+                    <a href="{{ url_for('update_logement', id=row.logement.id_logement) }}" class="btn btn-warning" title="Modifier">Modifier<i class="fas fa-pen"></i></a>
+                    <a href="{{ url_for('delete_logement', id=row.logement.id_logement) }}" class="btn btn-danger" title="Supprimer" onclick="return confirm('Confirmer la suppression du logement ?');">Supprimer<i class="fas fa-trash"></i></a>
                 </div>
             </td>
         </tr>

@@ -56,7 +56,47 @@ def reinitialiser():
 @app.route('/tableauDeBord/')
 @login_required
 def tableau_de_bord():
-    return render_template('tableauDeBord.html')
+    assure = current_user.assure_profile
+    logements_bruts = []
+    if assure:
+        logements_bruts = assure.logements
+
+    nb_logements_total = len(logements_bruts)
+    nb_biens_total = 0
+    valeur_totale_globale = 0.0
+    logements_avec_stats = []
+
+    for l in logements_bruts:
+        nb_pieces_logement = len(l.pieces)
+        nb_biens_logement = 0
+        valeur_logement = 0.0
+
+        for p in l.pieces:
+            biens_de_la_piece = getattr(p, 'biens', [])
+            nb_biens_logement += len(biens_de_la_piece)
+            for b in biens_de_la_piece:
+                if b.prix_achat is not None:
+                    try:
+                        valeur_logement += float(b.prix_achat)
+                    except (ValueError, TypeError):
+                        pass
+
+        nb_biens_total += nb_biens_logement
+        valeur_totale_globale += valeur_logement
+
+        logements_avec_stats.append({
+            'logement': l,
+            'nb_pieces': nb_pieces_logement,
+            'nb_biens': nb_biens_logement,
+            'valeur_logement': valeur_logement
+        })
+
+    # 8. Renvoyer toutes les données au template
+    return render_template('tableauDeBord.html', 
+                           nb_logements=nb_logements_total, 
+                           nb_biens_total=nb_biens_total, 
+                           valeur_totale=valeur_totale_globale, 
+                           logements_stats=logements_avec_stats)
 
 @app.route('/modifier_bien/')
 @login_required
