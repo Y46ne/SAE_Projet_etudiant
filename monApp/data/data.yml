@@ -104,79 +104,59 @@ possede:
 
 pieces:
   - nom_piece: "Salon"
-    type_piece: "Séjour"
     surface: 25
-    etage: 1
     id_logement: 1
 
   - nom_piece: "Cuisine"
-    type_piece: "Cuisine"
     surface: 10
-    etage: 1
     id_logement: 1
 
   - nom_piece: "Chambre principale"
-    type_piece: "Chambre"
     surface: 14
-    etage: 1
     id_logement: 2
 
   - nom_piece: "Salle de bain"
-    type_piece: "Salle d’eau"
     surface: 8
-    etage: 1
     id_logement: 2
 
   - nom_piece: "Bureau"
-    type_piece: "Bureau"
     surface: 12
-    etage: 2
     id_logement: 3
 
 biens:
   - nom_bien: "Téléviseur Samsung 4K"
-    description: "Écran plat 55 pouces"
     categorie: "Électronique"
     date_achat: "2022-03-01"
     prix_achat: 800
     etat: "Neuf"
-    valeur_actuelle: 750
     id_piece: 1
 
   - nom_bien: "Canapé IKEA"
-    description: "Canapé 3 places gris"
     categorie: "Mobilier"
     date_achat: "2021-09-12"
     prix_achat: 600
     etat: "Bon"
-    valeur_actuelle: 500
     id_piece: 1
 
   - nom_bien: "Ordinateur portable HP"
-    description: "Laptop 15 pouces"
     categorie: "Informatique"
     date_achat: "2023-02-10"
     prix_achat: 900
     etat: "Excellent"
-    valeur_actuelle: 850
     id_piece: 5
 
   - nom_bien: "Table en chêne"
-    description: "Table de salle à manger"
     categorie: "Mobilier"
     date_achat: "2020-05-20"
     prix_achat: 450
     etat: "Bon"
-    valeur_actuelle: 400
     id_piece: 2
 
   - nom_bien: "Machine à laver Bosch"
-    description: "7 kg, A+++"
     categorie: "Électroménager"
     date_achat: "2021-01-15"
     prix_achat: 500
     etat: "Très bon"
-    valeur_actuelle: 450
     id_piece: 4
 
 sinistres:

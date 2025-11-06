@@ -17,7 +17,7 @@
         <section class="form-section">
             <div class="card">
                 <form action="{{ url_for('ajouter_bien') }}" method="POST" enctype="multipart/form-data" class="form">
-                    
+                    {{ form.hidden_tag() }}
                     <div class="form-group">
                         {{ form.nom_bien.label(class="form-label") }}
                         {{ form.nom_bien(class="form-input", placeholder="Ex : Télévision 4K") }}
@@ -86,9 +86,12 @@
             </div>
         </section>
     </main>
-</div>
+</div> 
+
+    
 
 <script>
+    //Script généré par IA
     document.addEventListener('DOMContentLoaded', function() {
         const logementSelect = document.getElementById('logement_id');
         const pieceSelect = document.getElementById('piece_id');

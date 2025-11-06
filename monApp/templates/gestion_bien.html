@@ -40,10 +40,10 @@
             <tbody>
                 {% for bien in biens %}
                 <tr>
-                    <td>{{ bien.nom }}</td>
+                    <td>{{ bien.nom_bien }}</td>
                     <td>{{ bien.categorie }}</td>
                     <td>{{ bien.date_achat.strftime('%d/%m/%Y') }}</td>
-                    <td>{{ bien.valeur }}</td>
+                    <td>{{ bien.valeur_actuelle }}</td>
                     <td>
                         {% if bien.etat == 'Bon' %}
                             <span class="status bon">Bon</span>
@@ -54,10 +54,10 @@
                         {% endif %}
                     </td>
                     <td>
-                        <a href="{{ url_for('voir_bien', bien_id=bien.id) }}" class="view" title="Voir">👁️</a>
-                        <a href="{{ url_for('modifier_bien', bien_id=bien.id) }}" class="edit" title="Modifier">✏️</a>
-                        <form action="{{ url_for('supprimer_bien', bien_id=bien.id) }}" method="POST" style="display:inline;">
-                            <button type="submit" class="delete" title="Supprimer" onclick="return confirm('Supprimer ce bien ?')">🗑️</button>
+                        <a href="{{ url_for('voir_bien', bien_id=bien.id_bien) }}" class="btn btn-info" title="Voir">Voir</a>
+                        <a href="{{ url_for('modifier_bien', bien_id=bien.id_bien) }}" class="btn btn-sm btn-warning" title="Modifier">Modifier</a>
+                        <form action="{{ url_for('supprimer_bien', bien_id=bien.id_bien) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-danger" title="Supprimer" onclick="return confirm('Supprimer ce bien ?')">Supprimer</button>
                         </form>
                     </td>
                 </tr>
