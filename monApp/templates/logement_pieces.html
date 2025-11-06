@@ -17,7 +17,6 @@
     <thead>
         <tr>
             <th>Nom de la pièce</th>
-            <th>Type</th>
             <th>Surface</th>
             <th>Nombre de biens</th>
             <th>Actions</th>
@@ -27,7 +26,6 @@
         {% for piece in logement.pieces %}
         <tr>
             <td>{{ piece.nom_piece }}</td>
-            <td>{{ piece.type_piece or "-" }}</td>
             <td>{{ piece.surface or "-" }}</td>
             <td>{{ piece.biens|length }}</td>
             <td>
