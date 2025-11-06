@@ -41,6 +41,7 @@ def logout():
     return redirect ( url_for ('login'))
 
 @app.route('/info_bien/')
+@login_required
 def info_bien(id):
     bien = Bien.query.get_or_404(id)
     return render_template('info_bien.html', bien=bien)
@@ -52,10 +53,12 @@ def reinitialiser():
 
 
 @app.route('/tableauDeBord/')
+@login_required
 def tableau_de_bord():
     return render_template('tableauDeBord.html')
 
 @app.route('/modifier_bien/')
+@login_required
 def modifier_bien():
     return render_template('modifier_bien.html')
 
@@ -63,6 +66,7 @@ def modifier_bien():
 
 
 @app.route('/ajouter_logement/', methods=['GET', 'POST'])
+@login_required
 def ajouter_logement():
     form = LogementForm()
     if form.validate_on_submit():
@@ -89,12 +93,14 @@ def ajouter_logement():
     return render_template('ajouter_logement.html', form=form)
 
 @app.route('/gestion_bien/')
+@login_required
 def gestion_bien():
     form = LogementForm()
     return render_template('gestion_bien.html',form=form)
     
 
 @app.route('/mes_logements/')
+@login_required
 def mes_logements():
     logements = []
     if current_user.assure_profile:
@@ -118,12 +124,14 @@ def mes_logements():
 
 
 @app.route('/logement/<int:id>/pieces/')
+@login_required
 def view_logement_pieces(id):
     logement = Logement.query.get_or_404(id)
     return render_template('logement_pieces.html', logement=logement)
 
 
 @app.route('/logement/<int:id>/delete', methods=['GET', 'POST'])
+@login_required
 def delete_logement(id):
     logement = Logement.query.get_or_404(id)
     try:
@@ -137,6 +145,7 @@ def delete_logement(id):
 
 
 @app.route('/logement/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
 def update_logement(id):
     logement = Logement.query.get_or_404(id)
     form = LogementForm(obj=logement)
@@ -177,10 +186,12 @@ def creer_compte():
     return render_template('creeruncompte.html', form=form)
     
 @app.route('/TableauDeBord/')
+@login_required
 def TableauDeBord():
     return render_template('TableauDeBord.html')
 
 @app.route('/parametres/', methods=['GET', 'POST'])
+@login_required
 def parametres():
     """
     Affiche la page des paramètres et gère la mise à jour
@@ -239,81 +250,86 @@ def changer_mot_de_passe():
     return render_template('changer_mot_de_passe.html', form=form)
 
 @app.route('/ajouter_piece/', methods=['GET', 'POST'])
+@login_required
 def ajouter_piece():
     form = PieceForm()
+    logements = current_user.assure_profile.logements
+    form.logement_id.choices = [(l.id_logement, l.adresse) for l in logements]
+
+    if form.validate_on_submit():
+        try:
+            nouvelle_piece = Piece(
+                nom_piece=form.nom_piece.data,
+                surface=form.surface.data,
+                id_logement=form.logement_id.data
+            )
+            db.session.add(nouvelle_piece)
+            db.session.commit()
+            flash("Nouvelle pièce ajoutée avec succès !", "success")
+            return redirect(url_for('mes_logements'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erreur lors de l'ajout de la pièce : {e}", "danger")
+    if form.errors:
+        print("Erreurs du formulaire :", form.errors)
     return render_template('ajouter_piece.html', form=form)
 
 @app.route('/ajouter_bien/', methods=['GET', 'POST'])
+@login_required
 def ajouter_bien():
 
     form = AjouterBienForm()
-    """
-    # 2. Récupère les logements de l'utilisateur pour le menu déroulant
-    assure_profil = current_user.assure
-    user_logements = assure_profil.logements # (Suppose que la relation s'appelle 'logements')
+    assure_profil = current_user.assure_profile
+    user_logements = assure_profil.logements
     
-    # 3. Prépare la liste de TOUTES les pièces de l'utilisateur pour le JS
-    #    (Le JS s'occupera de filtrer)
     user_pieces = []
     for log in user_logements:
-        user_pieces.extend(log.pieces) # (Suppose que la relation s'appelle 'pieces')
+        user_pieces.extend(log.pieces)
 
-    # 4. On passe les choix aux menus déroulants du formulaire
-    #    (Note: le template HTML manuel les utilise aussi)
     form.logement_id.choices = [(l.id_logement, l.adresse) for l in user_logements]
     form.piece_id.choices = [(p.id_piece, p.nom_piece) for p in user_pieces]
 
     if form.validate_on_submit():
         try:
-            # 5. Récupère les données du formulaire
             nouveau_bien = Bien(
                 nom_bien=form.nom_bien.data,
-                prix_achat=form.valeur.data, # Note: ton modèle utilise prix_achat
+                prix_achat=form.valeur.data,
                 categorie=form.categorie.data,
                 date_achat=form.date_achat.data,
                 etat=form.etat.data,
-                id_piece=form.piece_id.data # Le bien est lié à la pièce
+                id_piece=form.piece_id.data
             )
             
             db.session.add(nouveau_bien)
-            db.session.flush() # Pour obtenir l'ID du nouveau_bien
+            db.session.flush() 
 
-            # 6. Gère l'upload de la facture
             fichier_facture = form.facture.data
             if fichier_facture:
                 filename = secure_filename(fichier_facture.filename)
                 
-                # Crée un chemin unique pour éviter les conflits
-                # ex: uploads/justificatifs/assure_5/bien_10_facture.pdf
                 user_folder = os.path.join(app.config['UPLOAD_FOLDER'], f"assure_{current_user.id}")
                 os.makedirs(user_folder, exist_ok=True)
                 
                 file_path = os.path.join(user_folder, f"bien_{nouveau_bien.id_bien}_{filename}")
                 fichier_facture.save(file_path)
                 
-                # Enregistre le chemin relatif dans la DB
                 relative_path = os.path.join(f"assure_{current_user.id}", f"bien_{nouveau_bien.id_bien}_{filename}")
 
                 nouveau_justificatif = Justificatif(
                     chemin_fichier=relative_path,
                     type_justificatif="Facture",
-                    # Lie le justificatif au bien (suppose une relation)
                     bien=nouveau_bien 
                 )
                 db.session.add(nouveau_justificatif)
 
-            # 7. Valide la transaction
             db.session.commit()
             flash("Nouveau bien ajouté avec succès !", "success")
-            # Redirige vers la page du logement ou le tableau de bord
             return redirect(url_for('mes_logements')) 
 
         except Exception as e:
             db.session.rollback()
             flash(f"Erreur lors de l'ajout du bien : {e}", "danger")
 
-    # 8. Si GET ou si le formulaire est invalide, on affiche la page
-    #    On convertit les objets pour le template HTML (pour le script JS)
     liste_logement_pour_template = [{'id': l.id_logement, 'adresse': l.adresse} for l in user_logements]
     liste_pieces_pour_template = [{'id': p.id_piece, 'nom_piece': p.nom_piece, 'id_logement': p.id_logement} for p in user_pieces]
     
@@ -322,11 +338,6 @@ def ajouter_bien():
         form=form, 
         liste_logement=liste_logement_pour_template, 
         liste_pieces=liste_pieces_pour_template
-    )
-    """
-    return render_template(
-        'ajouter_bien.html', 
-        form=form, 
     )
 
 # ------------------- MAIN -------------------

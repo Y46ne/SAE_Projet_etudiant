@@ -63,8 +63,6 @@ class LogementForm(FlaskForm):
 class PieceForm(FlaskForm):
     nom_piece = StringField('Nom de la pièce', validators=[DataRequired()])
     surface = FloatField('Surface (m²)', validators=[DataRequired()])
-    type_piece = StringField('Type de pièce (Salon, Chambre, Cuisine...)', validators=[DataRequired()])
-    etage = StringField('Étage (ex: RDC, 1er, Sous-sol)', validators=[DataRequired()])
     logement_id = SelectField('Logement associé', coerce=int, validators=[DataRequired()])
     submit = SubmitField('Ajouter la pièce')
 

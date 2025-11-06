@@ -84,9 +84,7 @@ def loaddb(filename):
     for p in data.get('pieces', []):
         piece = Piece(
             nom_piece=p['nom_piece'],
-            type_piece=p.get('type_piece'),
             surface=Decimal(str(p['surface'])) if p.get('surface') is not None else None,
-            etage=p.get('etage'),
             id_logement=p['id_logement']
         )
         db.session.add(piece)
