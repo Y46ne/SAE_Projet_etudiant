@@ -102,11 +102,6 @@ def ajouter_logement():
     print("-------------------------probleme----------------------")
     return render_template('ajouter_logement.html', form=form)
 
-@app.route('/gestion_bien/')
-@login_required
-def gestion_bien():
-    form = LogementForm()
-    return render_template('gestion_bien.html',form=form)
     
 
 @app.route('/mes_logements/')
