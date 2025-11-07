@@ -2,16 +2,38 @@
 
 {% macro render_field(field) %}
   <div class="form-group">
-    {{ field.label }}
+    {{ field.label(class="form-label") }}
+
+    {% if field.type == 'PasswordField' %}
+      
+      {% set field_class = 'form-control is-invalid' if field.errors else 'form-control' %}
+      
+      <div class="password-wrapper">
+        {{ field(class_=field_class, id=field.id) }}
+        
+        {# On ajoute le bouton oeil. Notez l'ID et 'this' #}
+        <button type="button" class="toggle-password" onclick="togglePassword('{{ field.id }}', this)">
+            <i class="fas fa-eye"></i>
+        </button>
+      </div>
+      
+    {% else %}
+      
+      {% if field.errors %}
+        {{ field(class_="form-control is-invalid") }}
+      {% else %}
+        {{ field(class_="form-control") }}
+      {% endif %}
+
+    {% endif %}
+
     {% if field.errors %}
-      {{ field(class_="form-control is-invalid") }}
       <div class="invalid-feedback">
         {% for error in field.errors %}
           <span>{{ error }}</span>
         {% endfor %}
       </div>
-    {% else %}
-      {{ field(class_="form-control") }}
     {% endif %}
+
   </div>
 {% endmacro %}
