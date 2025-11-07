@@ -8,11 +8,10 @@ from hashlib import sha256
 from flask import abort
 
 @app.route('/')
-@app.route('/index/')
 def index():
     if current_user.is_authenticated:
         return redirect(url_for('tableau_de_bord'))
-    return render_template('login.html')
+    return redirect(url_for('login'))
 
 @login_manager.user_loader
 def load_user(user_id):
