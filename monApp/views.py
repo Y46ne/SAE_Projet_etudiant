@@ -215,26 +215,54 @@ def parametres():
     return render_template('parametres.html', form=form)
 
 
+from flask import render_template, redirect, url_for, flash
+from flask_login import current_user, login_required
+from hashlib import sha256
+from .app import app, db # Assurez-vous d'importer db
+from .forms import ChangePasswordForm # Assurez-vous que le formulaire est importé
+
 @app.route('/changer_mot_de_passe/', methods=['GET', 'POST'])
+@login_required
 def changer_mot_de_passe():
-    """
-    Affiche et traite le formulaire de changement de mot de passe.
-    """
     form = ChangePasswordForm()
     if form.validate_on_submit():
-        if not current_user.check_password(form.old_password.data):
-            flash("L'ancien mot de passe est incorrect.", "danger")
-            return redirect(url_for('changer_mot_de_passe'))
         
+        m_old = sha256()
+        m_old.update(form.old_password.data.encode())
+        old_password_hashed = m_old.hexdigest()
+        
+        is_correct = False
+        if old_password_hashed == current_user.Password:
+            is_correct = True
+        elif form.old_password.data == current_user.Password:
+            is_correct = True
+        
+        if not is_correct:
+            flash("L'ancien mot de passe est incorrect.", "danger")
+            return render_template('changer_mot_de_passe.html', form=form)
+            
         try:
-            current_user.set_password(form.new_password.data)
+            m_new = sha256()
+            m_new.update(form.new_password.data.encode())
+            new_password_hashed = m_new.hexdigest()
+            
+            current_user.Password = new_password_hashed
+            
+            if current_user.assure_profile:
+                current_user.assure_profile.mdp_assure = new_password_hashed
+            elif current_user.assureur_profile:
+                current_user.assureur_profile.mot_de_passe = new_password_hashed
+
             db.session.commit()
             flash('Votre mot de passe a été changé avec succès.', 'success')
-            return redirect(url_for('parametres'))
+
+            return redirect(url_for('parametres')) 
+            
         except Exception as e:
             db.session.rollback()
             flash(f'Erreur lors du changement de mot de passe : {e}', 'danger')
     return render_template('changer_mot_de_passe.html', form=form)
+
 
 @app.route('/ajouter_piece/', methods=['GET', 'POST'])
 @login_required
