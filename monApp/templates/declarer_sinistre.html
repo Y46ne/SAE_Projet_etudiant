@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Déclarer un sinistre{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/declarer_sinistre.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <main class="main-content">
+        <header>
+            <h1>Déclarer un sinistre</h1>
+            <p>Signalez un sinistre et calculez la valeur estimée de vos biens à indemniser</p>
+        </header>
+
+        <form action="{{ url_for('declarer_sinistre') }}" method="POST" class="sinistre-form">
+            {{ form.hidden_tag() }}
+
+            <section class="form-section">
+                <div class="info-cards">
+                    <div class="info-card">
+                        <div class="card-header">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-blue">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                <path d="M16 2v4M8 2v4M3 10h18"/>
+                            </svg>
+                            <label class="card-label">Date de sinistre</label>
+                        </div>
+                        <div class="card-input">
+                            {{ form.date_sinistre(class="date-input", placeholder="jj / mm / aaaa") }}
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="card-header">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-orange">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                            <label class="card-label">Type de sinistre</label>
+                        </div>
+                        <div class="card-input">
+                            {{ form.type_sinistre(class="select-input") }}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="biens-section">
+                <h2>Biens endommagés</h2>
+                <p class="section-subtitle">Sélectionnez les biens affectés par le sinistre</p>
+
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label>Résidence</label>
+                        <select id="filter-residence" class="filter-select">
+                            <option value="">Sélectionner</option>
+                            {% for logement in logements %}
+                                <option value="{{ logement.id }}">{{ logement.nom or logement.adresse }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Pièce</label>
+                        <select id="filter-piece" class="filter-select">
+                            <option value="">Sélectionner</option>
+                            {% for piece in pieces %}
+                                <option value="{{ piece.id }}">{{ piece.nom }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="biens-table">
+                        <thead>
+                            <tr>
+                                <th>Sélection</th>
+                                <th>Nom du bien</th>
+                                <th>Valeur</th>
+                                <th>État du bien</th>
+                            </tr>
+                        </thead>
+                        <tbody id="biens-tbody">
+                            {% for bien in biens %}
+                            <tr data-residence="{{ bien.logement_id }}" data-piece="{{ bien.piece_id }}">
+                                <td>
+                                    <input type="checkbox" name="biens_selectionnes" value="{{ bien.id }}" class="checkbox-bien" data-valeur="{{ bien.valeur_actuelle }}">
+                                </td>
+                                <td>{{ bien.nom }}</td>
+                                <td>{{ bien.valeur_actuelle }}€</td>
+                                <td>
+                                    <select name="etat_bien_{{ bien.id }}" class="etat-select">
+                                        <option value="perte_totale">Perte totale</option>
+                                        <option value="perte_partielle">Perte partielle</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="footer-section">
+                <div class="total-card">
+                    <span class="total-label">Total à indemniser :</span>
+                    <span class="total-value" id="total-indemnisation">0€</span>
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    Générer l'état financier des biens
+                </button>
+            </section>
+        </form>
+    </main>
+</div>
+{% endblock %}

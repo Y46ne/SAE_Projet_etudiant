@@ -1,0 +1,194 @@
+users:
+  - Login: "assureur.pro@example.com"
+    Password: "pbkdf2:sha256:600000$zJpGq9bL8dKjR3sT$c8a2b6e3e4f5a09b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b" # mdp: password
+    role: "assureur"
+
+assureurs:
+  - nom: "Max"
+    prenom: "Assur"
+    email: "assureur.pro@example.com"
+    mot_de_passe: "hashed_pwd1"
+    telephone: "0123456789"
+    user_id: "assureur.pro@example.com"
+
+assures:
+  - nom: "Dupont"
+    prenom: "Jean"
+    date_naissance: "1985-04-12"
+    email: "jean.dupont@example.com"
+    mdp_assure: "hashed_pwd2"
+    telephone: "0601020304"
+    user_login: "jean.dupont@example.com"
+    id_assureur: 1
+
+  - nom: "Durand"
+    prenom: "Marie"
+    date_naissance: "1992-07-25"
+    email: "marie.durand@example.com"
+    mdp_assure: "hashed_pwd3"
+    telephone: "0611121314"
+    user_login: "marie.durand@example.com"
+    id_assureur: 1
+
+  - nom: "Lefebvre"
+    prenom: "Luc"
+    date_naissance: "1978-02-09"
+    email: "luc.lefebvre@example.com"
+    mdp_assure: "hashed_pwd4"
+    telephone: "0622232425"
+    user_login: "luc.lefebvre@example.com"
+    id_assureur: 1
+
+  - nom: "Moreau"
+    prenom: "Emma"
+    date_naissance: "1998-10-03"
+    email: "emma.moreau@example.com"
+    mdp_assure: "hashed_pwd5"
+    telephone: "0633343536"
+    user_login: "emma.moreau@example.com"
+    id_assureur: 1
+
+  - nom: "Martin"
+    prenom: "Paul"
+    date_naissance: "1990-01-15"
+    email: "paul.martin@example.com"
+    mdp_assure: "hashed_pwd6"
+    telephone: "0644454647"
+    user_login: "paul.martin@example.com"
+    id_assureur: 1
+
+logements:
+  - adresse: "12 rue des Fleurs, Blois"
+    type_logement: "Appartement"
+    surface: 70
+    description: "Appartement T3 lumineux avec balcon"
+
+  - adresse: "5 avenue de la Liberté, Tours"
+    type_logement: "Maison"
+    surface: 120
+    description: "Maison familiale avec jardin"
+
+  - adresse: "8 impasse des Lilas, Orléans"
+    type_logement: "Studio"
+    surface: 30
+    description: "Petit studio bien situé en centre-ville"
+
+  - adresse: "22 boulevard Victor Hugo, Blois"
+    type_logement: "Appartement"
+    surface: 80
+    description: "Appartement rénové, proche des commerces"
+
+  - adresse: "17 rue de la Paix, Paris"
+    type_logement: "Maison"
+    surface: 140
+    description: "Maison moderne avec terrasse"
+
+possede:
+  - id_assure: 1
+    id_logement: 1
+
+  - id_assure: 2
+    id_logement: 1
+  
+  - id_assure: 2
+    id_logement: 2
+  
+  - id_assure: 3
+    id_logement: 3
+  
+  - id_assure: 4
+    id_logement: 4
+
+  - id_assure: 1
+    id_logement: 5
+
+pieces:
+  - nom_piece: "Salon"
+    surface: 25
+    id_logement: 1
+
+  - nom_piece: "Cuisine"
+    surface: 10
+    id_logement: 1
+
+  - nom_piece: "Chambre principale"
+    surface: 14
+    id_logement: 2
+
+  - nom_piece: "Salle de bain"
+    surface: 8
+    id_logement: 2
+
+  - nom_piece: "Bureau"
+    surface: 12
+    id_logement: 3
+
+biens:
+  - nom_bien: "Téléviseur Samsung 4K"
+    categorie: "Électronique"
+    date_achat: "2022-03-01"
+    prix_achat: 800
+    etat: "Acceptable"
+    id_piece: 1
+
+  - nom_bien: "Canapé IKEA"
+    categorie: "Mobilier"
+    date_achat: "2021-09-12"
+    prix_achat: 600
+    etat: "Excellent"
+    id_piece: 1
+
+  - nom_bien: "Ordinateur portable HP"
+    categorie: "Informatique"
+    date_achat: "2023-02-10"
+    prix_achat: 900
+    etat: "Excellent"
+    id_piece: 5
+
+  - nom_bien: "Table en chêne"
+    categorie: "Mobilier"
+    date_achat: "2020-05-20"
+    prix_achat: 450
+    etat: "Bon"
+    id_piece: 2
+
+  - nom_bien: "Machine à laver Bosch"
+    categorie: "Électroménager"
+    date_achat: "2021-01-15"
+    prix_achat: 500
+    etat: "Usé"
+    id_piece: 4
+
+sinistres:
+  - date_sinistre: "2024-03-10"
+    type_sinistre: "Dégât des eaux"
+    description: "Fuite dans la salle de bain"
+    montant_estime: 1200
+    numero_sinistre: "SIN-001"
+    id_assure: 1
+    id_logement: 1
+
+  - date_sinistre: "2023-12-01"
+    type_sinistre: "Vol"
+    description: "Ordinateur portable volé"
+    montant_estime: 950
+    numero_sinistre: "SIN-002"
+    id_assure: 2
+    id_logement: 2
+
+  - date_sinistre: "2022-09-18"
+    type_sinistre: "Incendie"
+    description: "Feu de cuisine"
+    montant_estime: 5000
+    numero_sinistre: "SIN-003"
+    id_assure: 3
+    id_logement: 3
+
+impacte:
+  - id_bien: 3
+    id_sinistre: 2
+    degat_estime: 900
+
+  - id_bien: 5
+    id_sinistre: 1
+    degat_estime: 400

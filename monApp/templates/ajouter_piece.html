@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Ajouter une Pièce{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/ajouter_piece.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <main class="main-content">
+        <header>
+            <h1>Ajouter une Pièce</h1>
+            <p>Remplissez le formulaire ci-dessous pour enregistrer une nouvelle pièce.</p>
+        </header>
+
+        <section class="form-section">
+            <div class="card">
+                <form action="{{ url_for('ajouter_piece') }}" method="POST" class="form">
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-group">
+                        {{ form.nom_piece.label(class="form-label") }}
+                        {{ form.nom_piece(class="form-input", placeholder="Ex : Salle de bain") }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.surface.label(class="form-label") }}
+                        {{ form.surface(class="form-input", placeholder="Surface en m²") }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.logement_id.label(class="form-label") }}
+                        <select name="{{ form.logement_id.name }}" id="{{ form.logement_id.id }}" class="form-input" required>
+                            <option value="" disabled selected>Sélectionner un logement</option>
+                            {% for value, label in form.logement_id.choices %}
+                                <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        {{ form.submit(class="btn-primary") }}
+                        <a href="{{ url_for('tableau_de_bord') }}" class="btn-secondary">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}
