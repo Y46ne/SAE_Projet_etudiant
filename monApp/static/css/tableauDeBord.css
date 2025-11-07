@@ -55,7 +55,6 @@ header p {
   background-color: #0b5ed7;
 }
 
-/* ----- Stats Cards ----- */
 .stats {
   display: flex;
   gap: 20px;
@@ -73,7 +72,6 @@ header p {
   margin-top: 5px;
 }
 
-/* ----- Logements Section ----- */
 .logements {
   background-color: #e9ecef;
   padding: 15px 20px;

@@ -15,7 +15,6 @@ from .database.impacte import impacte
 def loaddb(filename):
     """Charge les données depuis un fichier YAML dans la base de données."""
     
-    # Réinitialiser la base
     db.drop_all()
     db.create_all()
 

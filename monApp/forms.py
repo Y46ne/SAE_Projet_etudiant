@@ -3,7 +3,6 @@ from wtforms import StringField, PasswordField, HiddenField, SubmitField, FloatF
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
 from hashlib import sha256 
 from .database import *
-from .app import db 
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField
 from monApp.database.assure import get_tous_les_assures
 from flask_wtf.file import FileField, FileAllowed
