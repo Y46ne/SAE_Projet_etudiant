@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}{{ bien.nom_bien or 'Bien sans nom' }} - Détails{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/detail_bien.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-card">
+        <div class="header-top">
+            <div class="title-section">
+                <div class="icon-box">📦</div>
+                <div class="title-text">
+                    <h1>{{ bien.nom_bien or 'Nom inconnu' }}</h1>
+                    <div class="tags">
+                        <span class="tag tag-blue">{{ bien.categorie or 'Non renseigné' }}</span>
+                        <span class="tag tag-green">{{ bien.etat or 'Non renseigné' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="{{ url_for('modifier_bien', bien_id=bien.id_bien) }}" class="btn btn-warning">✏️ Modifier</a>
+                <form action="{{ url_for('supprimer_bien', bien_id=bien.id_bien) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Supprimer ce bien ?')">🗑️ Supprimer</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-icon">💶</div>
+                <div class="info-label">Prix Achat</div>
+                <div class="info-value">{{ bien.prix_achat if bien.prix_achat is not none else 'Non renseigné' }} €</div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">📅</div>
+                <div class="info-label">Date Achat</div>
+                <div class="info-value">{{ bien.date_achat.strftime('%d/%m/%Y') if bien.date_achat else 'Non renseigné' }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">🏠</div>
+                <div class="info-label">Logement</div>
+                <div class="info-value">
+                    {{ bien.piece.logement.nom_logement if bien.piece and bien.piece.logement else 'Non renseigné' }}
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">📍</div>
+                <div class="info-label">Pièce</div>
+                <div class="info-value">
+                    {{ bien.piece.nom_piece if bien.piece else 'Non renseigné' }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-grid">
+        <div class="media-card">
+            <div class="media-header">
+                <h3>🖼️ Photos</h3>
+                <span class="media-count">({{ bien.photos|length if bien.photos else 0 }})</span>
+            </div>
+            <div class="media-list">
+                {% if bien.photos %}
+                    {% for photo in bien.photos %}
+                    <div class="media-item">
+                        <div class="media-info">
+                            <span class="media-icon">🖼️</span>
+                            <span class="media-name">{{ photo.titre or 'Photo' }}</span>
+                        </div>
+                        <a href="{{ url_for('static', filename='uploads/' + photo.fichier) }}" download class="download-btn">⬇️</a>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state"><p>Aucune photo</p></div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="media-card">
+            <div class="media-header">
+                <h3>📄 Documents</h3>
+                <span class="media-count">({{ bien.documents|length if bien.documents else 0 }})</span>
+            </div>
+            <div class="media-list">
+                {% if bien.documents %}
+                    {% for doc in bien.documents %}
+                    <div class="media-item">
+                        <div class="media-info">
+                            <span class="media-icon">📄</span>
+                            <span class="media-name">{{ doc.titre or 'Document' }}</span>
+                        </div>
+                        <a href="{{ url_for('static', filename='uploads/' + doc.fichier) }}" download class="download-btn">⬇️</a>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state"><p>Aucun document</p></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

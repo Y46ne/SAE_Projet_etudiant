@@ -57,7 +57,7 @@
                         {% endif %}
                     </td>
                     <td>
-                        <a href="{{ url_for('voir_bien', bien_id=bien.id_bien) }}" class="btn btn-info" title="Voir">Voir</a>
+                        <a href="{{ url_for('detail_bien', id=bien.id_bien) }}" class="btn btn-info" title="Voir">Voir</a>
                         <a href="{{ url_for('modifier_bien', bien_id=bien.id_bien) }}" class="btn btn-sm btn-warning" title="Modifier">Modifier</a>
                         <form action="{{ url_for('supprimer_bien', bien_id=bien.id_bien) }}" method="post" style="display:inline;">
                             <button type="submit" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce bien ?');">

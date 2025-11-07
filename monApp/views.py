@@ -188,6 +188,13 @@ def creer_compte():
 def TableauDeBord():
     return render_template('TableauDeBord.html')
 
+@app.route('/tableauDeBord/detail_bien/<int:id>')
+@login_required
+def detail_bien(id):
+    bien = Bien.query.get_or_404(id)
+    return render_template('detail_bien.html', bien=bien)
+
+
 @app.route('/parametres/', methods=['GET', 'POST'])
 @login_required
 def parametres():
