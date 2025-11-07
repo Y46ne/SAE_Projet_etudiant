@@ -38,6 +38,9 @@ header p {
   margin-top: 5px;
   color: #555;
 }
+
+
+
 .btn-primary {
   background-color: #0d6efd;
   border: none;
@@ -52,7 +55,6 @@ header p {
   background-color: #0b5ed7;
 }
 
-/* ----- Stats Cards ----- */
 .stats {
   display: flex;
   gap: 20px;
@@ -70,7 +72,6 @@ header p {
   margin-top: 5px;
 }
 
-/* ----- Logements Section ----- */
 .logements {
   background-color: #e9ecef;
   padding: 15px 20px;
@@ -139,4 +140,65 @@ header p {
   .main-content {
     padding: 20px;
   }
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #fff;
+}
+
+.btn:hover {
+    opacity: 0.85;
+}
+
+.btn-info { background-color: #0d6efd; }
+.btn-warning { background-color: #ffc107; color: #212529; }
+.btn-danger { background-color: #dc3545; }
+
+.btn i {
+    margin-left: 10px;
+    
+    border-left: 1px solid rgba(255, 255, 255, 0.5);
+    
+    padding-left: 10px;
+    
+    line-height: 1; 
+}
+
+.btn-warning i {
+    border-left-color: rgba(0, 0, 0, 0.25);
+}
+
+.voir-plus{
+  gap: 20px;
+  margin-bottom: 30px;
+  margin-top: 30px;
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+.alert-success {
+    background: #d1fae5;
+    color: #065f46;
+}
+.alert-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+.alert-warning {
+    background: #fef9c3;
+    color: #92400e;
 }

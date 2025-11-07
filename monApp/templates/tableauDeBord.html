@@ -3,10 +3,18 @@
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/tableauDeBord.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 {% endblock %}
 
 {% block content %}
 <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
     <main class="main-content">
         <header> 
             <h1>Tableau de Bord</h1>
@@ -21,46 +29,39 @@
             </div>
             <div class="card">
                 <p>🏡 Nombre de Biens :</p>
-                <h3>{{ nb_biens }}</h3>
+                <h3>{{ nb_biens_total }}</h3>
             </div>
             <div class="card">
                 <p>💰 Valeur Totale des Biens :</p>
-                <h3>{{ valeur_totale }} €</h3>
+                <h3>{{ "%.2f"|format(valeur_totale) }} €</h3>
             </div>
         </section>
 
         <section class="logements">
             <h2>Mes Logements</h2>
-            {% if logements %}
-                {% for logement in logements %}
-                <div class="logement-item">
-                    <div class="logement-info">
-                        <h3>{{ logement.nom }}</h3>
-                        <p>
-                            {{ logement.nb_pieces }} pièces - 
-                            {{ logement.nb_biens }} biens - 
-                            Valeur : {{ logement.valeur|round(2) }} € - 
-                            Maj : {{ logement.date_maj.strftime('%d/%m/%Y') if logement.date_maj else 'N/A' }}
-                        </p>
-                    </div>
-                    <div class="logement-actions">
-                        <a href="{{ url_for('voir_logement', id=logement.id) }}" class="btn-consulter">Consulter ></a>
-                        <a href="{{ url_for('update_logement', id=logement.id) }}" class="btn-icon" title="Modifier">✏️ Modifier</a>
-                        <button class="btn-icon btn-delete" onclick="confirmerSuppression('{{ logement.id }}')" , title="Supprimer">🗑️ Supprimer</button>
-                    </div>
+            
+            {% for item in logements_stats[:3] %}
+            <div class="logement-item">
+                <div class="logement-info">
+                    
+                    <h3>{{ item.logement.adresse }}</h3> 
+                    
+                    <p>
+                        {{ item.nb_pieces }} pièces - 
+                        {{ item.nb_biens }} biens - 
+                        Valeur : {{ "%.2f"|format(item.valeur_logement) }} €
+                    </p>
                 </div>
-                {% endfor %}
-
-                {% if logements|length > 5 %}
-                <button class="btn-secondary" onclick="afficherPlus()">Voir plus</button>
-                {% endif %}
-
+                <div class="logement-actions">
+                    <a href="{{ url_for('view_logement_pieces', id=item.logement.id_logement) }}" class="btn btn-info">Consulter<i class="fas fa-eye"></i></a>
+                </div>
+            </div>
             {% else %}
-                <div class="aucun-logement">
-                    <p>Vous n'avez pas encore de logement enregistré.</p>
-                    <a href="{{ url_for('ajouter_logement') }}" class="btn-primary">+ Ajouter mon premier logement</a>
-                </div>
-            {% endif %}
+                <p>Vous n'avez pas encore de logement.</p>
+            {% endfor %}
+            <div class="voir-plus">
+                <a href="{{ url_for('mes_logements') }}" class="btn btn-info">Voir plus<i class="fas fa-eye"></i></a>
+            </div>
         </section>
     </main>
 </div>

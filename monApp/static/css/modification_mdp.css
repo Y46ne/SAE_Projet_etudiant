@@ -1,0 +1,184 @@
+body {
+    background: #f7fafc;
+    font-family: 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+}
+
+h1 {
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: #2563eb;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.card {
+    background: #fff;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    
+    width: 90%;
+    max-width: 900px; 
+    
+    margin: 5rem auto; 
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.form-group,
+.mb-3 {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #374151;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid #cbd5e1;
+    padding: 0.75rem;
+    font-size: 1rem;
+    background: #f1f5f9;
+    transition: border-color 0.2s;
+    
+    box-sizing: border-box; 
+}
+
+.form-control:focus {
+    border-color: #2563eb;
+    background: #fff;
+    outline: none;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background-color: #e2e8f0;
+    margin: 1.5rem 0;
+}
+
+input[type="submit"].form-control {
+    width: auto;
+    height: auto;
+    background-color: #dc3545;
+    border: none;
+    color: #fff;
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem; 
+    
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: background 0.2s;
+    cursor: pointer;
+}
+
+input[type="submit"].form-control:hover {
+    background-color: #b91c1c;
+}
+
+
+.btn-secondary {
+    background-color: #64748b;
+    border: none;
+    color: #fff;
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem; 
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: background 0.2s;
+    text-decoration: none;
+    display: inline-block;
+    align-self: center; 
+}
+
+.btn-secondary:hover {
+    background-color: #475569;
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+    text-align: center;
+}
+.alert-success {
+    background: #d1fae5;
+    color: #065f46;
+}
+.alert-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+}
+
+.form-control.is-invalid {
+    border-color: #dc3545;
+}
+
+.d-flex {
+    display: flex;
+}
+.justify-content-end {
+    justify-content: flex-start;
+}
+.gap-2 {
+    gap: 0.5rem;
+}
+.mt-4 {
+    margin-top: 1.5rem;
+}
+
+.form-text {
+    font-size: 0.875em;
+    color: #64748b;
+    margin-top: 5px;  
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 1px;
+    top: 1px;
+    bottom: 1px;
+    
+    border: none;
+    background: none;
+    padding: 0 12px;
+    cursor: pointer;
+    color: #64748b;
+    
+    display: flex;
+    align-items: center;
+    
+    border-top-right-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+}
+
+.toggle-password:hover {
+    color: #2563eb;
+}
+
+.password-wrapper .form-control {
+    padding-right: 45px;
+}
+
+.password-wrapper .form-control.is-invalid {
+    padding-right: 45px;
+}

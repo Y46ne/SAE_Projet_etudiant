@@ -6,12 +6,10 @@ class Bien(db.Model):
     __tablename__ = 'bien'
     id_bien = db.Column(db.Integer, primary_key=True)
     nom_bien = db.Column(db.String(255), nullable=False)
-    description = db.Column(db.Text)
     categorie = db.Column(db.String(100))
     date_achat = db.Column(db.Date)
     prix_achat = db.Column(db.Float)
     etat = db.Column(db.String(100))
-    valeur_actuelle = db.Column(db.Float)
 
     id_piece = db.Column(db.Integer, db.ForeignKey('piece.id_piece'), nullable=False)
     sinistres = db.relationship('Sinistre', secondary=impacte, lazy='subquery', backref=db.backref('biens', lazy='subquery'))

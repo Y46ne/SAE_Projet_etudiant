@@ -15,7 +15,6 @@ from .database.impacte import impacte
 def loaddb(filename):
     """Charge les données depuis un fichier YAML dans la base de données."""
     
-    # Réinitialiser la base
     db.drop_all()
     db.create_all()
 
@@ -23,10 +22,21 @@ def loaddb(filename):
         data = yaml.safe_load(f)
 
     # ---- USERS ----
-    for u in data.get('users', []):
+    for a in data.get('assureurs', []):
+        m = sha256()
+        m.update(a['mot_de_passe'].encode())
         user = User(
-            Login=u['Login'],
-            Password=u['Password']
+            Login=a['email'],
+            Password=m.hexdigest()
+        )
+        db.session.add(user)
+    db.session.commit()
+    for a in data.get('assures', []):
+        m = sha256()
+        m.update(a['mdp_assure'].encode())
+        user = User(
+            Login=a['user_login'],
+            Password=m.hexdigest()
         )
         db.session.add(user)
     db.session.commit()
@@ -36,11 +46,10 @@ def loaddb(filename):
         assureur = Assureur(
             nom=assr['nom'],
             prenom=assr['prenom'],
-            email=assr['user_login'],  # email
-            login=assr['user_login'],  # login
+            email=assr['email'],  # email
             mot_de_passe=assr['mot_de_passe'],
             telephone=assr.get('telephone'),
-            societe=assr.get('societe')
+            societe=assr.get('societe'),
         )
         db.session.add(assureur)
     db.session.commit()
@@ -74,9 +83,7 @@ def loaddb(filename):
     for p in data.get('pieces', []):
         piece = Piece(
             nom_piece=p['nom_piece'],
-            type_piece=p.get('type_piece'),
             surface=Decimal(str(p['surface'])) if p.get('surface') is not None else None,
-            etage=p.get('etage'),
             id_logement=p['id_logement']
         )
         db.session.add(piece)
@@ -136,7 +143,13 @@ def loaddb(filename):
 
     # Possede
     for p in data.get('possede', []):
-        db.session.execute(possede.insert().values(**p))
+        assure = Assure.query.get(p['id_assure'])
+        logement = Logement.query.get(p['id_logement'])
+
+        if assure and logement:
+            assure.logements.append(logement)
+        else:
+            print(f"Assure {p['id_assure']} ou Logement {p['id_logement']} n'existe pas.")
 
     db.session.commit()
 
@@ -157,7 +170,7 @@ def syncdb():
 @app.cli.command()
 @click.argument('login')
 @click.argument('pwd')
-def newuser (login, pwd):
+def newuser(login, pwd):
     '''Adds a new user''' 
     from .database import User
     from hashlib import sha256

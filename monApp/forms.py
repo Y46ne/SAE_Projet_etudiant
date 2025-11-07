@@ -1,11 +1,11 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, HiddenField, SubmitField, FloatField, SelectField, DateField, TextAreaField
-from wtforms.validators import DataRequired, Email, EqualTo
+from wtforms import StringField, PasswordField, HiddenField, SubmitField, FloatField, SelectField, DateField, TextAreaField, DecimalField
+from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
 from hashlib import sha256 
-from .database import User
-from .app import db 
+from .database import *
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField
 from monApp.database.assure import get_tous_les_assures
+from flask_wtf.file import FileField, FileAllowed
 
 class LoginForm(FlaskForm):
     Login = StringField('Identifiant', validators=[DataRequired()])
@@ -13,14 +13,19 @@ class LoginForm(FlaskForm):
     next = HiddenField()
 
     def get_authenticated_user(self):
-        user = db.session.get(User, self.Login.data)
-        if not user:
+        unUser = User.query.get(self.Login.data)
+
+        if unUser is None:
             return None
+
         m = sha256()
         m.update(self.Password.data.encode())
-        hashed = m.hexdigest()
-        return user if user.Password == hashed else None
+        passwd_input_hache = m.hexdigest()
+        print(passwd_input_hache)
 
+        if passwd_input_hache == unUser.Password:
+            return unUser 
+        return None
 
 class SignUpForm(FlaskForm):
     nom = StringField('Nom', validators=[DataRequired()])
@@ -48,7 +53,7 @@ class LogementForm(FlaskForm):
     assures = QuerySelectMultipleField(
         'Assures',
         query_factory=get_tous_les_assures,
-        get_label='nom',            
+        get_label=lambda x: f"{x.prenom}  {x.nom} - {x.email}",            
         allow_blank=False            
     )
     submit = SubmitField('Ajouter le logement')
@@ -57,8 +62,6 @@ class LogementForm(FlaskForm):
 class PieceForm(FlaskForm):
     nom_piece = StringField('Nom de la pièce', validators=[DataRequired()])
     surface = FloatField('Surface (m²)', validators=[DataRequired()])
-    type_piece = StringField('Type de pièce (Salon, Chambre, Cuisine...)', validators=[DataRequired()])
-    etage = StringField('Étage (ex: RDC, 1er, Sous-sol)', validators=[DataRequired()]) # Added etage field
     logement_id = SelectField('Logement associé', coerce=int, validators=[DataRequired()])
     submit = SubmitField('Ajouter la pièce')
 
@@ -86,3 +89,131 @@ class SinistreForm(FlaskForm):
 
 class DeleteForm(FlaskForm):
     submit = SubmitField('Supprimer')
+
+class ChangePasswordForm(FlaskForm):
+    old_password = PasswordField(
+        'Ancien mot de passe', 
+        validators=[DataRequired(message="Champ requis.")]
+    )
+    
+    new_password = PasswordField(
+        'Nouveau mot de passe', 
+        validators=[
+            DataRequired(message="Champ requis."),
+            Length(min=8, message="Le mot de passe doit faire au moins 8 caractères.")
+        ]
+    )
+    
+    confirm_password = PasswordField(
+        'Confirmer le nouveau mot de passe', 
+        validators=[
+            DataRequired(message="Champ requis."),
+            EqualTo('new_password', message='Les mots de passe ne correspondent pas.')
+        ]
+    )
+    
+    submit = SubmitField('Changer le mot de passe')
+
+class AjouterBienForm(FlaskForm):
+    nom_bien = StringField(
+        "Nom du bien", 
+        validators=[DataRequired(message="Le nom est requis.")]
+    )
+    valeur = DecimalField(
+        "Valeur (€)", 
+        validators=[DataRequired(message="La valeur est requise.")]
+    )
+    categorie = StringField(
+        "Catégorie", 
+        validators=[DataRequired(message="La catégorie est requise.")]
+    )
+    date_achat = DateField(
+        "Date d'achat", 
+        validators=[DataRequired(message="La date est requise.")]
+    )
+    etat = SelectField(
+        "État",
+        choices=[
+            ("", "Sélectionner un état"),
+            ("Excellent", "Excellent"),
+            ("Bon", "Bon"),
+            ("Acceptable", "Acceptable"),
+            ("Usé", "Usé")
+        ],
+        validators=[DataRequired(message="L'état est requis.")]
+    )
+    logement_id = SelectField(
+        "Logement", 
+        coerce=int, 
+        validators=[DataRequired(message="Le logement est requis.")]
+    )
+    piece_id = SelectField(
+        "Pièce", 
+        coerce=int, 
+        validators=[DataRequired(message="La pièce est requise.")]
+    )
+    facture = FileField(
+        "Joindre une facture (Facture, Preuve d'achat...)",
+        validators=[
+            Optional(),
+            FileAllowed(['pdf', 'png', 'jpg', 'jpeg'], 'Seuls les images et PDF sont autorisés!')
+        ]
+    )
+    submit = SubmitField("Enregistrer le bien")
+
+class DeclarerSinistre(FlaskForm):
+    date_sinistre = DateField(
+        "Date du sinistre",
+        format="%Y-%m-%d",
+        validators=[DataRequired(message="Veuillez entrer une date valide.")]
+    )
+
+    type_sinistre = SelectField(
+        "Type de sinistre",
+        choices=[
+            ("incendie", "Incendie"),
+            ("degat_eau", "Dégât des eaux"),
+            ("vol", "Vol"),
+            ("tempete", "Tempête"),
+            ("bris_glace", "Bris de glace"),
+        ],
+        validators=[DataRequired(message="Veuillez sélectionner un type de sinistre.")]
+    )
+
+    biens_selectionnes = QuerySelectMultipleField(
+        "Biens sélectionnés",
+        query_factory=lambda: Bien.query.all(),
+        get_label="nom",
+        allow_blank=True
+    )
+
+    submit = SubmitField("Générer l'état financier des biens")
+
+class ModifierLogementForm(FlaskForm):
+    adresse = StringField('Nom du logement', validators=[DataRequired()])
+    submit = SubmitField('Enregistrer')
+
+class ModifierPieceForm(FlaskForm):
+    nom_piece = StringField('Nom de la pièce', validators=[DataRequired()])
+    surface = FloatField('Surface (m²)', validators=[DataRequired()])
+    submit = SubmitField('Enregistrer')
+
+class ModifierBienForm(FlaskForm):
+    nom_bien = StringField('Nom du bien', validators=[DataRequired()])
+    categorie = StringField('Catégorie', validators=[DataRequired()])
+    date_achat = DateField('Date d\'achat', format='%Y-%m-%d', validators=[Optional()])
+    prix_achat = FloatField('Valeur (€)', validators=[DataRequired()])
+    etat = SelectField('État', choices=[
+            ("Excellent", "Excellent"),
+            ("Bon", "Bon"),
+            ("Acceptable", "Acceptable"),
+            ("Usé", "Usé")
+    ], validators=[DataRequired()])
+    submit = SubmitField('Enregistrer')
+
+class ParametresForm(FlaskForm):
+    nom = StringField('Nom', validators=[DataRequired()])
+    prenom = StringField('Prénom', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    telephone = StringField('Téléphone', validators=[Optional()])
+    submit = SubmitField('Enregistrer')
