@@ -211,3 +211,10 @@ class ModifierBienForm(FlaskForm):
             ("Usé", "Usé")
     ], validators=[DataRequired()])
     submit = SubmitField('Enregistrer')
+
+class ParametresForm(FlaskForm):
+    nom = StringField('Nom', validators=[DataRequired()])
+    prenom = StringField('Prénom', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    telephone = StringField('Téléphone', validators=[Optional()])
+    submit = SubmitField('Enregistrer')

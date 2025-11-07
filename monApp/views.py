@@ -198,32 +198,21 @@ def detail_bien(id):
 @app.route('/parametres/', methods=['GET', 'POST'])
 @login_required
 def parametres():
-    """
-    Affiche la page des paramètres et gère la mise à jour
-    des informations du profil (nom, prenom, telephone).
-    """
-
-    profile = current_user.assure_profile
-    
-    if profile is None:
-        flash("Erreur : Profil utilisateur introuvable.", "danger")
-        return redirect(url_for('index'))
-
-    if request.method == 'POST':
+    user = current_user
+    assure = current_user.assure_profile
+    print("Assure utilisé :", assure.nom, assure.prenom, assure.email, assure.telephone)
+    form = ParametresForm(obj=assure)
+    if form.validate_on_submit():
+        assure.nom = form.nom.data
+        assure.prenom = form.prenom.data
+        assure.telephone = form.telephone.data
         try:
-            profile.nom = request.form.get('nom')
-            profile.prenom = request.form.get('prenom')
-            profile.telephone = request.form.get('telephone')
-            
             db.session.commit()
-            flash('Vos informations ont été mises à jour avec succès.', 'success')
+            flash("Paramètres modifiés avec succès.", "success")
         except Exception as e:
             db.session.rollback()
-            flash(f'Erreur lors de la mise à jour : {e}', 'danger')
-        
-        return redirect(url_for('parametres'))
-
-    return render_template('parametres.html', profile=profile)
+            flash(f"Erreur lors de la modification : {e}", "danger")
+    return render_template('parametres.html', form=form)
 
 
 @app.route('/changer_mot_de_passe/', methods=['GET', 'POST'])
