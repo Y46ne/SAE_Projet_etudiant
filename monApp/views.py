@@ -1,11 +1,17 @@
+from flask import render_template, request, url_for, redirect, flash
+from flask_login import (
+    login_user, logout_user, login_required, current_user
+)
+from hashlib import sha256
+
 from .app import app, db, login_manager
 from config import *
-from flask import render_template, request, url_for, redirect, flash, jsonify
-from monApp.database import User, Assure, Assureur, Logement, Piece, Bien, Sinistre, impacte
+from monApp.database import User, Assure, Logement, Piece, Bien
 from monApp.forms import *
-from flask_login import login_user, logout_user, login_required, current_user
-from hashlib import sha256
-from flask import abort
+from .forms import ChangePasswordForm
+
+
+
 
 @app.route('/')
 def index():
@@ -90,7 +96,6 @@ def tableau_de_bord():
             'valeur_logement': valeur_logement
         })
 
-    # 8. Renvoyer toutes les données au template
     return render_template('tableauDeBord.html', 
                            nb_logements=nb_logements_total, 
                            nb_biens_total=nb_biens_total, 
@@ -133,6 +138,8 @@ def ajouter_logement():
 @app.route('/mes_logements/')
 @login_required
 def mes_logements():
+    if current_user.assure_profile.logements == None:
+        return render_template('mes_logements.html', logements=[])
     logements = current_user.assure_profile.logements
     rows = []
     for logement in logements:
@@ -174,7 +181,17 @@ def creer_compte():
                 Login=form.email.data,
                 Password=sha256(form.Password.data.encode()).hexdigest()
             )
+            new_assure = Assure(
+                nom=form.nom.data,
+                prenom=form.prenom.data,
+                date_naissance=form.date_naissance.data,
+                telephone=form.telephone.data,
+                email=form.email.data,
+                mdp_assure= form.Password.data,
+                id_assureur= 1
+            )
             db.session.add(new_user)
+            db.session.add(new_assure)
             db.session.commit()
             flash('Votre compte a été créé avec succès ! Vous pouvez maintenant vous connecter.', 'success')
             return redirect(url_for('login'))
@@ -188,7 +205,7 @@ def creer_compte():
 def TableauDeBord():
     return render_template('TableauDeBord.html')
 
-@app.route('/tableauDeBord/detail_bien/<int:id>')
+@app.route('/detail_bien/<int:id>')
 @login_required
 def detail_bien(id):
     bien = Bien.query.get_or_404(id)
@@ -214,12 +231,6 @@ def parametres():
             flash(f"Erreur lors de la modification : {e}", "danger")
     return render_template('parametres.html', form=form)
 
-
-from flask import render_template, redirect, url_for, flash
-from flask_login import current_user, login_required
-from hashlib import sha256
-from .app import app, db # Assurez-vous d'importer db
-from .forms import ChangePasswordForm # Assurez-vous que le formulaire est importé
 
 @app.route('/changer_mot_de_passe/', methods=['GET', 'POST'])
 @login_required
