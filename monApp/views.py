@@ -97,30 +97,10 @@ def tableau_de_bord():
                            valeur_totale=valeur_totale_globale, 
                            logements_stats=logements_avec_stats)
 
-@app.route('/modifier_bien/')
-@login_required
-def modifier_bien():
-    return render_template('modifier_bien.html')
-
-@app.route('/modifier_pièce/')
-def modifier_piece():
-    return render_template('modifier_pièce.html')
-
-@app.route('/supprimer_pièce/')
-def supprimer_piece():
-    return render_template('supprimer_pièce.html')
-
 @app.route('/declarer_sinstre')
 def declarer_sinistre():
     form = DeclarerSinistre()
     return render_template('declarer_sinistre.html', form=form)
-
-
-
-@app.route('/supprimer_bien/')
-def supprimer_bien():
-    return render_template('supprimer_bien.html')
-
 
 @app.route('/ajouter_logement/', methods=['GET', 'POST'])
 @login_required
@@ -177,40 +157,6 @@ def view_logement_pieces(id):
     return render_template('logement_pieces.html', logement=logement)
 
 
-@app.route('/logement/<int:id>/delete', methods=['GET', 'POST'])
-@login_required
-def delete_logement(id):
-    logement = Logement.query.get_or_404(id)
-    try:
-        db.session.delete(logement)
-        db.session.commit()
-        flash('Logement supprimé.', 'success')
-    except Exception as e:
-        db.session.rollback()
-        flash(f'Erreur lors de la suppression : {e}', 'danger')
-    return redirect(url_for('mes_logements'))
-
-
-@app.route('/logement/<int:id>/edit', methods=['GET', 'POST'])
-@login_required
-def update_logement(id):
-    logement = Logement.query.get_or_404(id)
-    form = LogementForm(obj=logement)
-    if form.validate_on_submit():
-        logement.adresse = form.adresse.data
-        logement.type_logement = form.type_logement.data
-        logement.surface = form.surface.data
-        logement.description = form.description.data
-        try:
-            db.session.commit()
-            flash('Logement mis à jour.', 'success')
-            return redirect(url_for('mes_logements'))
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Erreur lors de la mise à jour : {e}', 'danger')
-    return render_template('logement_client.html', form=form)
-
-
 @app.route('/piece/<int:piece_id>/biens/')
 @login_required
 def gestion_bien(piece_id):
@@ -224,7 +170,6 @@ def creer_compte():
     form = SignUpForm()
     if form.validate_on_submit():
         try:
-            # Le modèle User n'attend que Login et Password
             new_user = User(
                 Login=form.email.data,
                 Password=sha256(form.Password.data.encode()).hexdigest()
@@ -250,9 +195,7 @@ def parametres():
     Affiche la page des paramètres et gère la mise à jour
     des informations du profil (nom, prenom, telephone).
     """
-    # Récupère le bon profil (Assure ou Assureur)
-    # Note: 'assure' et 'assureur' sont les noms des relations
-    # définies dans ton modèle User.
+
     profile = current_user.assure_profile
     
     if profile is None:
@@ -260,7 +203,6 @@ def parametres():
         return redirect(url_for('index'))
 
     if request.method == 'POST':
-        # C'est une soumission de formulaire pour ENREGISTRER
         try:
             profile.nom = request.form.get('nom')
             profile.prenom = request.form.get('prenom')
@@ -272,10 +214,8 @@ def parametres():
             db.session.rollback()
             flash(f'Erreur lors de la mise à jour : {e}', 'danger')
         
-        # Redirige vers la même page pour voir les changements
         return redirect(url_for('parametres'))
 
-    # Si c'est un GET, on affiche simplement la page
     return render_template('parametres.html', profile=profile)
 
 
@@ -286,17 +226,15 @@ def changer_mot_de_passe():
     """
     form = ChangePasswordForm()
     if form.validate_on_submit():
-        # 1. Vérifier l'ancien mot de passe
         if not current_user.check_password(form.old_password.data):
             flash("L'ancien mot de passe est incorrect.", "danger")
             return redirect(url_for('changer_mot_de_passe'))
         
-        # 2. Mettre à jour avec le nouveau mot de passe
         try:
             current_user.set_password(form.new_password.data)
             db.session.commit()
             flash('Votre mot de passe a été changé avec succès.', 'success')
-            return redirect(url_for('parametres')) # Retourne aux paramètres
+            return redirect(url_for('parametres'))
         except Exception as e:
             db.session.rollback()
             flash(f'Erreur lors du changement de mot de passe : {e}', 'danger')
@@ -399,6 +337,109 @@ def voir_bien(bien_id):
     bien = Bien.query.get_or_404(bien_id)
     return render_template('info_bien.html', bien=bien)
 
+
+@app.route('/modifier_logement/<int:logement_id>/', methods=['GET', 'POST'])
+@login_required
+def modifier_logement(logement_id):
+    logement = Logement.query.get_or_404(logement_id)
+    form = ModifierLogementForm(obj=logement)
+    if form.validate_on_submit():
+        logement.adresse = form.adresse.data
+        try:
+            db.session.commit()
+            flash("Nom du logement modifié avec succès.", "success")
+            return redirect(url_for('mes_logements'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erreur lors de la modification : {e}", "danger")
+    return render_template('modifier_logement.html', form=form, logement=logement)
+
+@app.route('/modifier_piece/<int:piece_id>/', methods=['GET', 'POST'])
+@login_required
+def modifier_piece(piece_id):
+    piece = Piece.query.get_or_404(piece_id)
+    form = ModifierPieceForm(obj=piece)
+    if form.validate_on_submit():
+        piece.nom_piece = form.nom_piece.data
+        piece.surface = form.surface.data
+        try:
+            db.session.commit()
+            flash("Pièce modifiée avec succès.", "success")
+            return redirect(url_for('view_logement_pieces', id=piece.id_logement))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erreur lors de la modification : {e}", "danger")
+    return render_template('modifier_piece.html', form=form, piece=piece)
+
+@app.route('/supprimer_piece/<int:piece_id>/', methods=['POST', 'GET'])
+@login_required
+def supprimer_piece(piece_id):
+    piece = Piece.query.get_or_404(piece_id)
+    try:
+        for bien in piece.biens:
+            db.session.delete(bien)
+        db.session.delete(piece)
+        db.session.commit()
+        flash("Pièce et tous ses biens supprimés avec succès.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Erreur lors de la suppression : {e}", "danger")
+    return redirect(url_for('view_logement_pieces', id=piece.id_logement))
+
+@app.route('/logement/<int:id>/delete', methods=['POST'])
+@login_required
+def delete_logement(id):
+    logement = Logement.query.get_or_404(id)
+    try:
+        for sinistre in logement.sinistres:
+            db.session.delete(sinistre)
+        for piece in logement.pieces:
+            for bien in piece.biens:
+                db.session.delete(bien)
+            db.session.delete(piece)
+        db.session.delete(logement)
+        db.session.commit()
+        flash('Logement et toutes ses pièces et biens supprimés.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        print("Erreur suppression :", e)
+        flash(f'Erreur lors de la suppression : {e}', 'danger')
+    return redirect(url_for('mes_logements'))
+
+@app.route('/modifier_bien/<int:bien_id>/', methods=['GET', 'POST'])
+@login_required
+def modifier_bien(bien_id):
+    bien = Bien.query.get_or_404(bien_id)
+    form = ModifierBienForm(obj=bien)
+
+    if form.validate_on_submit():
+        bien.nom_bien = form.nom_bien.data
+        bien.categorie = form.categorie.data
+        bien.date_achat = form.date_achat.data
+        bien.prix_achat = form.prix_achat.data
+        bien.etat = form.etat.data
+        try:
+            db.session.commit()
+            flash("Bien modifié avec succès.", "success")
+            return redirect(url_for('gestion_bien', piece_id=bien.id_piece))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erreur lors de la modification : {e}", "danger")
+    return render_template('modifier_bien.html', form=form, bien=bien)
+
+@app.route('/supprimer_bien/<int:bien_id>/', methods=['POST'])
+@login_required
+def supprimer_bien(bien_id):
+    bien = Bien.query.get_or_404(bien_id)
+    piece_id = bien.id_piece
+    try:
+        db.session.delete(bien)
+        db.session.commit()
+        flash("Bien supprimé avec succès.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Erreur lors de la suppression : {e}", "danger")
+    return redirect(url_for('gestion_bien', piece_id=piece_id))
 
 # ------------------- MAIN -------------------
 if __name__ == '__main__':

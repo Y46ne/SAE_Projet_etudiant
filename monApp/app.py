@@ -15,5 +15,4 @@ Bootstrap(app)
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
-
-
+app.config['SQLALCHEMY_ECHO'] = True

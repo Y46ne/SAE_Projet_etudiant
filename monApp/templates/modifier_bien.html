@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Modifier le bien{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modifier_bien.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Modifier le bien</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.nom_bien.label(class="form-label") }}
+            {{ form.nom_bien(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.categorie.label(class="form-label") }}
+            {{ form.categorie(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.date_achat.label(class="form-label") }}
+            {{ form.date_achat(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.prix_achat.label(class="form-label") }}
+            {{ form.prix_achat(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.etat.label(class="form-label") }}
+            {{ form.etat(class="form-control") }}
+        </div>
+        <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
+        <a href="{{ url_for('gestion_bien', piece_id=bien.id_piece) }}" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+{% endblock %}

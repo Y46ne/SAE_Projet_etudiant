@@ -12,7 +12,7 @@ class Logement(db.Model):
     surface = db.Column(db.Numeric(10,2))
     description = db.Column(db.Text)
 
-    pieces = db.relationship('Piece', backref='logement', lazy='subquery')
+    pieces = db.relationship('Piece', backref='logement', lazy='subquery', cascade="all, delete-orphan")
     sinistres = db.relationship('Sinistre', backref='logement', lazy=True)
     justificatifs = db.relationship('Justificatif', secondary=justifie, backref=db.backref('logements', lazy='subquery'), lazy='subquery')
     assureurs = db.relationship('Assureur', secondary=couvre, backref=db.backref('logements', lazy='subquery'), lazy='subquery')

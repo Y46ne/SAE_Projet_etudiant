@@ -43,9 +43,12 @@
                     <td>{{ bien.nom_bien }}</td>
                     <td>{{ bien.categorie }}</td>
                     <td>{{ bien.date_achat.strftime('%d/%m/%Y') }}</td>
-                    <td>{{ bien.valeur_actuelle }}</td>
+                    <td>{{ bien.prix_achat }}</td>
                     <td>
-                        {% if bien.etat == 'Bon' %}
+                        {% if bien.etat == 'Excellent' %}
+                            <span class="status bon">Excellent</span>
+                        
+                        {% elif bien.etat == 'Bon'%}
                             <span class="status bon">Bon</span>
                         {% elif bien.etat == 'Acceptable' %}
                             <span class="status acceptable">Acceptable</span>
@@ -56,8 +59,10 @@
                     <td>
                         <a href="{{ url_for('voir_bien', bien_id=bien.id_bien) }}" class="btn btn-info" title="Voir">Voir</a>
                         <a href="{{ url_for('modifier_bien', bien_id=bien.id_bien) }}" class="btn btn-sm btn-warning" title="Modifier">Modifier</a>
-                        <form action="{{ url_for('supprimer_bien', bien_id=bien.id_bien) }}" method="POST" style="display:inline;">
-                            <button type="submit" class="btn btn-sm btn-danger" title="Supprimer" onclick="return confirm('Supprimer ce bien ?')">Supprimer</button>
+                        <form action="{{ url_for('supprimer_bien', bien_id=bien.id_bien) }}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce bien ?');">
+                                Supprimer
+                            </button>
                         </form>
                     </td>
                 </tr>

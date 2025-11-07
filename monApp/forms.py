@@ -189,3 +189,25 @@ class DeclarerSinistre(FlaskForm):
     )
 
     submit = SubmitField("Générer l'état financier des biens")
+
+class ModifierLogementForm(FlaskForm):
+    adresse = StringField('Nom du logement', validators=[DataRequired()])
+    submit = SubmitField('Enregistrer')
+
+class ModifierPieceForm(FlaskForm):
+    nom_piece = StringField('Nom de la pièce', validators=[DataRequired()])
+    surface = FloatField('Surface (m²)', validators=[DataRequired()])
+    submit = SubmitField('Enregistrer')
+
+class ModifierBienForm(FlaskForm):
+    nom_bien = StringField('Nom du bien', validators=[DataRequired()])
+    categorie = StringField('Catégorie', validators=[DataRequired()])
+    date_achat = DateField('Date d\'achat', format='%Y-%m-%d', validators=[Optional()])
+    prix_achat = FloatField('Valeur (€)', validators=[DataRequired()])
+    etat = SelectField('État', choices=[
+            ("Excellent", "Excellent"),
+            ("Bon", "Bon"),
+            ("Acceptable", "Acceptable"),
+            ("Usé", "Usé")
+    ], validators=[DataRequired()])
+    submit = SubmitField('Enregistrer')

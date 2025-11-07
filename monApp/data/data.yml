@@ -128,14 +128,14 @@ biens:
     categorie: "Électronique"
     date_achat: "2022-03-01"
     prix_achat: 800
-    etat: "Neuf"
+    etat: "Acceptable"
     id_piece: 1
 
   - nom_bien: "Canapé IKEA"
     categorie: "Mobilier"
     date_achat: "2021-09-12"
     prix_achat: 600
-    etat: "Bon"
+    etat: "Excellent"
     id_piece: 1
 
   - nom_bien: "Ordinateur portable HP"
@@ -156,7 +156,7 @@ biens:
     categorie: "Électroménager"
     date_achat: "2021-01-15"
     prix_achat: 500
-    etat: "Très bon"
+    etat: "Usé"
     id_piece: 4
 
 sinistres:

@@ -172,20 +172,22 @@ p {
 }
 
 .alert {
-    padding: 15px 20px;
-    margin-bottom: 20px;
-    border-radius: 12px;
-    font-size: 14px;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
 }
-
 .alert-success {
-    color: #155724;
-    background-color: #d4edda;
+    background: #d1fae5;
+    color: #065f46;
 }
-
 .alert-danger {
-    color: #721c24;
-    background-color: #f8d7da;
+    background: #fee2e2;
+    color: #991b1b;
+}
+.alert-warning {
+    background: #fef9c3;
+    color: #92400e;
 }
 
 #biensTable tbody tr td[colspan] {
