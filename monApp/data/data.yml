@@ -125,7 +125,7 @@ pieces:
 
 biens:
   - nom_bien: "Téléviseur Samsung 4K"
-    categorie: "Électronique"
+    categorie: "Multimedia"
     date_achat: "2022-03-01"
     prix_achat: 800
     id_piece: 1
@@ -137,7 +137,7 @@ biens:
     id_piece: 1
 
   - nom_bien: "Ordinateur portable HP"
-    categorie: "Informatique"
+    categorie: "Multimedia"
     date_achat: "2023-02-10"
     prix_achat: 900
     id_piece: 5

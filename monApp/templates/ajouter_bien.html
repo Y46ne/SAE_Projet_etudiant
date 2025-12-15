@@ -38,7 +38,24 @@
 
                     <div class="form-group">
                         {{ form.categorie.label(class="form-label") }}
-                        {{ form.categorie(class="form-input", placeholder="Ex : Électronique") }}
+                        <select name="{{ form.categorie.name }}" id="{{ form.categorie.id }}" class="form-input" required>
+                            <option value="" disabled selected>Sélectionner une catégorie</option>
+                            <option value="Electromenager" {% if form.categorie.data == 'Electromenager' %}selected{% endif %}>Électroménager</option>
+                            <option value="Mobilier" {% if form.categorie.data == 'Mobilier' %}selected{% endif %}>Mobilier</option>
+                            <option value="Multimedia" {% if form.categorie.data == 'Multimedia' %}selected{% endif %}>Multimédia</option>
+                            <option value="Vetements" {% if form.categorie.data == 'Vetements' %}selected{% endif %}>Vêtements</option>
+                            <option value="Bijoux" {% if form.categorie.data == 'Bijoux' %}selected{% endif %}>Bijoux</option>
+                            <option value="Loisirs" {% if form.categorie.data == 'Loisirs' %}selected{% endif %}>Loisirs</option>
+                            <option value="Vaisselle" {% if form.categorie.data == 'Vaisselle' %}selected{% endif %}>Vaisselle</option>
+                            <option value="Outillage" {% if form.categorie.data == 'Outillage' %}selected{% endif %}>Outillage</option>
+                            <option value="Autre" {% if form.categorie.data == 'Autre' %}selected{% endif %}>Autre</option>
+                            {# {% for value, label in form.categorie.choices %}
+                                <option value="{{ value }}" {% if form.categorie.data == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %} #}
+                        </select>
+                        {% if form.categorie.errors %}
+                            <div class="invalid-feedback">{{ form.categorie.errors[0] }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="form-group">
