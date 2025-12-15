@@ -6,7 +6,7 @@ from monApp.database.possede import possede
 class Logement(db.Model):
     __tablename__ = 'logement'
     id_logement = db.Column(db.Integer, primary_key=True)
-    adresse = db.Column(db.String(255), nullable=False)
+    adresse = db.Column(db.String(255), nullable=False, unique=True)
     type_logement = db.Column(db.String(50))
     surface = db.Column(db.Numeric(10,2))
     description = db.Column(db.Text)
