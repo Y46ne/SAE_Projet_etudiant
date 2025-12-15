@@ -395,9 +395,10 @@ def modifier_logement(logement_id):
     if form.validate_on_submit():
         logement.nom_logement = form.nom_logement.data
         logement.adresse = form.adresse.data
+        logement.description = form.description.data
         try:
             db.session.commit()
-            flash("Nom du logement modifié avec succès.", "success")
+            flash("Logement modifié avec succès.", "success")
             return redirect(url_for('mes_logements'))
         except Exception as e:
             db.session.rollback()

@@ -54,7 +54,7 @@ class LogementForm(FlaskForm):
     assures = QuerySelectMultipleField(
         'Assures',
         query_factory=get_tous_les_assures,
-        get_label=lambda x: f"{x.prenom}  {x.nom} - {x.email}",            
+        get_label="email",
         allow_blank=False            
     )
     submit = SubmitField('Ajouter le logement')
@@ -182,6 +182,7 @@ class DeclarerSinistre(FlaskForm):
 class ModifierLogementForm(FlaskForm):
     nom_logement = StringField('Nom du logement', validators=[DataRequired()])
     adresse = StringField('Adresse', validators=[DataRequired()])
+    description = TextAreaField('Description')
     submit = SubmitField('Enregistrer')
 
 class ModifierPieceForm(FlaskForm):
