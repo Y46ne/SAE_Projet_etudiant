@@ -41,6 +41,11 @@
         <div class="form-group">
             {{ form.prix_achat.label(class="form-label") }}
             {{ form.prix_achat(class="form-control") }}
+            {% if form.prix_achat.errors %}
+                <div class="text-red-500 text-sm mt-1">
+                    {% for error in form.prix_achat.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
         </div>
         <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
         <a href="{{ url_for('gestion_bien', piece_id=bien.id_piece) }}" class="btn btn-secondary">Annuler</a>

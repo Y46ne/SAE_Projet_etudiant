@@ -42,6 +42,11 @@
                     <div class="form-group">
                         {{ form.surface.label(class="form-label") }}
                         {{ form.surface(class="form-input", placeholder="Surface en m²") }}
+                        {% if form.surface.errors %}
+                            <div class="text-red-500 text-sm mt-1">
+                                {% for error in form.surface.errors %}<span>{{ error }}</span>{% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div class="form-group">
