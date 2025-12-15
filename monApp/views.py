@@ -169,6 +169,9 @@ def view_logement_pieces(id):
 def gestion_bien(piece_id):
     piece = Piece.query.get_or_404(piece_id)
     biens = Bien.query.filter_by(id_piece=piece.id_piece).all()
+    # Met à jour la valeur actuelle pour chaque bien si besoin
+    for bien in biens:
+        bien.valeur_actuelle = bien.calculer_valeur_actuelle()
     return render_template('gestion_bien.html', piece=piece, biens=biens)
 
 
@@ -319,10 +322,9 @@ def ajouter_bien():
         try:
             nouveau_bien = Bien(
                 nom_bien=form.nom_bien.data,
-                prix_achat=form.valeur.data,
+                prix_achat=form.prix_achat.data,
                 categorie=form.categorie.data,
                 date_achat=form.date_achat.data,
-                etat=form.etat.data,
                 id_piece=form.piece_id.data
             )
             
@@ -350,7 +352,12 @@ def ajouter_bien():
 
             db.session.commit()
             flash("Nouveau bien ajouté avec succès !", "success")
-            return redirect(url_for('mes_logements')) 
+            # Récupérer la pièce et le logement associés
+            piece = Piece.query.get(nouveau_bien.id_piece)
+            if piece:
+                return redirect(url_for('gestion_bien', piece_id=piece.id_piece))
+            else:
+                return redirect(url_for('mes_logements'))
 
         except Exception as e:
             db.session.rollback()
@@ -452,11 +459,14 @@ def modifier_bien(bien_id):
         bien.categorie = form.categorie.data
         bien.date_achat = form.date_achat.data
         bien.prix_achat = form.prix_achat.data
-        bien.etat = form.etat.data
         try:
             db.session.commit()
             flash("Bien modifié avec succès.", "success")
-            return redirect(url_for('gestion_bien', piece_id=bien.id_piece))
+            piece = Piece.query.get(bien.id_piece)
+            if piece:
+                return redirect(url_for('gestion_bien', piece_id=piece.id_piece))
+            else:
+                return redirect(url_for('mes_logements'))
         except Exception as e:
             db.session.rollback()
             flash(f"Erreur lors de la modification : {e}", "danger")

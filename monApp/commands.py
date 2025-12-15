@@ -97,7 +97,6 @@ def loaddb(filename):
             categorie=b.get('categorie'),
             date_achat=date.fromisoformat(b['date_achat']) if b.get('date_achat') else None,
             prix_achat=Decimal(str(b['prix_achat'])) if b.get('prix_achat') is not None else None,
-            valeur_actuelle=Decimal(str(b['valeur_actuelle'])) if b.get('valeur_actuelle') is not None else None,
             id_piece=b['id_piece']
         )
         db.session.add(bien)

@@ -33,7 +33,8 @@
                     <th>Nom du bien</th>
                     <th>Catégorie</th>
                     <th>Date d’achat</th>
-                    <th>Valeur (€)</th>
+                    <th>Prix d'achat (€)</th>
+                    <th>Valeur actuelle (€)</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -44,6 +45,7 @@
                     <td>{{ bien.categorie }}</td>
                     <td>{{ bien.date_achat.strftime('%d/%m/%Y') }}</td>
                     <td>{{ bien.prix_achat }}</td>
+                    <td>{{ '%.2f' % (bien.valeur_actuelle or bien.calculer_valeur_actuelle() or 0) }}</td>
                     <td>
                         <a href="{{ url_for('detail_bien', id=bien.id_bien) }}" class="btn btn-info" title="Voir">
                             Voir

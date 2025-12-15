@@ -72,8 +72,7 @@ class BienForm(FlaskForm):
     categorie = StringField('Catégorie', validators=[DataRequired()])
     date_achat = DateField("Date d'achat", format='%Y-%m-%d', validators=[DataRequired()])
     prix_achat = FloatField("Prix d'achat (€)", validators=[DataRequired()])
-    etat = StringField('État (Neuf, Bon, Usé...)', validators=[DataRequired()])
-    valeur_actuelle = FloatField('Valeur actuelle (€)', validators=[DataRequired()])
+    valeur_actuelle = FloatField('Valeur actuelle (€)', render_kw={'readonly': True})
     logement_id = SelectField('Logement associé', coerce=int, validators=[DataRequired()])
     piece_id = SelectField('Pièce associée', coerce=int, validators=[DataRequired()])
     submit = SubmitField('Ajouter le bien')
@@ -119,9 +118,9 @@ class AjouterBienForm(FlaskForm):
         "Nom du bien", 
         validators=[DataRequired(message="Le nom est requis.")]
     )
-    valeur = DecimalField(
-        "Valeur (€)", 
-        validators=[DataRequired(message="La valeur est requise.")]
+    prix_achat = FloatField(
+        "Prix d'achat (€)",
+        validators=[DataRequired(message="Le prix d'achat est requis.")]
     )
     categorie = StringField(
         "Catégorie", 
@@ -131,17 +130,7 @@ class AjouterBienForm(FlaskForm):
         "Date d'achat", 
         validators=[DataRequired(message="La date est requise.")]
     )
-    etat = SelectField(
-        "État",
-        choices=[
-            ("", "Sélectionner un état"),
-            ("Excellent", "Excellent"),
-            ("Bon", "Bon"),
-            ("Acceptable", "Acceptable"),
-            ("Usé", "Usé")
-        ],
-        validators=[DataRequired(message="L'état est requis.")]
-    )
+    # etat supprimé
     logement_id = SelectField(
         "Logement", 
         coerce=int, 
@@ -202,13 +191,8 @@ class ModifierBienForm(FlaskForm):
     nom_bien = StringField('Nom du bien', validators=[DataRequired()])
     categorie = StringField('Catégorie', validators=[DataRequired()])
     date_achat = DateField('Date d\'achat', format='%Y-%m-%d', validators=[Optional()])
-    prix_achat = FloatField('Valeur (€)', validators=[DataRequired()])
-    etat = SelectField('État', choices=[
-            ("Excellent", "Excellent"),
-            ("Bon", "Bon"),
-            ("Acceptable", "Acceptable"),
-            ("Usé", "Usé")
-    ], validators=[DataRequired()])
+    prix_achat = FloatField("Prix d'achat (€)", validators=[DataRequired()])
+    valeur_actuelle = FloatField('Valeur actuelle (€)', render_kw={'readonly': True})
     submit = SubmitField('Enregistrer')
 
 class ParametresForm(FlaskForm):
