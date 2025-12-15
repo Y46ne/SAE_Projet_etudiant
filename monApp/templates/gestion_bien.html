@@ -33,7 +33,6 @@
                     <th>Catégorie</th>
                     <th>Date d’achat</th>
                     <th>Valeur (€)</th>
-                    <th>État</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -44,18 +43,6 @@
                     <td>{{ bien.categorie }}</td>
                     <td>{{ bien.date_achat.strftime('%d/%m/%Y') }}</td>
                     <td>{{ bien.prix_achat }}</td>
-                    <td>
-                        {% if bien.etat == 'Excellent' %}
-                            <span class="status bon">Excellent</span>
-                        
-                        {% elif bien.etat == 'Bon'%}
-                            <span class="status bon">Bon</span>
-                        {% elif bien.etat == 'Acceptable' %}
-                            <span class="status acceptable">Acceptable</span>
-                        {% else %}
-                            <span class="status use">Usé</span>
-                        {% endif %}
-                    </td>
                     <td>
                         <a href="{{ url_for('detail_bien', id=bien.id_bien) }}" class="btn btn-info" title="Voir">Voir</a>
                         <a href="{{ url_for('modifier_bien', bien_id=bien.id_bien) }}" class="btn btn-sm btn-warning" title="Modifier">Modifier</a>
