@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Rapport d'Inventaire{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/rapport.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Rapport d'Inventaire</h1>
+        <div class="no-print">
+            <button onclick="window.print()" class="btn btn-primary">🖨️ Imprimer / PDF</button>
+            <a href="{{ url_for('generation_rapport') }}" class="btn btn-secondary">Retour</a>
+        </div>
+    </div>
+
+    {% if not rapport_data %}
+        <div class="alert alert-info">Aucune donnée à afficher.</div>
+    {% endif %}
+
+    {% for data in rapport_data %}
+        <div class="card mb-5 shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h2 class="h4 mb-0">🏠 {{ data.logement.adresse }} <small class="text-muted">({{ data.logement.type_logement }})</small></h2>
+            </div>
+            <div class="card-body">
+                {% if not data.pieces %}
+                    <p class="text-muted font-italic">Aucune pièce enregistrée.</p>
+                {% endif %}
+
+                {% for piece_data in data.pieces %}
+                    <div class="mb-4">
+                        <h3 class="h5 border-bottom pb-2 text-primary">{{ piece_data.piece.nom_piece }} <small class="text-muted">({{ piece_data.piece.surface }} m²)</small></h3>
+                        
+                        {% if not piece_data.categories %}
+                            <p class="text-muted pl-3">Aucun bien dans cette pièce.</p>
+                        {% else %}
+                            {% for categorie, cat_info in piece_data.categories.items() %}
+                                <div class="ml-3 mt-3">
+                                    <h4 class="h6 font-weight-bold text-secondary">{{ categorie }}</h4>
+                                    <table class="table table-sm table-hover">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th scope="col">Bien</th>
+                                                <th scope="col">Date Achat</th>
+                                                <th scope="col" class="text-right">Prix Achat</th>
+                                                <th scope="col" class="text-right">Valeur Actuelle</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for bien in cat_info.biens %}
+                                            <tr>
+                                                <td>{{ bien.nom_bien }}</td>
+                                                <td>{{ bien.date_achat.strftime('%d/%m/%Y') if bien.date_achat else '-' }}</td>
+                                                <td class="text-right">{{ "%.2f"|format(bien.prix_achat) if bien.prix_achat else '-' }} €</td>
+                                                <td class="text-right font-weight-bold">{{ "%.2f"|format(bien.valeur_calcul_temp) }} €</td>
+                                            </tr>
+                                            {% endfor %}
+                                            <tr class="table-active">
+                                                <td colspan="3" class="text-right font-italic">Total {{ categorie }} :</td>
+                                                <td class="text-right font-weight-bold">{{ "%.2f"|format(cat_info.total_cat) }} €</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% endfor %}
+                            
+                            <div class="d-flex justify-content-end mt-2">
+                                <div class="alert alert-light border font-weight-bold">
+                                    Total {{ piece_data.piece.nom_piece }} : {{ "%.2f"|format(piece_data.total_piece) }} €
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="card-footer bg-light text-right">
+                <h4 class="h5 mb-0">Valeur totale du logement : <span class="text-success">{{ "%.2f"|format(data.total_logement) }} €</span></h4>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="card border-primary mt-4">
+        <div class="card-body text-center bg-primary text-white">
+            <h2 class="mb-0">Valeur Totale Globale : {{ "%.2f"|format(total_global) }} €</h2>
+        </div>
+    </div>
+</div>
+{% endblock %}

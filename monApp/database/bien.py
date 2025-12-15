@@ -1,5 +1,6 @@
 from ..app import db
 from monApp.database.impacte import impacte
+import datetime
 
 
 class Bien(db.Model):
@@ -37,7 +38,6 @@ class Bien(db.Model):
         - Outillage : 12%
         - Autre : 8%
         """
-        import datetime
         if not self.date_achat or not self.prix_achat:
             return None
         taux_categories = {

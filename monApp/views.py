@@ -1,4 +1,4 @@
-from flask import render_template, request, url_for, redirect, flash
+from flask import render_template, request, url_for, redirect, flash, make_response
 from flask_login import (
     login_user, logout_user, login_required, current_user
 )
@@ -10,6 +10,12 @@ from monApp.database import User, Assure, Logement, Piece, Bien
 from monApp.forms import *
 from .forms import ChangePasswordForm
 
+# Import pour la génération de PDF
+try:
+    from weasyprint import HTML
+except ImportError:
+    HTML = None  # Gestion du cas où la librairie n'est pas installée
+import datetime
 
 
 
@@ -485,6 +491,115 @@ def supprimer_bien(bien_id):
         db.session.rollback()
         flash(f"Erreur lors de la suppression : {e}", "danger")
     return redirect(url_for('gestion_bien', piece_id=piece_id))
+
+
+# Fonction utilitaire pour préparer les données du rapport
+def get_rapport_data(logements):
+    rapport_data = []
+    total_global = 0.0
+    
+    for logement in logements:
+        logement_data = {
+            'logement': logement,
+            'pieces': [],
+            'total_logement': 0.0
+        }
+        
+        # On trie les pièces pour un affichage ordonné
+        pieces_sorted = sorted(logement.pieces, key=lambda x: x.nom_piece)
+        
+        for piece in pieces_sorted:
+            piece_data = {
+                'piece': piece,
+                'categories': {},
+                'total_piece': 0.0
+            }
+            
+            for bien in piece.biens:
+                valeur = bien.calculer_valeur_actuelle()
+                if valeur is None:
+                    valeur = 0.0
+                
+                cat = bien.categorie if bien.categorie else "Autre"
+                
+                if cat not in piece_data['categories']:
+                    piece_data['categories'][cat] = {'biens': [], 'total': 0.0}
+                
+                # On prépare un dictionnaire simple pour le template
+                bien_info = {
+                    'nom': bien.nom_bien,
+                    'date_achat': bien.date_achat,
+                    'prix_achat': bien.prix_achat,
+                    'valeur_actuelle': valeur
+                }
+                
+                piece_data['categories'][cat]['biens'].append(bien_info)
+                piece_data['categories'][cat]['total'] += valeur
+                piece_data['total_piece'] += valeur
+            
+            # On n'ajoute la pièce que si elle contient quelque chose
+            if piece_data['categories']:
+                 logement_data['pieces'].append(piece_data)
+                 logement_data['total_logement'] += piece_data['total_piece']
+        
+        rapport_data.append(logement_data)
+        total_global += logement_data['total_logement']
+        
+    return rapport_data, total_global
+
+@app.route('/generation_rapport')
+@login_required
+def generation_rapport():
+    logements = current_user.assure_profile.logements
+    return render_template('generation_rapport.html', logements=logements)
+
+@app.route('/generer_pdf_tous')
+@login_required
+def generer_pdf_tous():
+    if not HTML:
+        flash("Erreur : La librairie WeasyPrint n'est pas installée.", "danger")
+        return redirect(url_for('generation_rapport'))
+        
+    logements = current_user.assure_profile.logements
+    data, total = get_rapport_data(logements)
+    
+    html = render_template('pdf_rapport.html', data=data, total_global=total, title="Rapport Global", date_generation=datetime.date.today().strftime('%d/%m/%Y'))
+    pdf = HTML(string=html).write_pdf()
+    
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename=rapport_global.pdf'
+    return response
+
+@app.route('/generer_pdf_logement', methods=['POST'])
+@login_required
+def generer_pdf_logement():
+    if not HTML:
+        flash("Erreur : La librairie WeasyPrint n'est pas installée.", "danger")
+        return redirect(url_for('generation_rapport'))
+
+    id_logement = request.form.get('id_logement')
+    if not id_logement:
+        flash("Veuillez sélectionner un logement.", "warning")
+        return redirect(url_for('generation_rapport'))
+
+    logement = Logement.query.get_or_404(id_logement)
+    
+    # Vérification de sécurité
+    if logement not in current_user.assure_profile.logements:
+        flash("Accès interdit à ce logement.", "danger")
+        return redirect(url_for('generation_rapport'))
+        
+    data, total = get_rapport_data([logement])
+    
+    html = render_template('pdf_rapport.html', data=data, total_global=total, title=f"Rapport - {logement.adresse}", date_generation=datetime.date.today().strftime('%d/%m/%Y'))
+    pdf = HTML(string=html).write_pdf()
+    
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = f'attachment; filename=rapport_logement_{id_logement}.pdf'
+    return response
+
 
 # ------------------- MAIN -------------------
 if __name__ == '__main__':
