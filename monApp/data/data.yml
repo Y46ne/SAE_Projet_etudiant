@@ -128,35 +128,30 @@ biens:
     categorie: "Électronique"
     date_achat: "2022-03-01"
     prix_achat: 800
-    etat: "Acceptable"
     id_piece: 1
 
   - nom_bien: "Canapé IKEA"
     categorie: "Mobilier"
     date_achat: "2021-09-12"
     prix_achat: 600
-    etat: "Excellent"
     id_piece: 1
 
   - nom_bien: "Ordinateur portable HP"
     categorie: "Informatique"
     date_achat: "2023-02-10"
     prix_achat: 900
-    etat: "Excellent"
     id_piece: 5
 
   - nom_bien: "Table en chêne"
     categorie: "Mobilier"
     date_achat: "2020-05-20"
     prix_achat: 450
-    etat: "Bon"
     id_piece: 2
 
   - nom_bien: "Machine à laver Bosch"
     categorie: "Électroménager"
     date_achat: "2021-01-15"
     prix_achat: 500
-    etat: "Usé"
     id_piece: 4
 
 sinistres:

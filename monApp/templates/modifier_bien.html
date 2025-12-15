@@ -27,10 +27,6 @@
             {{ form.prix_achat.label(class="form-label") }}
             {{ form.prix_achat(class="form-control") }}
         </div>
-        <div class="form-group">
-            {{ form.etat.label(class="form-label") }}
-            {{ form.etat(class="form-control") }}
-        </div>
         <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
         <a href="{{ url_for('gestion_bien', piece_id=bien.id_piece) }}" class="btn btn-secondary">Annuler</a>
     </form>
