@@ -41,15 +41,15 @@ class Bien(db.Model):
         if not self.date_achat or not self.prix_achat:
             return None
         taux_categories = {
-            "electromenager": 0.20,
-            "mobilier": 0.10,
-            "multimedia": 0.25,
-            "vetements": 0.30,
-            "bijoux": 0.05,
-            "loisirs": 0.15,
-            "vaisselle": 0.10,
-            "outillage": 0.12,
-            "autre": 0.08
+            "electromenager": 0.15,   
+            "multimedia": 0.25,       
+            "mobilier": 0.10,         
+            "vetements": 0.30,        
+            "bijoux": 0.05,           
+            "loisirs": 0.10,         
+            "vaisselle": 0.10,        
+            "outillage": 0.15,        
+            "autre": 0.10  
         }
         taux = 0.08 
         if self.categorie:
