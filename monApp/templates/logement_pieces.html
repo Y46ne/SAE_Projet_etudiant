@@ -16,7 +16,8 @@
 
 <h1>Pièces du logement</h1>
 
-<h3>{{ logement.adresse }}</h3>
+<h3>{{ logement.nom_logement }}</h3>
+<p><strong>Adresse :</strong> {{ logement.adresse }}</p>
 
 <p><strong>Nombre de pièces :</strong> {{ logement.pieces|length }}</p>
 {% with messages = get_flashed_messages(with_categories=true) %}

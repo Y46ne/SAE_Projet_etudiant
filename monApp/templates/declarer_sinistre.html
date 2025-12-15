@@ -58,7 +58,7 @@
                         <select id="filter-residence" class="filter-select">
                             <option value="">Sélectionner</option>
                             {% for logement in logements %}
-                                <option value="{{ logement.id }}">{{ logement.nom or logement.adresse }}</option>
+                                <option value="{{ logement.id }}">{{ logement.nom_logement or logement.adresse }}</option>
                             {% endfor %}
                         </select>
                     </div>

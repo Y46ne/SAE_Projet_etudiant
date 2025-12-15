@@ -120,6 +120,7 @@ def ajouter_logement():
     if form.validate_on_submit():
 
         insertedLogement = Logement(
+            nom_logement=form.nom_logement.data,
             adresse=form.adresse.data,
             type_logement=form.type_logement.data,
             surface=form.surface.data, 
@@ -392,6 +393,7 @@ def modifier_logement(logement_id):
     logement = Logement.query.get_or_404(logement_id)
     form = ModifierLogementForm(obj=logement)
     if form.validate_on_submit():
+        logement.nom_logement = form.nom_logement.data
         logement.adresse = form.adresse.data
         try:
             db.session.commit()

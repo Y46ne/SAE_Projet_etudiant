@@ -26,6 +26,7 @@
     <thead>
         <tr>
             <th>Nom du logement</th>
+            <th>Adresse</th>
             <th>Nombre de biens</th>
             <th>Valeur (€)</th>
             <th>Actions</th>
@@ -34,6 +35,7 @@
     <tbody>
         {% for row in logements %}
         <tr>
+            <td>{{ row.logement.nom_logement }}</td>
             <td>{{ row.logement.adresse }}</td>
             <td>{{ row.nb_biens }}</td>
             <td>{{ "%.2f"|format(row.valeur) }}</td>

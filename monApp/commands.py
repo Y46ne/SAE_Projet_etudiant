@@ -72,6 +72,7 @@ def loaddb(filename):
     for l in data.get('logements', []):
         logement = Logement(
             adresse=l['adresse'],
+            nom_logement=l.get('nom_logement'),
             type_logement=l.get('type_logement'),
             surface=Decimal(str(l['surface'])) if l.get('surface') is not None else None,
             description=l.get('description')

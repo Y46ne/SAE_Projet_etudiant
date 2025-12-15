@@ -25,7 +25,8 @@
     {% for data in rapport_data %}
         <div class="card mb-5 shadow-sm">
             <div class="card-header bg-dark text-white">
-                <h2 class="h4 mb-0">🏠 {{ data.logement.adresse }} <small class="text-muted">({{ data.logement.type_logement }})</small></h2>
+                <h2 class="h4 mb-0">🏠 {{ data.logement.nom_logement }} <small class="text-muted">({{ data.logement.type_logement }})</small></h2>
+                <div class="small text-white-50">{{ data.logement.adresse }}</div>
             </div>
             <div class="card-body">
                 {% if not data.pieces %}

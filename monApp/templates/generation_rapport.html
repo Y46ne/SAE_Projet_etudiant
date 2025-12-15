@@ -38,7 +38,7 @@
                                 {% if logements %}
                                     {% for logement in logements %}
                                         <option value="{{ logement.id_logement }}">
-                                            {{ logement.adresse }} ({{ logement.type_logement }})
+                                            {{ logement.nom_logement }} - {{ logement.adresse }} ({{ logement.type_logement }})
                                         </option>
                                     {% endfor %}
                                 {% else %}

@@ -11,7 +11,8 @@
 
     {% for item in data %}
         <div class="logement-section">
-            <h2>{{ item.logement.adresse }} <small>({{ item.logement.type_logement }})</small></h2>
+            <h2>{{ item.logement.nom_logement }} <small>({{ item.logement.type_logement }})</small></h2>
+            <p style="margin-top: -10px; color: #666;">📍 {{ item.logement.adresse }}</p>
             
             {% if not item.pieces %}
                 <p>Aucune pièce enregistrée.</p>

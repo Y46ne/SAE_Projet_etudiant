@@ -46,6 +46,7 @@ class ResetPasswordForm(FlaskForm):
 
 
 class LogementForm(FlaskForm):
+    nom_logement = StringField('Nom du logement', validators=[DataRequired()])
     adresse = StringField('Adresse du logement', validators=[DataRequired()])
     type_logement = StringField('Type de logement (Appartement, Maison...)', validators=[DataRequired()])
     surface = FloatField('Surface (m²)', validators=[DataRequired()])
@@ -179,7 +180,8 @@ class DeclarerSinistre(FlaskForm):
     submit = SubmitField("Générer l'état financier des biens")
 
 class ModifierLogementForm(FlaskForm):
-    adresse = StringField('Nom du logement', validators=[DataRequired()])
+    nom_logement = StringField('Nom du logement', validators=[DataRequired()])
+    adresse = StringField('Adresse', validators=[DataRequired()])
     submit = SubmitField('Enregistrer')
 
 class ModifierPieceForm(FlaskForm):
