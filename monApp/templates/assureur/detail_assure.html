@@ -1,82 +1,9 @@
 {% extends "base.html" %}
-
-{% block title %}Détail Assuré{% endblock %}
-
-{% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/mes_logements.css') }}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<style>
-    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
-    .detail-card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .section-title { font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 0.5rem; }
-</style>
-{% endblock %}
-
+{% block title %}Détail de l'assuré{% endblock %}
 {% block content %}
-<div class="p-8">
-    <div class="mb-4">
-        <a href="{{ url_for('liste_assures') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Retour à la liste
-        </a>
-    </div>
-
-    <div class="detail-card mb-6">
-        <h1 class="text-2xl font-bold mb-4 text-blue-700">{{ assure.prenom }} {{ assure.nom }}</h1>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <p><strong>Email :</strong> <a href="mailto:{{ assure.email }}" class="text-blue-600 hover:underline">{{ assure.email }}</a></p>
-                <p><strong>Téléphone :</strong> {{ assure.telephone }}</p>
-            </div>
-            <div>
-                <p><strong>Date de naissance :</strong> {{ assure.date_naissance.strftime('%d/%m/%Y') if assure.date_naissance else 'Non renseignée' }}</p>
-                <p><strong>Identifiant :</strong> {{ assure.user_login }}</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="info-grid">
-        <!-- Logements -->
-        <div class="detail-card">
-            <h2 class="section-title"><i class="fas fa-home"></i> Logements</h2>
-            {% if assure.logements %}
-                <div class="space-y-3">
-                    {% for logement in assure.logements %}
-                    <div class="p-3 border rounded hover:bg-gray-50">
-                        <div class="font-bold">{{ logement.type_logement }}</div>
-                        <div class="text-gray-600">{{ logement.adresse }}</div>
-                        <div class="text-sm text-gray-500">{{ logement.surface }} m²</div>
-                    </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p class="text-gray-500 italic">Aucun logement enregistré.</p>
-            {% endif %}
-        </div>
-
-        <!-- Sinistres -->
-        <div class="detail-card">
-            <h2 class="section-title"><i class="fas fa-file-contract"></i> Sinistres</h2>
-            {% if assure.sinistres %}
-                <div class="space-y-3">
-                    {% for sinistre in assure.sinistres %}
-                    <div class="p-3 border rounded hover:bg-gray-50 flex justify-between items-center">
-                        <div>
-                            <div class="font-bold">{{ sinistre.type_sinistre }}</div>
-                            <div class="text-sm text-gray-600">{{ sinistre.date_sinistre.strftime('%d/%m/%Y') }}</div>
-                            <div class="text-sm font-medium text-{{ 'green-600' if sinistre.statut == 'Validé' else 'orange-500' }}">
-                                {{ sinistre.statut }}
-                            </div>
-                        </div>
-                        <a href="{{ url_for('detail_sinistre', id=sinistre.id) }}" class="btn btn-sm btn-info">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                    </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p class="text-gray-500 italic">Aucun sinistre déclaré.</p>
-            {% endif %}
-        </div>
-    </div>
+<div class="container">
+    <h1>Détail de l'assuré</h1>
+    <p>Cette page affichera les détails d'un assuré.</p>
+    <p>ID: {{ assure.id_assure }}</p>
 </div>
 {% endblock %}

@@ -45,20 +45,20 @@
             <h2>Sinistres Récents</h2>
             
             {% for sinistre in sinistres[:3] %}
-            <div class="sinistre-item">
-                <div class="sinistre-info">
+            <div class="logement-item">
+                <div class="logement-info">
                     
                     <h3>Sinistre {{ sinistre.numero_sinistre }} - {{ sinistre.type_sinistre }}</h3> 
                     
                     <p>
                         Date : {{ sinistre.date_sinistre.strftime('%d/%m/%Y') }} - 
                         Statut: {{ sinistre.statut }} -
-                        Montant estimé: {{ "%.2f"|format(sinistre.montant_estime) }} €
+                        Montant estimé: {% if sinistre.montant_estime is not none %}{{ "%.2f"|format(sinistre.montant_estime) }} €{% else %}Non estimé{% endif %}
                     </p>
 
                 </div>
                 <div class="logement-actions">
-                    <a href="{{ url_for('detail_sinistre', id=sinistre.id) }}" class="btn btn-info">Consulter<i class="fas fa-eye"></i></a>
+                    <a href="{{ url_for('detail_sinistre', id=sinistre.id_sinistre) }}" class="btn btn-info">Consulter<i class="fas fa-eye"></i></a>
                 </div>
             </div>
             {% else %}

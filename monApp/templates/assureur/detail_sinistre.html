@@ -1,84 +1,9 @@
 {% extends "base.html" %}
-
-{% block title %}Détail du Sinistre{% endblock %}
-
-{% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/detail_bien.css') }}">
-{% endblock %}
-
+{% block title %}Détail du sinistre{% endblock %}
 {% block content %}
 <div class="container">
-    <div class="header-card">
-        <div class="header-top">
-            <div class="title-section">
-                <h1>Sinistre {{ sinistre.numero_sinistre }}</h1>
-                <span class="tag tag-blue">{{ sinistre.type_sinistre }}</span>
-                <span class="status-badge status-{{ sinistre.statut|replace(' ', '.') }}">{{ sinistre.statut }}</span>
-            </div>
-            <div class="action-buttons">
-                {% if sinistre.statut == 'En attente' %}
-                <form action="{{ url_for('valider_sinistre', id=sinistre.id) }}" method="POST" style="display:inline;">
-                    <button type="submit" class="btn btn-success">Valider</button>
-                </form>
-                <form action="{{ url_for('refuser_sinistre', id=sinistre.id) }}" method="POST" style="display:inline;">
-                    <button type="submit" class="btn btn-danger">Refuser</button>
-                </form>
-                {% endif %}
-                <a href="{{ url_for('liste_sinistres') }}" class="btn btn-secondary">Retour</a>
-            </div>
-        </div>
-
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="info-label">Date du sinistre</div>
-                <div class="info-value">{{ sinistre.date_sinistre.strftime('%d/%m/%Y') }}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Assuré</div>
-                <div class="info-value">{{ sinistre.assure.nom }} {{ sinistre.assure.prenom }}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Logement concerné</div>
-                <div class="info-value">{{ sinistre.logement.adresse }}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Montant total estimé</div>
-                <div class="info-value">{{ "%.2f"|format(sinistre.montant_estime) }} €</div>
-            </div>
-        </div>
-        
-        <div class="description-section mt-4">
-            <h3>Description</h3>
-            <p>{{ sinistre.description }}</p>
-        </div>
-    </div>
-
-    <div class="biens-section mt-6">
-        <h2>Biens impactés</h2>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Bien</th>
-                    <th>Catégorie</th>
-                    <th>Valeur Initiale</th>
-                    <th>Dégât Estimé</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for impact in sinistre.impacts %}
-                <tr>
-                    <td>{{ impact.bien.nom_bien }}</td>
-                    <td>{{ impact.bien.categorie }}</td>
-                    <td>{{ "%.2f"|format(impact.bien.prix_achat) }} €</td>
-                    <td>{{ "%.2f"|format(impact.degat_estime) }} €</td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="4">Aucun bien listé pour ce sinistre.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <h1>Détail du sinistre</h1>
+    <p>Cette page affichera les détails d'un sinistre.</p>
+    <p>ID: {{ sinistre.id_sinistre }}</p>
 </div>
 {% endblock %}
