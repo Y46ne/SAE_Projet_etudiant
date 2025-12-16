@@ -172,8 +172,7 @@ class DeclarerSinistre(FlaskForm):
     biens_selectionnes = QuerySelectMultipleField(
         "Biens sélectionnés",
         query_factory=lambda: Bien.query.all(),
-        get_label="nom",
-        allow_blank=True
+        get_label="nom_bien"
     )
 
     submit = SubmitField("Générer l'état financier des biens")

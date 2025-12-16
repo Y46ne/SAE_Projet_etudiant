@@ -55,10 +55,10 @@
                 <div class="filter-row">
                     <div class="filter-group">
                         <label>Résidence</label>
-                        <select id="filter-residence" class="filter-select">
+                        <select id="filter-residence" class="filter-select" name="logement_id" required>
                             <option value="">Sélectionner</option>
                             {% for logement in logements %}
-                                <option value="{{ logement.id }}">{{ logement.nom_logement or logement.adresse }}</option>
+                                <option value="{{ logement.id_logement }}">{{ logement.nom_logement or logement.adresse }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -68,7 +68,7 @@
                         <select id="filter-piece" class="filter-select">
                             <option value="">Sélectionner</option>
                             {% for piece in pieces %}
-                                <option value="{{ piece.id }}">{{ piece.nom }}</option>
+                                <option value="{{ piece.id_piece }}">{{ piece.nom_piece }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -86,14 +86,14 @@
                         </thead>
                         <tbody id="biens-tbody">
                             {% for bien in biens %}
-                            <tr data-residence="{{ bien.logement_id }}" data-piece="{{ bien.piece_id }}">
+                            <tr data-residence="{{ bien.piece.id_logement }}" data-piece="{{ bien.id_piece }}">
                                 <td>
-                                    <input type="checkbox" name="biens_selectionnes" value="{{ bien.id }}" class="checkbox-bien" data-valeur="{{ bien.valeur_actuelle }}">
+                                    <input type="checkbox" name="biens_selectionnes" value="{{ bien.id_bien }}" class="checkbox-bien" data-valeur="{{ bien.valeur_actuelle }}">
                                 </td>
-                                <td>{{ bien.nom }}</td>
-                                <td>{{ bien.valeur_actuelle }}€</td>
+                                <td>{{ bien.nom_bien }}</td>
+                                <td>{{ "%.2f"|format(bien.valeur_actuelle) }}€</td>
                                 <td>
-                                    <select name="etat_bien_{{ bien.id }}" class="etat-select">
+                                    <select name="etat_bien_{{ bien.id_bien }}" class="etat-select">
                                         <option value="perte_totale">Perte totale</option>
                                         <option value="perte_partielle">Perte partielle</option>
                                     </select>
@@ -118,4 +118,55 @@
         </form>
     </main>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const residenceSelect = document.getElementById('filter-residence');
+    const pieceSelect = document.getElementById('filter-piece');
+    const rows = document.querySelectorAll('#biens-tbody tr');
+    const totalDisplay = document.getElementById('total-indemnisation');
+    const checkboxes = document.querySelectorAll('.checkbox-bien');
+    const etatSelects = document.querySelectorAll('.etat-select');
+
+    function filterBiens() {
+        const residenceId = residenceSelect.value;
+        const pieceId = pieceSelect.value;
+
+        rows.forEach(row => {
+            const rowResidence = row.dataset.residence;
+            const rowPiece = row.dataset.piece;
+
+            let show = true;
+            if (residenceId && rowResidence !== residenceId) show = false;
+            if (pieceId && rowPiece !== pieceId) show = false;
+
+            row.style.display = show ? '' : 'none';
+            
+            if (!show) {
+                const checkbox = row.querySelector('.checkbox-bien');
+                if (checkbox) checkbox.checked = false;
+            }
+        });
+        calculateTotal();
+    }
+
+    function calculateTotal() {
+        let total = 0;
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                const row = checkbox.closest('tr');
+                const valeur = parseFloat(checkbox.dataset.valeur) || 0;
+                const etat = row.querySelector('.etat-select').value;
+                total += (etat === 'perte_totale') ? valeur : valeur * 0.5;
+            }
+        });
+        totalDisplay.textContent = total.toFixed(2) + '€';
+    }
+
+    residenceSelect.addEventListener('change', filterBiens);
+    pieceSelect.addEventListener('change', filterBiens);
+    checkboxes.forEach(cb => cb.addEventListener('change', calculateTotal));
+    etatSelects.forEach(select => select.addEventListener('change', calculateTotal));
+});
+</script>
 {% endblock %}

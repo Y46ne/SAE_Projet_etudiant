@@ -8,7 +8,8 @@ import os
 
 from .app import app, db, login_manager
 from config import *
-from monApp.database import User, Assure, Logement, Piece, Bien, Justificatif
+from monApp.database import User, Assure, Logement, Piece, Bien, Justificatif, Sinistre
+from monApp.database.impacte import impacte as impacte_table
 from monApp.forms import *
 from .forms import ChangePasswordForm
 
@@ -110,11 +111,6 @@ def tableau_de_bord():
                            valeur_totale=valeur_totale_globale, 
                            logements_stats=logements_avec_stats)
 
-@app.route('/declarer_sinstre')
-def declarer_sinistre():
-    form = DeclarerSinistre()
-    return render_template('declarer_sinistre.html', form=form)
-
 @app.route('/declarer_sinistre/', methods=['GET', 'POST'])
 @login_required
 def declarer_sinistre():
@@ -133,8 +129,9 @@ def declarer_sinistre():
         sinistre = Sinistre(
             date_sinistre=form.date_sinistre.data,
             type_sinistre=form.type_sinistre.data,
-            id_assure=assure.id_assure,
-            id_logement=request.form.get("logement_id")
+            description="Déclaration de sinistre",
+            numero_sinistre="SIN-" + datetime.datetime.now().strftime("%Y%m%d%H%M%S"),
+            id_logement=int(request.form.get("logement_id"))
         )
         db.session.add(sinistre)
         db.session.flush() 
@@ -150,7 +147,7 @@ def declarer_sinistre():
             else:
                 degat = (bien.valeur_actuelle or 0) * 0.5
             total += degat
-            db.session.execute(impacte.insert().values(
+            db.session.execute(impacte_table.insert().values(
                 id_bien=bien.id_bien,
                 id_sinistre=sinistre.id_sinistre,
                 degat_estime=degat
