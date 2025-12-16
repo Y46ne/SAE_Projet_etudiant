@@ -59,26 +59,31 @@ assures:
 
 logements:
   - adresse: "12 rue des Fleurs, Blois"
+    nom_logement: "Résidence Fleurs"
     type_logement: "Appartement"
     surface: 70
     description: "Appartement T3 lumineux avec balcon"
 
   - adresse: "5 avenue de la Liberté, Tours"
+    nom_logement: "Maison Tours"
     type_logement: "Maison"
     surface: 120
     description: "Maison familiale avec jardin"
 
   - adresse: "8 impasse des Lilas, Orléans"
+    nom_logement: "Studio Orléans"
     type_logement: "Studio"
     surface: 30
     description: "Petit studio bien situé en centre-ville"
 
   - adresse: "22 boulevard Victor Hugo, Blois"
+    nom_logement: "Appartement Centre"
     type_logement: "Appartement"
     surface: 80
     description: "Appartement rénové, proche des commerces"
 
   - adresse: "17 rue de la Paix, Paris"
+    nom_logement: "Maison Paris"
     type_logement: "Maison"
     surface: 140
     description: "Maison moderne avec terrasse"
@@ -125,38 +130,33 @@ pieces:
 
 biens:
   - nom_bien: "Téléviseur Samsung 4K"
-    categorie: "Électronique"
+    categorie: "Multimedia"
     date_achat: "2022-03-01"
     prix_achat: 800
-    etat: "Acceptable"
     id_piece: 1
 
   - nom_bien: "Canapé IKEA"
     categorie: "Mobilier"
     date_achat: "2021-09-12"
     prix_achat: 600
-    etat: "Excellent"
     id_piece: 1
 
   - nom_bien: "Ordinateur portable HP"
-    categorie: "Informatique"
+    categorie: "Multimedia"
     date_achat: "2023-02-10"
     prix_achat: 900
-    etat: "Excellent"
     id_piece: 5
 
   - nom_bien: "Table en chêne"
     categorie: "Mobilier"
     date_achat: "2020-05-20"
     prix_achat: 450
-    etat: "Bon"
     id_piece: 2
 
   - nom_bien: "Machine à laver Bosch"
     categorie: "Électroménager"
     date_achat: "2021-01-15"
     prix_achat: 500
-    etat: "Usé"
     id_piece: 4
 
 sinistres:
@@ -192,3 +192,29 @@ impacte:
   - id_bien: 5
     id_sinistre: 1
     degat_estime: 400
+
+justificatifs:
+  - chemin_fichier: "assure_1/facture_tv.pdf"
+    type_justificatif: "Facture"
+    date_ajout: "2023-01-15"
+    id_bien: 1
+
+  - chemin_fichier: "assure_1/facture_canape.pdf"
+    type_justificatif: "Facture"
+    date_ajout: "2021-09-12"
+    id_bien: 2
+
+  - chemin_fichier: "assure_2/facture_pc.pdf"
+    type_justificatif: "Facture"
+    date_ajout: "2023-02-10"
+    id_bien: 3
+
+  - chemin_fichier: "assure_2/facture_table.pdf"
+    type_justificatif: "Facture"
+    date_ajout: "2020-05-20"
+    id_bien: 4
+
+  - chemin_fichier: "assure_3/facture_lave_linge.pdf"
+    type_justificatif: "Facture"
+    date_ajout: "2021-01-15"
+    id_bien: 5
