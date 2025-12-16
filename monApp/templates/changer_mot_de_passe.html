@@ -38,8 +38,14 @@
             <hr>
             
             <div class="d-flex justify-content-end gap-2 mt-4">
-                <a href="{{ url_for('parametres') }}" class="btn btn-secondary">Annuler</a>
-                {{ form.submit(class="form-control") }}
+                {% if not current_user.is_assureur %}
+                    <a href="{{ url_for('parametres') }}" class="btn btn-secondary">Annuler</a>
+                    {{ form.submit(class="form-control") }}
+                {% else %}
+                     <a href="{{ url_for('parametres_assureur') }}" class="btn btn-secondary">Annuler</a>
+                    {{ form.submit(class="form-control") }}
+                {% endif %}
+
             </div>
         </form>
     </div>
