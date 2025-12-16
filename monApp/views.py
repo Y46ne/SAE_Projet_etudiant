@@ -115,6 +115,58 @@ def declarer_sinistre():
     form = DeclarerSinistre()
     return render_template('declarer_sinistre.html', form=form)
 
+@app.route('/declarer_sinistre/', methods=['GET', 'POST'])
+@login_required
+def declarer_sinistre():
+    form = DeclarerSinistre()
+    assure = current_user.assure_profile
+    logements = assure.logements
+    pieces = []
+    biens = []
+    for logement in logements:
+        for piece in logement.pieces:
+            pieces.append(piece)
+            for bien in piece.biens:
+                bien.valeur_actuelle = bien.calculer_valeur_actuelle()
+                biens.append(bien)
+    if form.validate_on_submit():
+        sinistre = Sinistre(
+            date_sinistre=form.date_sinistre.data,
+            type_sinistre=form.type_sinistre.data,
+            id_assure=assure.id_assure,
+            id_logement=request.form.get("logement_id")
+        )
+        db.session.add(sinistre)
+        db.session.flush() 
+        biens_selectionnes = request.form.getlist("biens_selectionnes")
+        total = 0
+        for bien_id in biens_selectionnes:
+            etat = request.form.get(f"etat_bien_{bien_id}")
+            bien = Bien.query.get(int(bien_id))
+            if not bien:
+                continue
+            if etat == "perte_totale":
+                degat = bien.valeur_actuelle or 0
+            else:
+                degat = (bien.valeur_actuelle or 0) * 0.5
+            total += degat
+            db.session.execute(impacte.insert().values(
+                id_bien=bien.id_bien,
+                id_sinistre=sinistre.id_sinistre,
+                degat_estime=degat
+            ))
+        sinistre.montant_estime = total
+        db.session.commit()
+        flash("Sinistre déclaré avec succès", "success")
+        return redirect(url_for("tableau_de_bord"))
+    return render_template(
+        "declarer_sinistre.html",
+        form=form,
+        logements=logements,
+        pieces=pieces,
+        biens=biens
+    )
+
 @app.route('/ajouter_logement/', methods=['GET', 'POST'])
 @login_required
 def ajouter_logement():
