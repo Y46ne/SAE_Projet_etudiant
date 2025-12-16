@@ -15,14 +15,13 @@ class Bien(db.Model):
     id_piece = db.Column(db.Integer, db.ForeignKey('piece.id_piece'), nullable=False)
     sinistres = db.relationship('Sinistre', secondary=impacte, lazy='subquery', backref=db.backref('biens', lazy='subquery'))
 
-    def __init__(self, nom_bien, id_piece, description=None, categorie=None, date_achat=None, prix_achat=None, id_justificatif=None):
+    def __init__(self, nom_bien, id_piece, description=None, categorie=None, date_achat=None, prix_achat=None):
         self.nom_bien = nom_bien
         self.description = description
         self.categorie = categorie
         self.date_achat = date_achat
         self.prix_achat = prix_achat
         self.id_piece = id_piece
-        self.id_justificatif = id_justificatif
         self.valeur_actuelle = self.calculer_valeur_actuelle()
     def calculer_valeur_actuelle(self):
         """

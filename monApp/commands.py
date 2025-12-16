@@ -108,7 +108,8 @@ def loaddb(filename):
         justificatif = Justificatif(
             chemin_fichier=j['chemin_fichier'],
             type_justificatif=j.get('type_justificatif'),
-            date_ajout=datetime.fromisoformat(j['date_ajout']) if j.get('date_ajout') else None
+            date_ajout=datetime.fromisoformat(j['date_ajout']) if j.get('date_ajout') else None,
+            id_bien=int(j['id_bien']) if j.get('id_bien') else None
         )
         db.session.add(justificatif)
     db.session.commit()

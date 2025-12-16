@@ -192,3 +192,29 @@ impacte:
   - id_bien: 5
     id_sinistre: 1
     degat_estime: 400
+
+justificatifs:
+  - chemin_fichier: "assure_1/facture_tv.pdf"
+    type_justificatif: "Facture"
+    date_ajout: "2023-01-15"
+    id_bien: 1
+
+  - chemin_fichier: "assure_1/facture_canape.pdf"
+    type_justificatif: "Facture"
+    date_ajout: "2021-09-12"
+    id_bien: 2
+
+  - chemin_fichier: "assure_2/facture_pc.pdf"
+    type_justificatif: "Facture"
+    date_ajout: "2023-02-10"
+    id_bien: 3
+
+  - chemin_fichier: "assure_2/facture_table.pdf"
+    type_justificatif: "Facture"
+    date_ajout: "2020-05-20"
+    id_bien: 4
+
+  - chemin_fichier: "assure_3/facture_lave_linge.pdf"
+    type_justificatif: "Facture"
+    date_ajout: "2021-01-15"
+    id_bien: 5

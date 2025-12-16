@@ -95,8 +95,8 @@
                     
                     <div class="form-group">
                         {{ form.facture.label(class="form-label") }}
-                        {{ form.facture(class="form-input-file") }}
-                        <small class="form-text">Joindre une facture pour prouver l'achat (PDF, JPG, PNG).</small>
+                        {{ form.facture(class="form-input-file", required=True) }}
+                        <small class="form-text" style="color: #d9534f;">* Justificatif obligatoire (PDF, JPG, PNG).</small>
                     </div>
 
 

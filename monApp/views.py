@@ -3,10 +3,12 @@ from flask_login import (
     login_user, logout_user, login_required, current_user
 )
 from hashlib import sha256
+from werkzeug.utils import secure_filename
+import os
 
 from .app import app, db, login_manager
 from config import *
-from monApp.database import User, Assure, Logement, Piece, Bien
+from monApp.database import User, Assure, Logement, Piece, Bien, Justificatif
 from monApp.forms import *
 from .forms import ChangePasswordForm
 
@@ -52,7 +54,7 @@ def logout():
     logout_user()
     return redirect ( url_for ('login'))
 
-@app.route('/info_bien/')
+@app.route('/info_bien/<int:id>')
 @login_required
 def info_bien(id):
     bien = Bien.query.get_or_404(id)
@@ -86,9 +88,9 @@ def tableau_de_bord():
             biens_de_la_piece = getattr(p, 'biens', [])
             nb_biens_logement += len(biens_de_la_piece)
             for b in biens_de_la_piece:
-                if b.prix_achat is not None:
+                if b.valeur_actuelle is not None:
                     try:
-                        valeur_logement += float(b.prix_achat)
+                        valeur_logement += float(b.valeur_actuelle)
                     except (ValueError, TypeError):
                         pass
 
@@ -327,44 +329,50 @@ def ajouter_bien():
 
     if form.validate_on_submit():
         try:
-            nouveau_bien = Bien(
-                nom_bien=form.nom_bien.data,
-                prix_achat=form.prix_achat.data,
-                categorie=form.categorie.data,
-                date_achat=form.date_achat.data,
-                id_piece=form.piece_id.data
-            )
-            
-            db.session.add(nouveau_bien)
-            db.session.flush() 
-
             fichier_facture = form.facture.data
-            if fichier_facture:
-                filename = secure_filename(fichier_facture.filename)
-                
-                user_folder = os.path.join(app.config['UPLOAD_FOLDER'], f"assure_{current_user.id}")
-                os.makedirs(user_folder, exist_ok=True)
-                
-                file_path = os.path.join(user_folder, f"bien_{nouveau_bien.id_bien}_{filename}")
-                fichier_facture.save(file_path)
-                
-                relative_path = os.path.join(f"assure_{current_user.id}", f"bien_{nouveau_bien.id_bien}_{filename}")
-
-                nouveau_justificatif = Justificatif(
-                    chemin_fichier=relative_path,
-                    type_justificatif="Facture",
-                    bien=nouveau_bien 
-                )
-                db.session.add(nouveau_justificatif)
-
-            db.session.commit()
-            flash("Nouveau bien ajouté avec succès !", "success")
-            # Récupérer la pièce et le logement associés
-            piece = Piece.query.get(nouveau_bien.id_piece)
-            if piece:
-                return redirect(url_for('gestion_bien', piece_id=piece.id_piece))
+            if not fichier_facture:
+                flash("L'ajout d'un justificatif est obligatoire.", "danger")
             else:
-                return redirect(url_for('mes_logements'))
+                filename = secure_filename(fichier_facture.filename)
+                file_ext = os.path.splitext(filename)[1].lower()
+
+                if file_ext not in ['.pdf', '.png', '.jpg', '.jpeg']:
+                    flash("Format de fichier non supporté. Veuillez utiliser PDF, PNG, JPG ou JPEG.", "danger")
+                else:
+                    nouveau_bien = Bien(
+                        nom_bien=form.nom_bien.data,
+                        prix_achat=form.prix_achat.data,
+                        categorie=form.categorie.data,
+                        date_achat=form.date_achat.data,
+                        id_piece=form.piece_id.data
+                    )
+                    
+                    db.session.add(nouveau_bien)
+                    db.session.flush() 
+
+                    user_folder = os.path.join(app.config['UPLOAD_FOLDER'], f"assure_{current_user.id_assure}")
+                    os.makedirs(user_folder, exist_ok=True)
+                    
+                    file_path = os.path.join(user_folder, f"bien_{nouveau_bien.id_bien}_{filename}")
+                    fichier_facture.save(file_path)
+                    
+                    relative_path = os.path.join(f"assure_{current_user.id_assure}", f"bien_{nouveau_bien.id_bien}_{filename}")
+
+                    nouveau_justificatif = Justificatif(
+                        chemin_fichier=relative_path,
+                        type_justificatif="Facture",
+                        id_bien=nouveau_bien.id_bien
+                    )
+                    db.session.add(nouveau_justificatif)
+
+                    db.session.commit()
+                    flash("Nouveau bien ajouté avec succès !", "success")
+                    # Récupérer la pièce et le logement associés
+                    piece = Piece.query.get(nouveau_bien.id_piece)
+                    if piece:
+                        return redirect(url_for('gestion_bien', piece_id=piece.id_piece))
+                    else:
+                        return redirect(url_for('mes_logements'))
 
         except Exception as e:
             db.session.rollback()
