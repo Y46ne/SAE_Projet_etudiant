@@ -341,7 +341,7 @@ def changer_mot_de_passe():
 def ajouter_piece():
     form = PieceForm()
     logements = current_user.assure_profile.logements
-    form.logement_id.choices = [(l.id_logement, l.adresse) for l in logements]
+    form.logement_id.choices = [(l.id_logement, l.nom_logement) for l in logements]
 
     if form.validate_on_submit():
         try:
@@ -373,7 +373,7 @@ def ajouter_bien():
     for log in user_logements:
         user_pieces.extend(log.pieces)
 
-    form.logement_id.choices = [(l.id_logement, l.adresse) for l in user_logements]
+    form.logement_id.choices = [(l.id_logement, l.nom_logement) for l in user_logements]
     form.piece_id.choices = [(p.id_piece, p.nom_piece) for p in user_pieces]
 
     if form.validate_on_submit():
@@ -427,7 +427,7 @@ def ajouter_bien():
             db.session.rollback()
             flash(f"Erreur lors de l'ajout du bien : {e}", "danger")
 
-    liste_logement_pour_template = [{'id': l.id_logement, 'adresse': l.adresse} for l in user_logements]
+    liste_logement_pour_template = [{'id': l.id_logement, 'nom': l.nom_logement, 'adresse': l.adresse} for l in user_logements]
     liste_pieces_pour_template = [{'id': p.id_piece, 'nom_piece': p.nom_piece, 'id_logement': p.id_logement} for p in user_pieces]
     
     return render_template(

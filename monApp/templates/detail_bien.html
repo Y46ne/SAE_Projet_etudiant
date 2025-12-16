@@ -32,7 +32,7 @@
             <div class="info-item">
                 <div class="info-icon">💶</div>
                 <div class="info-label">Valeur Actuelle</div>
-                <div class="info-value">{{ bien.valeur_actuelle if bien.valeur_actuelle is not none else 'Non renseigné' }} €</div>
+                <div class="info-value">{{'%.2f' % bien.valeur_actuelle if bien.valeur_actuelle is not none else 'Non renseigné' }} €</div>
             </div>
             <div class="info-item">
                 <div class="info-icon">📅</div>
