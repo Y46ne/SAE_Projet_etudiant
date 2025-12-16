@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import render_template, request, url_for, redirect, flash
 from flask_login import (
     login_user, logout_user, login_required, current_user
@@ -6,7 +7,7 @@ from hashlib import sha256
 
 from .app import app, db, login_manager
 from config import *
-from monApp.database import User, Assure, Assureur, Logement, Piece, Bien, Sinistre
+from monApp.database import User, Assure, Logement, Piece, Bien, Sinistre
 from monApp.forms import *
 from .forms import ChangePasswordForm
 
@@ -573,6 +574,12 @@ def detail_assure(id):
         flash("Accès non autorisé.", "danger")
         return redirect(url_for('login'))
     assure = Assure.query.get_or_404(id)
+    if assure.date_naissance and isinstance(assure.date_naissance, str):
+        try:
+            assure.date_naissance = datetime.strptime(assure.date_naissance, '%Y-%m-%d').date()
+        except ValueError:
+    
+            pass
     return render_template('assureur/detail_assure.html', assure=assure)
 
 
