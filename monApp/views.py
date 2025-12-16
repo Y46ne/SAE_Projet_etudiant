@@ -544,9 +544,12 @@ def liste_assures():
     if not current_user.assureur_profile:
         flash("Accès non autorisé.", "danger")
         return redirect(url_for('login'))
+
     assureur = current_user.assureur_profile
     assures = Assure.query.filter_by(id_assureur=assureur.id_assureur).all()
+
     return render_template('assureur/liste_assures.html', assures=assures)
+
 
 @app.route('/parametres_assureur/')
 @login_required
