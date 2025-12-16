@@ -15,7 +15,7 @@ class Logement(db.Model):
     pieces = db.relationship('Piece', backref='logement', lazy='subquery', cascade="all, delete-orphan")
     sinistres = db.relationship('Sinistre', backref='logement', lazy=True)
     justificatifs = db.relationship('Justificatif', secondary=justifie, backref=db.backref('logements', lazy='subquery'), lazy='subquery')
-    assureurs = db.relationship('Assureur', secondary=couvre, backref=db.backref('logements', lazy='subquery'), lazy='subquery')
+    assureurs = db.relationship('Assureur', secondary=couvre, back_populates='logements_couverts', lazy='subquery')
 
 
     def __init__(self, adresse, type_logement=None, surface=None, description=None):

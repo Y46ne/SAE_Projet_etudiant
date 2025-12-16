@@ -6,7 +6,7 @@ from hashlib import sha256
 
 from .app import app, db, login_manager
 from config import *
-from monApp.database import User, Assure, Logement, Piece, Bien
+from monApp.database import User, Assure, Assureur, Logement, Piece, Bien, Sinistre
 from monApp.forms import *
 from .forms import ChangePasswordForm
 
@@ -16,7 +16,10 @@ from .forms import ChangePasswordForm
 @app.route('/')
 def index():
     if current_user.is_authenticated:
-        return redirect(url_for('tableau_de_bord'))
+        if not current_user.is_assureur :
+            return redirect(url_for('tableau_de_bord'))
+        else:
+            return redirect(url_for('tableau_de_bord_assureur'))
     return redirect(url_for('login'))
 
 @login_manager.user_loader
@@ -475,6 +478,103 @@ def supprimer_bien(bien_id):
         db.session.rollback()
         flash(f"Erreur lors de la suppression : {e}", "danger")
     return redirect(url_for('gestion_bien', piece_id=piece_id))
+
+
+#------Partie assureur------
+@app.route('/tableau_de_bord_assureur/')
+@login_required
+def tableau_de_bord_assureur():
+    if not current_user.assureur_profile:
+        flash("Accès non autorisé.", "danger")
+        return redirect(url_for('login'))
+
+    assureur = current_user.assureur_profile
+    
+    assures = Assure.query.filter_by(id_assureur=assureur.id_assureur).all()
+
+    all_logements = []
+    for assure in assures:
+        all_logements.extend(assure.logements)
+
+
+    logement_ids = [l.id_logement for l in all_logements]
+    sinistres = Sinistre.query.filter(Sinistre.id_logement.in_(logement_ids)).order_by(Sinistre.date_sinistre.desc()).all()
+
+    for s in sinistres:
+        s.statut = "En attente"
+
+    sinistres_en_attente = len(sinistres) 
+    expertises_a_valider = 0 
+    total_demandes = len(sinistres)
+
+    valeur_totale = 0
+    for logement in all_logements:
+        for piece in logement.pieces:
+            for bien in piece.biens:
+                if bien.prix_achat:
+                    valeur_totale += bien.prix_achat
+
+    return render_template('assureur/tableau_bord_assureur.html',
+                           sinistres_en_attente=sinistres_en_attente,
+                           expertises_a_valider=expertises_a_valider,
+                           total_demandes=total_demandes,
+                           valeur_totale=valeur_totale,
+                           sinistres=sinistres)
+
+@app.route('/liste_sinistres/')
+@login_required
+def liste_sinistres():
+    if not current_user.assureur_profile:
+        flash("Accès non autorisé.", "danger")
+        return redirect(url_for('login'))
+    assureur = current_user.assureur_profile
+    assures = Assure.query.filter_by(id_assureur=assureur.id_assureur).all()
+    all_logements = []
+    for assure in assures:
+        all_logements.extend(assure.logements)
+    logement_ids = [l.id_logement for l in all_logements]
+    sinistres = Sinistre.query.filter(Sinistre.id_logement.in_(logement_ids)).order_by(Sinistre.date_sinistre.desc()).all()
+    for s in sinistres:
+        s.statut = "En attente"
+    return render_template('assureur/liste_sinistres.html', sinistres=sinistres)
+
+@app.route('/liste_assures/')
+@login_required
+def liste_assures():
+    if not current_user.assureur_profile:
+        flash("Accès non autorisé.", "danger")
+        return redirect(url_for('login'))
+    assureur = current_user.assureur_profile
+    assures = Assure.query.filter_by(id_assureur=assureur.id_assureur).all()
+    return render_template('assureur/liste_assures.html', assures=assures)
+
+@app.route('/parametres_assureur/')
+@login_required
+def parametres_assureur():
+    if not current_user.assureur_profile:
+        flash("Accès non autorisé.", "danger")
+        return redirect(url_for('login'))
+    return render_template('assureur/parametres_assureur.html')
+
+@app.route('/detail_sinistre/<int:id>')
+@login_required
+def detail_sinistre(id):
+    if not current_user.assureur_profile:
+        flash("Accès non autorisé.", "danger")
+        return redirect(url_for('login'))
+    sinistre = Sinistre.query.get_or_404(id)
+    sinistre.statut = "En attente"
+    return render_template('assureur/detail_sinistre.html', sinistre=sinistre)
+
+@app.route('/detail_assure/<int:id>')
+@login_required
+def detail_assure(id):
+    if not current_user.assureur_profile:
+        flash("Accès non autorisé.", "danger")
+        return redirect(url_for('login'))
+    assure = Assure.query.get_or_404(id)
+    return render_template('assureur/detail_assure.html', assure=assure)
+
 
 # ------------------- MAIN -------------------
 if __name__ == '__main__':
