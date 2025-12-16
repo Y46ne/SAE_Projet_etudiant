@@ -4,6 +4,8 @@ from flask_login import (
     login_user, logout_user, login_required, current_user
 )
 from hashlib import sha256
+import os
+from werkzeug.utils import secure_filename
 
 from .app import app, db, login_manager
 from config import *
@@ -106,7 +108,7 @@ def tableau_de_bord():
                            valeur_totale=valeur_totale_globale, 
                            logements_stats=logements_avec_stats)
 
-@app.route('/declarer_sinstre')
+@app.route('/declarer_sinistre')
 def declarer_sinistre():
     form = DeclarerSinistre()
     return render_template('declarer_sinistre.html', form=form)
@@ -204,11 +206,6 @@ def creer_compte():
             flash(f'Erreur lors de la création du compte : {e}', 'danger')
     return render_template('creeruncompte.html', form=form)
     
-@app.route('/TableauDeBord/')
-@login_required
-def TableauDeBord():
-    return render_template('TableauDeBord.html')
-
 @app.route('/detail_bien/<int:id>')
 @login_required
 def detail_bien(id):
@@ -545,9 +542,12 @@ def liste_assures():
     if not current_user.assureur_profile:
         flash("Accès non autorisé.", "danger")
         return redirect(url_for('login'))
+
     assureur = current_user.assureur_profile
     assures = Assure.query.filter_by(id_assureur=assureur.id_assureur).all()
+
     return render_template('assureur/liste_assures.html', assures=assures)
+
 
 @app.route('/parametres_assureur/')
 @login_required
@@ -555,7 +555,23 @@ def parametres_assureur():
     if not current_user.assureur_profile:
         flash("Accès non autorisé.", "danger")
         return redirect(url_for('login'))
-    return render_template('assureur/parametres_assureur.html')
+    
+    assureur = current_user.assureur_profile
+    form = ParametresForm(obj=assureur)
+
+    if form.validate_on_submit():
+        assureur.nom = form.nom.data
+        assureur.prenom = form.prenom.data
+        assureur.telephone = form.telephone.data
+        try:
+            db.session.commit()
+            flash("Paramètres modifiés avec succès.", "success")
+            return redirect(url_for('parametres_assureur'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erreur lors de la modification : {e}", "danger")
+    
+    return render_template('assureur/parametres_assureur.html', form=form)
 
 @app.route('/detail_sinistre/<int:id>')
 @login_required
