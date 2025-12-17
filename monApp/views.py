@@ -1,4 +1,3 @@
-from datetime import datetime
 from flask import render_template, request, url_for, redirect, flash, make_response
 from flask_login import (
     login_user, logout_user, login_required, current_user
@@ -796,7 +795,7 @@ def detail_assure(id):
     if assure.date_naissance:
         if isinstance(assure.date_naissance, str):
             try:
-                assure.date_naissance = datetime.strptime(assure.date_naissance, '%Y-%m-%d').date()
+                assure.date_naissance = datetime.datetime.strptime(assure.date_naissance, '%Y-%m-%d').date()
             except ValueError:
                 assure.date_naissance = None
     
