@@ -1,11 +1,12 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, HiddenField, SubmitField, FloatField, SelectField, DateField, TextAreaField, DecimalField
-from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
+from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional, ValidationError, Regexp
 from hashlib import sha256 
 from .database import *
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField
 from monApp.database.assure import get_tous_les_assures
 from flask_wtf.file import FileField, FileAllowed
+from datetime import datetime
 
 class LoginForm(FlaskForm):
     Login = StringField('Identifiant', validators=[DataRequired()])
@@ -28,15 +29,43 @@ class LoginForm(FlaskForm):
         return None
 
 class SignUpForm(FlaskForm):
-    nom = StringField('Nom', validators=[DataRequired()])
-    prenom = StringField('Prénom', validators=[DataRequired()])
-    date_naissance = StringField('Date de naissance (YYYY-MM-DD)', validators=[DataRequired()])
-    telephone = StringField('Téléphone', validators=[DataRequired()])
-    email = StringField('Adresse e-mail', validators=[DataRequired(), Email()])
-    Password = PasswordField('Mot de passe', validators=[DataRequired()])
-    confirm = PasswordField('Confirmer le mot de passe', validators=[DataRequired(), EqualTo('Password')])
-    submit = SubmitField('Créer mon compte')
+    nom = StringField('Nom', validators=[DataRequired(message="Le nom est requis.")])
+    prenom = StringField('Prénom', validators=[DataRequired(message="Le prénom est requis.")])
+    date_naissance = StringField(
+        'Date de naissance (YYYY-MM-DD)', 
+        validators=[DataRequired(message="La date de naissance est requise.")]
+    )
+    telephone = StringField(
+        'Téléphone', 
+        validators=[
+            DataRequired(message="Le téléphone est requis."),
+            Regexp(r'^\d{10}$', message="Le numéro doit contenir exactement 10 chiffres (ex: 0612345678).")
+        ]
+    )
+    email = StringField(
+        'Adresse e-mail', 
+        validators=[
+            DataRequired(message="L'email est requis."), 
+            Email(message="Adresse email invalide.")
+        ]
+    )
+    Password = PasswordField('Mot de passe', validators=[DataRequired(message="Le mot de passe est requis.")])
+    confirm = PasswordField('Confirmer le mot de passe', validators=[
+        DataRequired(), 
+        EqualTo('Password', message="Les mots de passe ne correspondent pas.")
+    ])
 
+    submit = SubmitField('Créer mon compte')
+    def validate_date_naissance(self, field):
+        date_str = field.data
+        try:
+            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
+            raise ValidationError("Date invalide ou format incorrect. Utilisez AAAA-MM-JJ (ex: 2000-01-31).")
+        if date_obj.year < 1900:
+            raise ValidationError("La date de naissance ne peut pas être antérieure à 1900.")
+        if date_obj > datetime.now().date():
+            raise ValidationError("La date de naissance ne peut pas être dans le futur.")
 
 class ResetPasswordForm(FlaskForm):
     email = StringField('Adresse e-mail', validators=[DataRequired(), Email()])

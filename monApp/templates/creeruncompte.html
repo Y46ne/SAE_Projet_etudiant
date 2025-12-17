@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Créer un compte</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/creeruncompte.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
 </head>
 <body>
   <div class="container">
@@ -23,31 +25,70 @@
     <form method="POST" action="{{ url_for('creer_compte') }}">
       {{ form.hidden_tag() }}
 
-      {{ form.nom.label }}
-      {{ form.nom(placeholder="Votre nom") }}
-
-      {{ form.prenom.label }}
-      {{ form.prenom(placeholder="Votre prénom") }}
-
-      {{ form.date_naissance.label }}
-      {{ form.date_naissance(placeholder="YYYY-MM-DD") }}
-
-      {{ form.telephone.label }}
-      {{ form.telephone(placeholder="0612345678") }}
-
-      {{ form.email.label }}
-      {{ form.email(placeholder="exemple@gmail.com") }}
-
-      {{ form.Password.label }}
-      <div class="password-field">
-        {{ form.Password(id="password") }}
-        <button type="button" class="eye" onclick="togglePassword('password')">👁️</button>
+      <div class="form-group {% if form.nom.errors %}has-error{% endif %}">
+          {{ form.nom.label }}
+          {{ form.nom(placeholder="Votre nom") }}
+          {% for error in form.nom.errors %}
+              <span class="form-error">{{ error }}</span>
+          {% endfor %}
       </div>
 
-      {{ form.confirm.label }}
-      <div class="password-field">
-        {{ form.confirm(id="confirm") }}
-        <button type="button" class="eye" onclick="togglePassword('confirm')">👁️</button>
+      <div class="form-group {% if form.prenom.errors %}has-error{% endif %}">
+          {{ form.prenom.label }}
+          {{ form.prenom(placeholder="Votre prénom") }}
+          {% for error in form.prenom.errors %}
+              <span class="form-error">{{ error }}</span>
+          {% endfor %}
+      </div>
+
+      <div class="form-group {% if form.date_naissance.errors %}has-error{% endif %}">
+          {{ form.date_naissance.label }}
+          {{ form.date_naissance(placeholder="YYYY-MM-DD") }}
+          {% for error in form.date_naissance.errors %}
+              <span class="form-error">{{ error }}</span>
+          {% endfor %}
+      </div>
+
+      <div class="form-group {% if form.telephone.errors %}has-error{% endif %}">
+          {{ form.telephone.label }}
+          {{ form.telephone(placeholder="0612345678") }}
+          {% for error in form.telephone.errors %}
+              <span class="form-error">{{ error }}</span>
+          {% endfor %}
+      </div>
+
+      <div class="form-group {% if form.email.errors %}has-error{% endif %}">
+          {{ form.email.label }}
+          {{ form.email(placeholder="exemple@gmail.com") }}
+          {% for error in form.email.errors %}
+              <span class="form-error">{{ error }}</span>
+          {% endfor %}
+      </div>
+
+      <div class="form-group {% if form.Password.errors %}has-error{% endif %}">
+          {{ form.Password.label }}
+          <div class="password-field">
+            {{ form.Password(id="password") }}
+            <span class="eye" onclick="togglePassword('password', this)">
+                <i class="fas fa-eye"></i>
+            </span>
+          </div>
+          {% for error in form.Password.errors %}
+              <span class="form-error">{{ error }}</span>
+          {% endfor %}
+      </div>
+
+      <div class="form-group {% if form.confirm.errors %}has-error{% endif %}">
+          {{ form.confirm.label }}
+          <div class="password-field">
+            {{ form.confirm(id="confirm") }}
+            <span class="eye" onclick="togglePassword('confirm', this)">
+                <i class="fas fa-eye"></i>
+            </span>
+          </div>
+          {% for error in form.confirm.errors %}
+              <span class="form-error">{{ error }}</span>
+          {% endfor %}
       </div>
 
       {{ form.submit(class="btn") }}
