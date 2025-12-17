@@ -4,10 +4,12 @@ from flask_login import (
     login_user, logout_user, login_required, current_user
 )
 from hashlib import sha256
+import os
+from werkzeug.utils import secure_filename
 
 from .app import app, db, login_manager
 from config import *
-from monApp.database import User, Assure, Logement, Piece, Bien, Sinistre
+from monApp.database import User, Assure, Logement, Piece, Bien, Sinistre, Assureur
 from monApp.forms import *
 from .forms import ChangePasswordForm
 
@@ -106,7 +108,7 @@ def tableau_de_bord():
                            valeur_totale=valeur_totale_globale, 
                            logements_stats=logements_avec_stats)
 
-@app.route('/declarer_sinstre')
+@app.route('/declarer_sinistre')
 def declarer_sinistre():
     form = DeclarerSinistre()
     return render_template('declarer_sinistre.html', form=form)
@@ -204,11 +206,6 @@ def creer_compte():
             flash(f'Erreur lors de la création du compte : {e}', 'danger')
     return render_template('creeruncompte.html', form=form)
     
-@app.route('/TableauDeBord/')
-@login_required
-def TableauDeBord():
-    return render_template('TableauDeBord.html')
-
 @app.route('/detail_bien/<int:id>')
 @login_required
 def detail_bien(id):
@@ -220,7 +217,14 @@ def detail_bien(id):
 @login_required
 def parametres():
     user = current_user
+    if user.is_assureur:
+        return redirect(url_for('parametres_assureur'))
+    
     assure = current_user.assure_profile
+    if assure is None:
+        flash("Profil d'assuré introuvable.", "danger")
+        return redirect(url_for('tableau_de_bord'))
+        
     print("Assure utilisé :", assure.nom, assure.prenom, assure.email, assure.telephone)
     form = ParametresForm(obj=assure)
     if form.validate_on_submit():
@@ -501,11 +505,8 @@ def tableau_de_bord_assureur():
     logement_ids = [l.id_logement for l in all_logements]
     sinistres = Sinistre.query.filter(Sinistre.id_logement.in_(logement_ids)).order_by(Sinistre.date_sinistre.desc()).all()
 
-    for s in sinistres:
-        s.statut = "En attente"
-
-    sinistres_en_attente = len(sinistres) 
-    expertises_a_valider = 0 
+    sinistres_en_attente = len([s for s in sinistres if s.statut == 'Déclaré'])
+    expertises_a_valider = len([s for s in sinistres if s.statut == 'Expertisé'])
     total_demandes = len(sinistres)
 
     valeur_totale = 0
@@ -535,8 +536,6 @@ def liste_sinistres():
         all_logements.extend(assure.logements)
     logement_ids = [l.id_logement for l in all_logements]
     sinistres = Sinistre.query.filter(Sinistre.id_logement.in_(logement_ids)).order_by(Sinistre.date_sinistre.desc()).all()
-    for s in sinistres:
-        s.statut = "En attente"
     return render_template('assureur/liste_sinistres.html', sinistres=sinistres)
 
 @app.route('/liste_assures/')
@@ -545,9 +544,12 @@ def liste_assures():
     if not current_user.assureur_profile:
         flash("Accès non autorisé.", "danger")
         return redirect(url_for('login'))
+
     assureur = current_user.assureur_profile
     assures = Assure.query.filter_by(id_assureur=assureur.id_assureur).all()
+
     return render_template('assureur/liste_assures.html', assures=assures)
+
 
 @app.route('/parametres_assureur/')
 @login_required
@@ -555,17 +557,49 @@ def parametres_assureur():
     if not current_user.assureur_profile:
         flash("Accès non autorisé.", "danger")
         return redirect(url_for('login'))
-    return render_template('assureur/parametres_assureur.html')
+    
+    assureur = current_user.assureur_profile
+    form = ParametresForm(obj=assureur)
 
-@app.route('/detail_sinistre/<int:id>')
+    if form.validate_on_submit():
+        assureur.nom = form.nom.data
+        assureur.prenom = form.prenom.data
+        assureur.telephone = form.telephone.data
+        try:
+            db.session.commit()
+            flash("Paramètres modifiés avec succès.", "success")
+            return redirect(url_for('parametres_assureur'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erreur lors de la modification : {e}", "danger")
+    
+    return render_template('assureur/parametres_assureur.html', form=form)
+
+@app.route('/detail_sinistre/<int:id>', methods=['GET', 'POST'])
 @login_required
 def detail_sinistre(id):
     if not current_user.assureur_profile:
         flash("Accès non autorisé.", "danger")
         return redirect(url_for('login'))
     sinistre = Sinistre.query.get_or_404(id)
-    sinistre.statut = "En attente"
-    return render_template('assureur/detail_sinistre.html', sinistre=sinistre)
+    form = UpdateSinistreForm(obj=sinistre)
+
+    if form.validate_on_submit():
+        sinistre.statut = form.statut.data
+        sinistre.montant_estime = form.montant_estime.data
+        sinistre.montant_final = form.montant_final.data
+        try:
+            db.session.commit()
+            flash("Sinistre mis à jour avec succès.", "success")
+            return redirect(url_for('detail_sinistre', id=sinistre.id_sinistre))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erreur lors de la mise à jour : {e}", "danger")
+    
+    logement = sinistre.logement
+    assure = logement.assures[0] if logement.assures else None
+
+    return render_template('assureur/detail_sinistre.html', sinistre=sinistre, form=form, logement=logement, assure=assure)
 
 @app.route('/detail_assure/<int:id>')
 @login_required
@@ -574,13 +608,25 @@ def detail_assure(id):
         flash("Accès non autorisé.", "danger")
         return redirect(url_for('login'))
     assure = Assure.query.get_or_404(id)
-    if assure.date_naissance and isinstance(assure.date_naissance, str):
-        try:
-            assure.date_naissance = datetime.strptime(assure.date_naissance, '%Y-%m-%d').date()
-        except ValueError:
+    total_valeur_biens = 0.0
+
+    if assure.date_naissance:
+        if isinstance(assure.date_naissance, str):
+            try:
+                assure.date_naissance = datetime.strptime(assure.date_naissance, '%Y-%m-%d').date()
+            except ValueError:
+                assure.date_naissance = None
     
-            pass
-    return render_template('assureur/detail_assure.html', assure=assure)
+    for logement in assure.logements:
+        for piece in logement.pieces:
+            for bien in piece.biens:
+                if bien.prix_achat is not None:
+                    try:
+                        total_valeur_biens += float(bien.prix_achat)
+                    except (ValueError, TypeError):
+                        pass
+                        
+    return render_template('assureur/detail_assure.html', assure=assure, total_valeur_biens=total_valeur_biens)
 
 
 # ------------------- MAIN -------------------

@@ -41,15 +41,7 @@
                 <div class="info-icon">💰</div>
                 <div class="info-label">Valeur totale des biens</div>
                 <div class="info-value">
-                    {% set total_value = 0 %}
-                    {% for logement in assure.logements %}
-                        {% for piece in logement.pieces %}
-                            {% for bien in piece.biens %}
-                                {% set total_value = total_value + (bien.prix_achat or 0) %}
-                            {% endfor %}
-                        {% endfor %}
-                    {% endfor %}
-                    {{ "%.2f"|format(total_value) }} €
+                    {{ "%.2f"|format(total_valeur_biens) }} €
                 </div>
             </div>
             <div class="info-item">
