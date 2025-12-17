@@ -8,10 +8,17 @@
 {% block content %}
 <div class="p-8">
 
+{% if not current_user.is_assureur %}
 <a href="{{ url_for('mes_logements') }}"
-   class="btn btn-danger">
+ class="btn btn-danger">
    ← Retour aux logements
 </a>
+{% else %}
+<a href="{{ url_for('detail_assure', id=logement.assures[0].id_assure) }}"
+ class="btn btn-danger">
+   ← Retour au détail du client
+</a>
+{% endif %}
 
 <div class="logement-details-header">
     <h1 class="text-2xl font-bold text-gray-800 mb-2">
@@ -21,8 +28,12 @@
     <p class="text-gray-600 mb-4"><strong>Nombre de pièces :</strong> {{ logement.pieces|length }}</p>
 
     {% if current_user.is_authenticated %}
+    {% if not current_user.is_assureur %}
+
     <a href="{{ url_for('ajouter_piece', logement_id=logement.id_logement) }}" class="btn btn-success mb-3">Ajouter une pièce</a>
     {% endif %}
+    {% endif %}
+
 </div>
 
 
@@ -56,6 +67,7 @@
             <td>
                 <div class="task-controls">
                 <a href="{{ url_for('gestion_bien', piece_id=piece.id_piece) }}" title="Voir les biens" class="btn btn-info">Voir biens<i class="fas fa-eye"></i></a>
+                {% if not current_user.is_assureur %}
                 <a href="{{ url_for('ajouter_bien', piece_id=piece.id_piece) }}" class="btn btn-info" title="Ajouter un bien">Ajouter bien<i class="fas fa-plus"></i></a>
                 <a href="{{ url_for('modifier_piece', piece_id=piece.id_piece) }}" class="btn btn-warning">Modifier</a>
                 <form action="{{ url_for('supprimer_piece', piece_id=piece.id_piece) }}" method="post" style="display:inline;">
@@ -63,6 +75,7 @@
                         Supprimer
                     </button>
                 </form>
+                {% endif %}
                 </div>
             </td>
         </tr>
