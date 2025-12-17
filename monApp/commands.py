@@ -122,7 +122,10 @@ def loaddb(filename):
             type_sinistre=s.get('type_sinistre'),
             description=s.get('description'),
             montant_estime=Decimal(str(s['montant_estime'])) if s.get('montant_estime') is not None else None,
+            montant_final=Decimal(str(s['montant_final'])) if s.get('montant_final') is not None else None,
             numero_sinistre=s['numero_sinistre'],
+            date_declaration=date.fromisoformat(s['date_declaration']) if s.get('date_declaration') else None,
+            statut=s.get('statut', 'Déclaré'),
             id_logement=s['id_logement']
         )
         db.session.add(sinistre)

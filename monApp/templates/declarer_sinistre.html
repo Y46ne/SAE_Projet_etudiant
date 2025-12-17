@@ -48,6 +48,14 @@
                 </div>
             </section>
 
+            <section class="form-section">
+                <div class="form-group">
+                    {{ form.description.label(class="form-label") }}
+                    {{ form.description(class="form-textarea", rows=4, placeholder="Ajoutez des détails sur le sinistre...") }}
+                </div>
+            </section>
+
+
             <section class="biens-section">
                 <h2>Biens endommagés</h2>
                 <p class="section-subtitle">Sélectionnez les biens affectés par le sinistre</p>
@@ -112,7 +120,7 @@
                 </div>
 
                 <button type="submit" class="btn-primary">
-                    Générer l'état financier des biens
+                    Déclarer le sinistre
                 </button>
             </section>
         </form>

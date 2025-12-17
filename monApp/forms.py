@@ -169,6 +169,11 @@ class DeclarerSinistre(FlaskForm):
         validators=[DataRequired(message="Veuillez sélectionner un type de sinistre.")]
     )
 
+    description = TextAreaField(
+        "Description",
+        validators=[Optional()]
+    )
+
     biens_selectionnes = QuerySelectMultipleField(
         "Biens sélectionnés",
         query_factory=lambda: Bien.query.all(),
@@ -202,3 +207,18 @@ class ParametresForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     telephone = StringField('Téléphone', validators=[Optional()])
     submit = SubmitField('Enregistrer')
+
+class UpdateSinistreForm(FlaskForm):
+    statut = SelectField(
+        'Statut du sinistre',
+        choices=[
+            ('Déclaré', 'Déclaré'),
+            ('En cours d\'expertise', 'En cours d\'expertise'),
+            ('Expertisé', 'Expertisé'),
+            ('Clos', 'Clos')
+        ],
+        validators=[DataRequired()]
+    )
+    montant_estime = DecimalField('Montant estimé', validators=[Optional()])
+    montant_final = DecimalField('Montant final', validators=[Optional()])
+    submit = SubmitField('Mettre à jour le sinistre')

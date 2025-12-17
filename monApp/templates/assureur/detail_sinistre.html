@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Détails du Sinistre {{ sinistre.numero_sinistre }}{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/detail_assure.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-card">
+        <div class="header-top">
+            <div class="title-section">
+                <div class="icon-box">👤</div>
+                <div class="title-text"> 
+                    <h1>Sinistre {{ sinistre.numero_sinistre }}</h1>
+                    <div class="tags">
+                        <span class="tag tag-blue">{{ sinistre.type_sinistre }}</span>
+                        <span class="tag tag-green">{{ sinistre.statut }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-icon">🆔</div>
+                <div class="info-label">ID du sinistre</div>
+                <div class="info-value">{{ sinistre.id_sinistre }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">#️⃣</div>
+                <div class="info-label">Numéro de sinistre</div>
+                <div class="info-value">{{ sinistre.numero_sinistre }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">🗓️</div>
+                <div class="info-label">Date du sinistre</div>
+                <div class="info-value">{{ sinistre.date_sinistre.strftime('%d/%m/%Y') }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">ℹ️</div>
+                <div class="info-label">Type de sinistre</div>
+                <div class="info-value">{{ sinistre.type_sinistre }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">💲</div>
+                <div class="info-label">Montant estimé</div>
+                <div class="info-value">
+                    {% if sinistre.montant_estime is not none %}{{ "%.2f"|format(sinistre.montant_estime) }} €{% else %}Non estimé{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-grid">
+        <div class="media-card">
+            <h2>Actions de l'assureur</h2>
+            <form method="POST" action="{{ url_for('detail_sinistre', id=sinistre.id_sinistre) }}">
+                {% from "_formhelpers.html" import render_field %}
+                {{ form.hidden_tag() }}
+                {{ render_field(form.statut) }}
+                {{ render_field(form.montant_estime) }}
+                {{ render_field(form.montant_final) }}
+                {{ form.submit(class="btn btn-primary mt-3") }}
+            </form>
+        </div>
+
+        <div class="media-card">
+            <h2>Description du sinistre</h2>
+            <p>{{ sinistre.description or 'Aucune description fournie.' }}</p>
+        </div>
+
+        <div class="media-card">
+            <h2>Informations sur l'assuré</h2>
+            {% if assure %}
+            <div class="assure-info-card">
+                <p><strong>Nom:</strong> {{ assure.nom }}</p>
+                <p><strong>Prénom:</strong> {{ assure.prenom }}</p>
+                <p><strong>Email:</strong> {{ assure.email }}</p>
+                <p><strong>Téléphone:</strong> {{ assure.telephone or 'Non renseigné' }}</p>
+                <a href="{{ url_for('detail_assure', id=assure.id_assure) }}" class="btn btn-info">Voir l'assuré</a>
+            </div>
+            {% else %}
+            <div class="empty-state"><p>Aucun assuré lié à ce sinistre.</p></div>
+            {% endif %}
+        </div>
+
+        <div class="media-card">
+            <h2>Logement concerné</h2>
+            {% if logement %}
+            <div class="logement-info-card">
+                <p><strong>Adresse:</strong> {{ logement.adresse }}</p>
+                <a href="{{ url_for('view_logement_pieces', id=logement.id_logement) }}" class="btn btn-info">Voir le logement</a>
+            </div>
+            {% else %}
+            <div class="empty-state"><p>Aucun logement lié à ce sinistre.</p></div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="back-button mt-4">
+        <a href="{{ url_for('liste_sinistres') }}" class="btn btn-secondary">Retour à la liste des sinistres</a>
+    </div>
+</div>
+{% endblock %}
