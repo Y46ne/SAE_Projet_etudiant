@@ -180,12 +180,10 @@ p {
 
 .btn i {
     margin-left: 10px;
-    
     border-left: 1px solid rgba(255, 255, 255, 0.5);
-    
     padding-left: 10px;
-    
-    line-height: 1; 
+    line-height: inherit;
+    vertical-align: middle;
 }
 
 .btn-warning i {
@@ -209,4 +207,25 @@ p {
 .alert-warning {
     background: #fef9c3;
     color: #92400e;
+}
+
+.search-filter {
+    margin-bottom: 20px;
+}
+
+.search-filter input {
+    width: 100%;
+    padding: 12px 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.search-filter input:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    outline: none;
 }

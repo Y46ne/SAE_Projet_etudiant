@@ -72,6 +72,7 @@ def loaddb(filename):
     for l in data.get('logements', []):
         logement = Logement(
             adresse=l['adresse'],
+            nom_logement=l.get('nom_logement'),
             type_logement=l.get('type_logement'),
             surface=Decimal(str(l['surface'])) if l.get('surface') is not None else None,
             description=l.get('description')
@@ -97,8 +98,6 @@ def loaddb(filename):
             categorie=b.get('categorie'),
             date_achat=date.fromisoformat(b['date_achat']) if b.get('date_achat') else None,
             prix_achat=Decimal(str(b['prix_achat'])) if b.get('prix_achat') is not None else None,
-            etat=b.get('etat'),
-            valeur_actuelle=Decimal(str(b['valeur_actuelle'])) if b.get('valeur_actuelle') is not None else None,
             id_piece=b['id_piece']
         )
         db.session.add(bien)
@@ -109,7 +108,8 @@ def loaddb(filename):
         justificatif = Justificatif(
             chemin_fichier=j['chemin_fichier'],
             type_justificatif=j.get('type_justificatif'),
-            date_ajout=datetime.fromisoformat(j['date_ajout']) if j.get('date_ajout') else None
+            date_ajout=datetime.fromisoformat(j['date_ajout']) if j.get('date_ajout') else None,
+            id_bien=int(j['id_bien']) if j.get('id_bien') else None
         )
         db.session.add(justificatif)
     db.session.commit()

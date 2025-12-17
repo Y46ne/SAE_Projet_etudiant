@@ -7,14 +7,14 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
+{% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
-          <div class="alert alert-{{ category }}">{{ message }}</div>
+          <div class="alert alert-{{ category }} text-center">{{ message }}</div>
         {% endfor %}
       {% endif %}
     {% endwith %}
+<div class="container">
     <main class="main-content">
         <header> 
             <h1>Tableau de Bord</h1>
@@ -44,7 +44,8 @@
             <div class="logement-item">
                 <div class="logement-info">
                     
-                    <h3>{{ item.logement.adresse }}</h3> 
+                    <h3>{{ item.logement.nom_logement }}</h3>
+                    <p style="color: #666; font-size: 0.9em; margin-bottom: 5px;">{{ item.logement.adresse }}</p>
                     
                     <p>
                         {{ item.nb_pieces }} pièces - 

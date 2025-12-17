@@ -1,7 +1,6 @@
 from ..app import db
 from monApp.database.couvre import couvre
 
-
 class Assureur(db.Model):
     __tablename__ = 'assureur'
     id_assureur = db.Column(db.Integer, primary_key=True)
@@ -22,7 +21,6 @@ class Assureur(db.Model):
         self.telephone = telephone
         self.societe = societe
         self.login = email
-
 
     def __repr__(self):
         return f"<Assureur {self.id_assureur} {self.prenom} {self.nom}>"

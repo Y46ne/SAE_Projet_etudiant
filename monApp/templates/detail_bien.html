@@ -16,7 +16,6 @@
                     <h1>{{ bien.nom_bien or 'Nom inconnu' }}</h1>
                     <div class="tags">
                         <span class="tag tag-blue">{{ bien.categorie or 'Non renseigné' }}</span>
-                        <span class="tag tag-green">{{ bien.etat or 'Non renseigné' }}</span>
                     </div>
                 </div>
             </div>
@@ -32,8 +31,8 @@
         <div class="info-grid">
             <div class="info-item">
                 <div class="info-icon">💶</div>
-                <div class="info-label">Prix Achat</div>
-                <div class="info-value">{{ bien.prix_achat if bien.prix_achat is not none else 'Non renseigné' }} €</div>
+                <div class="info-label">Valeur Actuelle</div>
+                <div class="info-value">{{'%.2f' % bien.valeur_actuelle if bien.valeur_actuelle is not none else 'Non renseigné' }} €</div>
             </div>
             <div class="info-item">
                 <div class="info-icon">📅</div>
@@ -57,49 +56,24 @@
         </div>
     </div>
 
-    <div class="bottom-grid">
-        <div class="media-card">
-            <div class="media-header">
-                <h3>🖼️ Photos</h3>
-                <span class="media-count">({{ bien.photos|length if bien.photos else 0 }})</span>
-            </div>
-            <div class="media-list">
-                {% if bien.photos %}
-                    {% for photo in bien.photos %}
-                    <div class="media-item">
-                        <div class="media-info">
-                            <span class="media-icon">🖼️</span>
-                            <span class="media-name">{{ photo.titre or 'Photo' }}</span>
-                        </div>
-                        <a href="{{ url_for('static', filename='uploads/' + photo.fichier) }}" download class="download-btn">⬇️</a>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-state"><p>Aucune photo</p></div>
-                {% endif %}
-            </div>
+    <div class="media-card" style="max-width: 800px; margin: 2rem auto;">
+        <div class="media-header">
+            <h3>📄 Justificatif</h3>
         </div>
-
-        <div class="media-card">
-            <div class="media-header">
-                <h3>📄 Documents</h3>
-                <span class="media-count">({{ bien.documents|length if bien.documents else 0 }})</span>
+        <div class="media-list">
+            {% if bien.justificatif and bien.justificatif.fichier_existe %}
+            <div class="media-item">
+                <div class="media-info">
+                    <span class="media-icon">{% if bien.justificatif.is_image %}🖼️{% else %}📄{% endif %}</span>
+                    <span class="media-name">{{ bien.justificatif.type_justificatif or 'Justificatif' }}</span>
+                </div>
+                <a href="{{ url_for('static', filename='uploads/' ~ bien.justificatif.chemin_fichier) }}" download class="download-btn">⬇️</a>
             </div>
-            <div class="media-list">
-                {% if bien.documents %}
-                    {% for doc in bien.documents %}
-                    <div class="media-item">
-                        <div class="media-info">
-                            <span class="media-icon">📄</span>
-                            <span class="media-name">{{ doc.titre or 'Document' }}</span>
-                        </div>
-                        <a href="{{ url_for('static', filename='uploads/' + doc.fichier) }}" download class="download-btn">⬇️</a>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-state"><p>Aucun document</p></div>
-                {% endif %}
+            {% else %}
+            <div class="empty-state" style="text-align: center; padding: 1rem; color: #666;">
+                <p>Aucun justificatif associé</p>
             </div>
+            {% endif %}
         </div>
     </div>
 </div>

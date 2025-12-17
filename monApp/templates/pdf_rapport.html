@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pdf_rapport.css', _external=True) }}">
+</head>
+<body>
+    <h1>Rapport d'Inventaire - MobiList</h1>
+    <p style="text-align: center;">Généré le {{ date_generation }}</p>
+
+    {% for item in data %}
+        <div class="logement-section">
+            <h2>{{ item.logement.nom_logement }} <small>({{ item.logement.type_logement }})</small></h2>
+            <p style="margin-top: -10px; color: #666;">📍 {{ item.logement.adresse }}</p>
+            
+            {% if not item.pieces %}
+                <p>Aucune pièce enregistrée.</p>
+            {% endif %}
+
+            {% for piece_data in item.pieces %}
+                <div class="piece-section">
+                    <h3>{{ piece_data.piece.nom_piece }} ({{ piece_data.piece.surface }} m²)</h3>
+                    
+                    {% if not piece_data.categories %}
+                        <p style="font-style: italic; color: #999;">Aucun bien dans cette pièce.</p>
+                    {% else %}
+                        {% for categorie, cat_info in piece_data.categories.items() %}
+                            <h4>{{ categorie }}</h4>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th width="40%">Bien</th>
+                                        <th width="20%">Date Achat</th>
+                                        <th width="20%" class="text-right">Prix Achat</th>
+                                        <th width="20%" class="text-right">Valeur Actuelle</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for bien in cat_info.biens %}
+                                    <tr>
+                                        <td>{{ bien.nom }}</td>
+                                        <td>{{ bien.date_achat.strftime('%d/%m/%Y') if bien.date_achat else '-' }}</td>
+                                        <td class="text-right">{{ "%.2f"|format(bien.prix_achat) if bien.prix_achat else '-' }} €</td>
+                                        <td class="text-right">{{ "%.2f"|format(bien.valeur_actuelle) }} €</td>
+                                    </tr>
+                                    {% endfor %}
+                                    <tr class="total-row">
+                                        <td colspan="3" class="text-right">Total {{ categorie }}</td>
+                                        <td class="text-right">{{ "%.2f"|format(cat_info.total) }} €</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        {% endfor %}
+                        <div style="text-align: right; font-weight: bold; color: #e67e22; margin-top: 5px;">
+                            Total {{ piece_data.piece.nom_piece }} : {{ "%.2f"|format(piece_data.total_piece) }} €
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <div style="text-align: right; font-size: 14px; font-weight: bold; border-top: 2px solid #2980b9; padding-top: 10px;">
+                Valeur totale du logement : {{ "%.2f"|format(item.total_logement) }} €
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="grand-total">
+        Valeur Totale Globale : {{ "%.2f"|format(total_global) }} €
+    </div>
+</body>
+</html>

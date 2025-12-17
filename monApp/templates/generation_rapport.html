@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Génération de Rapport{% endblock %}
+
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 mt-8">
+    <h1 class="text-3xl font-bold text-center text-gray-800 mb-10">Génération de Rapports</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="w-full">
+            <div class="bg-white rounded-lg shadow-md flex flex-col h-full">
+                <div class="bg-blue-600 text-white text-center p-4 rounded-t-lg">
+                    <h4 class="text-xl font-semibold">Rapport Global</h4>
+                </div>
+                <div class="p-6 flex flex-col justify-between flex-grow text-center">
+                    <p class="text-gray-600 mb-4">Générez un rapport complet incluant tous les logements, pièces, biens et sinistres enregistrés.</p>
+                    <a href="{{ url_for('generer_pdf_tous') }}" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded transition duration-200 mt-auto block">Télécharger le PDF complet</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-full">
+            <div class="bg-white rounded-lg shadow-md flex flex-col h-full">
+                <div class="bg-green-500 text-white text-center p-4 rounded-t-lg">
+                    <h4 class="text-xl font-semibold">Rapport par Logement</h4>
+                </div>
+                <div class="p-6 flex flex-col justify-between flex-grow">
+                    <p class="text-gray-600 text-center mb-4">Sélectionnez un logement spécifique pour obtenir un rapport détaillé.</p>
+                    <form action="{{ url_for('generer_pdf_logement') }}" method="POST" class="w-full">
+                        <div class="mb-4">
+                            <label for="selectLogement" class="block text-gray-700 font-medium mb-2">Choisir un logement :</label>
+                            <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" id="selectLogement" name="id_logement" required>
+                                <option value="" disabled selected>-- Sélectionner --</option>
+                                {% if logements %}
+                                    {% for logement in logements %}
+                                        <option value="{{ logement.id_logement }}">
+                                            {{ logement.nom_logement }} - {{ logement.adresse }} ({{ logement.type_logement }})
+                                        </option>
+                                    {% endfor %}
+                                {% else %}
+                                    <option disabled>Aucun logement disponible</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded transition duration-200 mt-auto">Télécharger le PDF</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

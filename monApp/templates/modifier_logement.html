@@ -9,12 +9,20 @@
 
 {% block content %}
 <div class="container">
-    <h1>Modifier le nom du logement</h1>
+    <h1>Modifier le logement</h1>
     <form method="POST">
         {{ form.hidden_tag() }}
         <div class="form-group">
+            {{ form.nom_logement.label(class="form-label") }}
+            {{ form.nom_logement(class="form-control") }}
+        </div>
+        <div class="form-group">
             {{ form.adresse.label(class="form-label") }}
             {{ form.adresse(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.description.label(class="form-label") }}
+            {{ form.description(class="form-control", rows=4) }}
         </div>
         <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
         <a href="{{ url_for('mes_logements') }}" class="btn btn-secondary">Annuler</a>
