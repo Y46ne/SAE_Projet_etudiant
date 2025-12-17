@@ -161,30 +161,28 @@ biens:
 
 sinistres:
   - date_sinistre: "2024-03-10"
-    date_declaration: "2024-03-11"
     type_sinistre: "Dégât des eaux"
     description: "Fuite dans la salle de bain"
     montant_estime: 1200
     numero_sinistre: "SIN-001"
+    id_assure: 1
     id_logement: 1
-    statut: "En cours d'expertise"
+
   - date_sinistre: "2023-12-01"
-    date_declaration: "2023-12-02"
     type_sinistre: "Vol"
     description: "Ordinateur portable volé"
     montant_estime: 950
-    montant_final: 900
     numero_sinistre: "SIN-002"
+    id_assure: 2
     id_logement: 2
-    statut: "Clos"
+
   - date_sinistre: "2022-09-18"
-    date_declaration: "2022-09-20"
     type_sinistre: "Incendie"
     description: "Feu de cuisine"
     montant_estime: 5000
     numero_sinistre: "SIN-003"
+    id_assure: 3
     id_logement: 3
-    statut: "Déclaré"
 
 impacte:
   - id_bien: 3
