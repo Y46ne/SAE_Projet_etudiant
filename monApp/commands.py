@@ -3,6 +3,7 @@ from .app import app, db
 import yaml
 from datetime import datetime, date
 from decimal import Decimal
+from hashlib import sha256
 
 from .database import Assure, Assureur, Bien, Justificatif, Logement, Piece, Sinistre, User
 from .database.couvre import couvre
@@ -164,7 +165,7 @@ def syncdb():
     Creates all missin tables
     """
     db.create_all()
-    lg.warning("Database sunchronized!")
+    click.echo("Database synchronized!")
 
 
 @app.cli.command()
@@ -179,7 +180,7 @@ def newuser(login, pwd):
     unUser = User(Login=login ,Password =m.hexdigest())
     db.session.add(unUser)
     db.session.commit()
-    lg.warning('User ' + login + ' created!')
+    click.echo('User ' + login + ' created!')
 
 import click
 from .app import db
