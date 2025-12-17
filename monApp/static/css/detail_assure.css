@@ -251,3 +251,157 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+
+.media-card h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 10px;
+}
+
+.media-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.media-card .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.media-card .form-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.media-card .form-control {
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: #f9fafb;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.media-card .form-control:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px #dbeafe;
+}
+
+.media-card .btn-primary {
+    background-color: #2563eb;
+    color: white;
+    padding: 12px;
+    font-size: 15px;
+    margin-top: 10px;
+}
+
+.media-card .btn-primary:hover {
+    background-color: #1d4ed8;
+}
+
+.assure-info-card p,
+.logement-info-card p {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 15px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.assure-info-card p:last-child,
+.logement-info-card p:last-child {
+    border-bottom: none;
+}
+
+.assure-info-card p strong,
+.logement-info-card p strong {
+    color: #4b5563;
+    font-weight: 600;
+}
+
+.assure-info-card .btn-info,
+.logement-info-card .btn-info {
+    background-color: #3b82f6;
+    color: white;
+    margin-top: 15px;
+}
+.assure-info-card .btn-info:hover,
+.logement-info-card .btn-info:hover {
+    background-color: #2563eb;
+}
+
+/* Style pour la description */
+.media-card > p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #4b5563;
+}
+
+.logement-list,
+.sinistre-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.logement-item,
+.sinistre-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: #f9fafb;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    border: 1px solid #f3f4f6;
+}
+
+.logement-item:hover,
+.sinistre-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    background-color: #fff;
+}
+
+.logement-info,
+.sinistre-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logement-icon,
+.sinistre-icon {
+    font-size: 22px;
+    color: #2563eb;
+}
+
+.logement-name,
+.sinistre-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: #1f2937;
+}
+
+.view-btn {
+    padding: 6px 14px;
+    background-color: #e0e7ff;
+    color: #3730a3;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.view-btn:hover {
+    background-color: #c7d2fe;
+}
