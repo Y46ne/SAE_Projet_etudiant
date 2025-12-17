@@ -169,6 +169,11 @@ class DeclarerSinistre(FlaskForm):
         validators=[DataRequired(message="Veuillez sélectionner un type de sinistre.")]
     )
 
+    description = TextAreaField(
+        "Description",
+        validators=[Optional()]
+    )
+
     biens_selectionnes = QuerySelectMultipleField(
         "Biens sélectionnés",
         query_factory=lambda: Bien.query.all(),

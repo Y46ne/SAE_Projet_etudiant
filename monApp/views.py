@@ -132,7 +132,7 @@ def declarer_sinistre():
         sinistre = Sinistre(
             date_sinistre=form.date_sinistre.data,
             type_sinistre=form.type_sinistre.data,
-            description="Déclaration de sinistre",
+            description=form.description.data,
             numero_sinistre="SIN-" + datetime.datetime.now().strftime("%Y%m%d%H%M%S"),
             id_logement=int(request.form.get("logement_id"))
         )
