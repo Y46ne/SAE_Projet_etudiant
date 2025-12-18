@@ -48,14 +48,6 @@
                 </div>
             </section>
 
-            <section class="form-section">
-                <div class="form-group">
-                    {{ form.description.label(class="form-label") }}
-                    {{ form.description(class="form-textarea", rows=4, placeholder="Ajoutez des détails sur le sinistre...") }}
-                </div>
-            </section>
-
-
             <section class="biens-section">
                 <h2>Biens endommagés</h2>
                 <p class="section-subtitle">Sélectionnez les biens affectés par le sinistre</p>
@@ -113,6 +105,23 @@
                 </div>
             </section>
 
+            <section class="biens-section" id="summary-section" style="display: none;">
+                <h2>Récapitulatif des pertes</h2>
+                <div class="table-container">
+                    <table class="biens-table">
+                        <thead>
+                            <tr>
+                                <th>Nom du bien</th>
+                                <th>Valeur</th>
+                                <th>État</th>
+                                <th>Indemnisation</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summary-tbody"></tbody>
+                    </table>
+                </div>
+            </section>
+
             <section class="footer-section">
                 <div class="total-card">
                     <span class="total-label">Total à indemniser :</span>
@@ -120,7 +129,7 @@
                 </div>
 
                 <button type="submit" class="btn-primary">
-                    Déclarer le sinistre
+                    Générer l'état financier des biens
                 </button>
             </section>
         </form>
@@ -135,6 +144,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalDisplay = document.getElementById('total-indemnisation');
     const checkboxes = document.querySelectorAll('.checkbox-bien');
     const etatSelects = document.querySelectorAll('.etat-select');
+    const summarySection = document.getElementById('summary-section');
+    const summaryTbody = document.getElementById('summary-tbody');
+    let isDirty = false;
+
+    // Détection des modifications pour l'alerte de sortie
+    document.querySelector('.sinistre-form').addEventListener('change', () => isDirty = true);
+    document.querySelector('.sinistre-form').addEventListener('submit', () => isDirty = false);
+    
+    window.addEventListener('beforeunload', (e) => {
+        if (isDirty) {
+            e.preventDefault();
+            e.returnValue = "Vous avez commencé une déclaration. Si vous quittez, vos données seront perdues.";
+        }
+    });
 
     function filterBiens() {
         const residenceId = residenceSelect.value;
@@ -149,25 +172,33 @@ document.addEventListener('DOMContentLoaded', function() {
             if (pieceId && rowPiece !== pieceId) show = false;
 
             row.style.display = show ? '' : 'none';
-            
-            if (!show) {
-                const checkbox = row.querySelector('.checkbox-bien');
-                if (checkbox) checkbox.checked = false;
-            }
         });
-        calculateTotal();
     }
 
     function calculateTotal() {
         let total = 0;
+        let summaryHTML = '';
+
         checkboxes.forEach(checkbox => {
             if (checkbox.checked) {
                 const row = checkbox.closest('tr');
                 const valeur = parseFloat(checkbox.dataset.valeur) || 0;
-                const etat = row.querySelector('.etat-select').value;
-                total += (etat === 'perte_totale') ? valeur : valeur * 0.5;
+                const etatSelect = row.querySelector('.etat-select');
+                const etat = etatSelect.value;
+                const indemnisation = (etat === 'perte_totale') ? valeur : valeur * 0.5;
+                
+                total += indemnisation;
+
+                summaryHTML += `<tr>
+                    <td>${row.cells[1].textContent}</td>
+                    <td>${row.cells[2].textContent}</td>
+                    <td>${etatSelect.options[etatSelect.selectedIndex].text}</td>
+                    <td>${indemnisation.toFixed(2)}€</td>
+                </tr>`;
             }
         });
+        summaryTbody.innerHTML = summaryHTML;
+        summarySection.style.display = summaryHTML ? 'block' : 'none';
         totalDisplay.textContent = total.toFixed(2) + '€';
     }
 
