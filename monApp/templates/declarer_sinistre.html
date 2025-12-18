@@ -127,54 +127,73 @@
     </main>
 </div>
 
+<!-- Script généré par IA-->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const residenceSelect = document.getElementById('filter-residence');
-    const pieceSelect = document.getElementById('filter-piece');
-    const rows = document.querySelectorAll('#biens-tbody tr');
-    const totalDisplay = document.getElementById('total-indemnisation');
-    const checkboxes = document.querySelectorAll('.checkbox-bien');
-    const etatSelects = document.querySelectorAll('.etat-select');
+    const pieceSelect = document.getElementById('filter-piece'); // Sélectionne l'élément de sélection des pièces
+    const rows = document.querySelectorAll('#biens-tbody tr'); // Sélectionne toutes les lignes du tableau des biens
+    const totalDisplay = document.getElementById('total-indemnisation'); // Sélectionne l'élément affichant le total à indemniser
+    const checkboxes = document.querySelectorAll('.checkbox-bien'); // Sélectionne toutes les cases à cocher des biens
+    const etatSelects = document.querySelectorAll('.etat-select'); // Sélectionne tous les sélecteurs d'état des biens
 
+    // Fonction pour filtrer les biens affichés dans le tableau
     function filterBiens() {
-        const residenceId = residenceSelect.value;
-        const pieceId = pieceSelect.value;
+        const residenceId = residenceSelect.value; // Récupère l'ID de la résidence sélectionnée
+        const pieceId = pieceSelect.value; // Récupère l'ID de la pièce sélectionnée
 
+        // Parcourt chaque ligne du tableau des biens
         rows.forEach(row => {
-            const rowResidence = row.dataset.residence;
-            const rowPiece = row.dataset.piece;
+            const rowResidence = row.dataset.residence; // Récupère l'ID de la résidence associée à la ligne
+            const rowPiece = row.dataset.piece; // Récupère l'ID de la pièce associée à la ligne
 
+            // Variable pour déterminer si la ligne doit être affichée
             let show = true;
-            if (residenceId && rowResidence !== residenceId) show = false;
-            if (pieceId && rowPiece !== pieceId) show = false;
+            // Si une résidence est sélectionnée et qu'elle ne correspond pas à celle de la ligne, masquer la ligne
+            if (residenceId && rowResidence !== residenceId) {
+                show = false;
+            }
+            // Si une pièce est sélectionnée et qu'elle ne correspond pas à celle de la ligne, masquer la ligne
+            if (pieceId && rowPiece !== pieceId) {
+                show = false;
+            }
 
+            // Affiche ou masque la ligne en fonction de la variable 'show'
             row.style.display = show ? '' : 'none';
             
+            // Si la ligne est masquée, décocher la case correspondante
             if (!show) {
                 const checkbox = row.querySelector('.checkbox-bien');
-                if (checkbox) checkbox.checked = false;
+                if (checkbox) {
+                    checkbox.checked = false;
+                }
             }
         });
-        calculateTotal();
+        calculateTotal(); // Recalcule le total après le filtrage
     }
 
+    // Fonction pour calculer le total à indemniser
     function calculateTotal() {
-        let total = 0;
+        let total = 0; // Initialise le total à 0
+        // Parcourt toutes les cases à cocher des biens
         checkboxes.forEach(checkbox => {
+            // Si la case est cochée
             if (checkbox.checked) {
-                const row = checkbox.closest('tr');
-                const valeur = parseFloat(checkbox.dataset.valeur) || 0;
-                const etat = row.querySelector('.etat-select').value;
-                total += (etat === 'perte_totale') ? valeur : valeur * 0.5;
+                const row = checkbox.closest('tr'); // Récupère la ligne parente de la case à cocher
+                const valeur = parseFloat(checkbox.dataset.valeur) || 0; // Récupère la valeur du bien
+                const etat = row.querySelector('.etat-select').value; // Récupère l'état du bien (perte totale/partielle)
+                // Ajoute la valeur au total : valeur complète pour perte totale, moitié pour perte partielle
+                total += (etat === 'perte_totale') ? valeur : valeur * 0.5; 
             }
         });
-        totalDisplay.textContent = total.toFixed(2) + '€';
+        totalDisplay.textContent = total.toFixed(2) + '€'; // Met à jour l'affichage du total
     }
 
-    residenceSelect.addEventListener('change', filterBiens);
-    pieceSelect.addEventListener('change', filterBiens);
-    checkboxes.forEach(cb => cb.addEventListener('change', calculateTotal));
-    etatSelects.forEach(select => select.addEventListener('change', calculateTotal));
+    // Ajoute des écouteurs d'événements pour les changements de sélection et de cases à cocher
+    residenceSelect.addEventListener('change', filterBiens); // Quand la résidence change, filtre les biens
+    pieceSelect.addEventListener('change', filterBiens); // Quand la pièce change, filtre les biens
+    checkboxes.forEach(cb => cb.addEventListener('change', calculateTotal)); // Quand une case à cocher change, recalcule le total
+    etatSelects.forEach(select => select.addEventListener('change', calculateTotal)); // Quand l'état d'un bien change, recalcule le total
 });
 </script>
 {% endblock %}

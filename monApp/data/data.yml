@@ -1,7 +1,3 @@
-users:
-  - Login: "assureur.pro@example.com"
-    Password: "pbkdf2:sha256:600000$zJpGq9bL8dKjR3sT$c8a2b6e3e4f5a09b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b" # mdp: password
-    role: "assureur"
 
 assureurs:
   - nom: "Max"

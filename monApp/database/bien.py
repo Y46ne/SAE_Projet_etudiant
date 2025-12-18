@@ -26,16 +26,6 @@ class Bien(db.Model):
     def calculer_valeur_actuelle(self):
         """
         Calcule la valeur actuelle du bien en fonction de la date d'achat, de la catégorie et du prix d'achat.
-        Dépréciation annuelle selon la catégorie :
-        - Electromenager : 20%
-        - Mobilier : 10%
-        - Multimedia : 25%
-        - Vetements : 30%
-        - Bijoux : 5%
-        - Loisirs : 15%
-        - Vaisselle : 10%
-        - Outillage : 12%
-        - Autre : 8%
         """
         if not self.date_achat or not self.prix_achat:
             return None

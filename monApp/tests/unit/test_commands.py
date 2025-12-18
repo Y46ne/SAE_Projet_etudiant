@@ -5,14 +5,14 @@ import os
 # https://flask.palletsprojects.com/en/stable/testing/
 
 
-
 def test_syncdb(app):
     """Teste la commande syncdb."""
-    coureur = app.test_cli_runner()
+    coureur = app.test_cli_runner() #test_cli_runner permet d'éxecuter des commandes de terminal dans un terminal en isolation
     resultat = coureur.invoke(args=['syncdb'])
     print(resultat)
     assert resultat.exit_code == 0
     assert "Database synchronized!" in resultat.output
+
 
 def test_newuser(app, db_session):
     """Teste la création d'un utilisateur via CLI."""
@@ -25,6 +25,7 @@ def test_newuser(app, db_session):
     
     utilisateur = User.query.get('cli')
     assert utilisateur is not None
+
 
 def test_newpassword(app, db_session):
     """Teste le changement de mot de passe via CLI."""
@@ -41,6 +42,7 @@ def test_newpassword(app, db_session):
 
     db_session.refresh(utilisateur)
     assert utilisateur.Password != 'old_password'
+
 
 def test_loaddb(app, db_session, tmp_path):
     """Teste le chargement de données depuis un YAML."""
