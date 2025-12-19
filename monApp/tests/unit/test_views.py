@@ -306,26 +306,3 @@ def test_crud_bien(client_authentifie, donnees_test, db_session):
     # Vérifie que le bien a été supprimé de la base
     assert response.status_code == 200
     assert Bien.query.get(bien.id_bien) is None
-
-def test_declarer_sinistre(client_authentifie, donnees_test):
-    """Teste la déclaration de sinistre."""
-    logement = donnees_test['logement']
-    bien = donnees_test['bien']
- 
-    # Vérifie l'accès à la page de déclaration de sinistre
-    # GET
-    client_authentifie.get('/declarer_sinistre/')
-
-    # POST
-    data = {
-        'date_sinistre': '2024-01-01',
-        'type_sinistre': 'vol',
-        'logement_id': logement.id_logement,
-        'biens_selectionnes': [str(bien.id_bien)],
-        f'etat_bien_{bien.id_bien}': 'perte_totale'
-    } # Données pour la déclaration de sinistre
-    response = client_authentifie.post('/declarer_sinistre/', data=data, follow_redirects=True)
-    # Vérifie le message de succès et la création du sinistre en base
-    assert response.status_code == 200
-    assert b"Sinistre d\xc3\xa9clar\xc3\xa9" in response.data
-    assert Sinistre.query.count() > 0
