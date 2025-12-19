@@ -47,8 +47,13 @@ def login():
         if user:
             login_user(user)
             flash('Connexion réussie.', 'success')
-            next_page = request.args.get('next') or url_for('tableau_de_bord')
-            return redirect(next_page)
+            if not current_user.is_assureur :
+                next_page = request.args.get('next') or url_for('tableau_de_bord')
+                return redirect(next_page)
+            else:
+                next_page = request.args.get('next') or url_for('tableau_de_bord_assureur')
+                return redirect(next_page)
+
         else:
             flash('Identifiant ou mot de passe incorrect.', 'danger')
     return render_template('login.html', form=unForm)
@@ -667,6 +672,12 @@ def generer_pdf_logement():
 
 
 
+
+
+
+
+
+
 #------Partie assureur------
 @app.route('/tableau_de_bord_assureur/')
 @login_required
@@ -695,8 +706,8 @@ def tableau_de_bord_assureur():
     for logement in all_logements:
         for piece in logement.pieces:
             for bien in piece.biens:
-                if bien.prix_achat:
-                    valeur_totale += bien.prix_achat
+                if bien.valeur_actuelle:
+                    valeur_totale += bien.valeur_actuelle
 
     return render_template('assureur/tableau_bord_assureur.html',
                            sinistres_en_attente=sinistres_en_attente,
@@ -799,16 +810,18 @@ def detail_assure(id):
             except ValueError:
                 assure.date_naissance = None
     
+    sinistres = []
     for logement in assure.logements:
+        sinistres.extend(logement.sinistres)
         for piece in logement.pieces:
             for bien in piece.biens:
-                if bien.prix_achat is not None:
+                if bien.valeur_actuelle is not None:
                     try:
-                        total_valeur_biens += float(bien.prix_achat)
+                        total_valeur_biens += float(bien.valeur_actuelle)
                     except (ValueError, TypeError):
                         pass
                         
-    return render_template('assureur/detail_assure.html', assure=assure, total_valeur_biens=total_valeur_biens)
+    return render_template('assureur/detail_assure.html', assure=assure, total_valeur_biens=total_valeur_biens, sinistres=sinistres)
 
 
 # ------------------- MAIN -------------------

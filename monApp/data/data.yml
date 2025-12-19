@@ -1,4 +1,3 @@
-
 assureurs:
   - nom: "Max"
     prenom: "Assur"
@@ -6,6 +5,14 @@ assureurs:
     mot_de_passe: "hashed_pwd1"
     telephone: "0123456789"
     user_id: "assureur.pro@example.com"
+
+  - nom: "Claire"
+    prenom: "Bernard"
+    email: "claire.bernard@example.com"
+    mot_de_passe: "hashed_pwd7"
+    telephone: "0188776655"
+    user_id: "claire.bernard@example.com"
+
 
 assures:
   - nom: "Dupont"
@@ -53,6 +60,34 @@ assures:
     user_login: "paul.martin@example.com"
     id_assureur: 1
 
+  - nom: "Rousseau"
+    prenom: "Antoine"
+    date_naissance: "1983-11-02"
+    email: "antoine.rousseau@example.com"
+    mdp_assure: "hashed_pwd8"
+    telephone: "0655667788"
+    user_login: "antoine.rousseau@example.com"
+    id_assureur: 2
+
+  - nom: "Petit"
+    prenom: "Laura"
+    date_naissance: "1995-06-18"
+    email: "laura.petit@example.com"
+    mdp_assure: "hashed_pwd9"
+    telephone: "0677889900"
+    user_login: "laura.petit@example.com"
+    id_assureur: 2
+
+  - nom: "Garnier"
+    prenom: "Sophie"
+    date_naissance: "1988-09-30"
+    email: "sophie.garnier@example.com"
+    mdp_assure: "hashed_pwd10"
+    telephone: "0666777888"
+    user_login: "sophie.garnier@example.com"
+    id_assureur: 2
+
+
 logements:
   - adresse: "12 rue des Fleurs, Blois"
     nom_logement: "Résidence Fleurs"
@@ -84,45 +119,83 @@ logements:
     surface: 140
     description: "Maison moderne avec terrasse"
 
+  - adresse: "3 rue du Moulin, Amboise"
+    nom_logement: "Maison Moulin"
+    type_logement: "Maison"
+    surface: 95
+    description: "Maison ancienne rénovée avec cour intérieure"
+
+  - adresse: "45 chemin des Vignes, Chinon"
+    nom_logement: "Pavillon Vignes"
+    type_logement: "Maison"
+    surface: 110
+    description: "Pavillon calme proche des vignes"
+
+  - adresse: "10 rue des Tilleuls, Blois"
+    nom_logement: "Copro Tilleuls"
+    type_logement: "Appartement"
+    surface: 65
+    description: "Appartement en copropriété au 2e étage"
+
+
 possede:
   - id_assure: 1
     id_logement: 1
-
   - id_assure: 2
     id_logement: 1
-  
   - id_assure: 2
     id_logement: 2
-  
   - id_assure: 3
     id_logement: 3
-  
   - id_assure: 4
     id_logement: 4
-
   - id_assure: 1
     id_logement: 5
+  - id_assure: 6
+    id_logement: 6
+  - id_assure: 7
+    id_logement: 7
+  - id_assure: 2
+    id_logement: 8
+  - id_assure: 8
+    id_logement: 8
+
 
 pieces:
   - nom_piece: "Salon"
     surface: 25
     id_logement: 1
-
   - nom_piece: "Cuisine"
     surface: 10
     id_logement: 1
-
   - nom_piece: "Chambre principale"
     surface: 14
     id_logement: 2
-
   - nom_piece: "Salle de bain"
     surface: 8
     id_logement: 2
-
   - nom_piece: "Bureau"
     surface: 12
     id_logement: 3
+  - nom_piece: "Salon"
+    surface: 28
+    id_logement: 6
+  - nom_piece: "Chambre"
+    surface: 15
+    id_logement: 6
+  - nom_piece: "Cuisine"
+    surface: 12
+    id_logement: 7
+  - nom_piece: "Séjour"
+    surface: 22
+    id_logement: 8
+  - nom_piece: "Chambre"
+    surface: 13
+    id_logement: 8
+  - nom_piece: "Salle de bain"
+    surface: 7
+    id_logement: 8
+
 
 biens:
   - nom_bien: "Téléviseur Samsung 4K"
@@ -155,6 +228,43 @@ biens:
     prix_achat: 500
     id_piece: 4
 
+  - nom_bien: "Télévision LG OLED"
+    categorie: "Multimedia"
+    date_achat: "2022-11-05"
+    prix_achat: 1400
+    id_piece: 6
+
+  - nom_bien: "Lit double"
+    categorie: "Mobilier"
+    date_achat: "2021-08-20"
+    prix_achat: 750
+    id_piece: 7
+
+  - nom_bien: "Réfrigérateur Samsung"
+    categorie: "Électroménager"
+    date_achat: "2023-04-01"
+    prix_achat: 900
+    id_piece: 8
+
+  - nom_bien: "Téléviseur Sony Bravia"
+    categorie: "Multimedia"
+    date_achat: "2019-11-10"
+    prix_achat: 1200
+    id_piece: 9
+
+  - nom_bien: "Armoire ancienne"
+    categorie: "Mobilier"
+    date_achat: "2015-06-01"
+    prix_achat: 900
+    id_piece: 10
+
+  - nom_bien: "Smartphone iPhone"
+    categorie: "Multimedia"
+    date_achat: "2024-01-05"
+    prix_achat: 1100
+    id_piece: 9
+
+
 sinistres:
   - date_sinistre: "2024-03-10"
     date_declaration: "2024-03-11"
@@ -164,6 +274,7 @@ sinistres:
     numero_sinistre: "SIN-001"
     id_logement: 1
     statut: "En cours d'expertise"
+
   - date_sinistre: "2023-12-01"
     date_declaration: "2023-12-02"
     type_sinistre: "Vol"
@@ -173,6 +284,7 @@ sinistres:
     numero_sinistre: "SIN-002"
     id_logement: 2
     statut: "Clos"
+
   - date_sinistre: "2022-09-18"
     date_declaration: "2022-09-20"
     type_sinistre: "Incendie"
@@ -182,37 +294,102 @@ sinistres:
     id_logement: 3
     statut: "Déclaré"
 
+  - date_sinistre: "2024-06-22"
+    date_declaration: "2024-06-23"
+    type_sinistre: "Tempête"
+    description: "Dommages sur la toiture"
+    montant_estime: 3200
+    numero_sinistre: "SIN-004"
+    id_logement: 6
+    statut: "En cours"
+
+  - date_sinistre: "2023-05-14"
+    date_declaration: "2023-05-15"
+    type_sinistre: "Cambriolage"
+    description: "Vol de biens électroniques"
+    montant_estime: 2000
+    montant_final: 1800
+    numero_sinistre: "SIN-005"
+    id_logement: 7
+    statut: "Indemnisé"
+
+  - date_sinistre: "2024-02-14"
+    date_declaration: "2024-02-15"
+    type_sinistre: "Dégât des eaux"
+    description: "Fuite provenant de l’appartement du dessus"
+    montant_estime: 2500
+    numero_sinistre: "SIN-006"
+    id_logement: 8
+    statut: "Expertise en cours"
+
+  - date_sinistre: "2023-08-03"
+    date_declaration: "2023-08-10"
+    type_sinistre: "Vol"
+    description: "Téléphone volé dans les transports"
+    montant_estime: 1100
+    numero_sinistre: "SIN-007"
+    id_logement: 8
+    statut: "Refusé"
+
+
 impacte:
   - id_bien: 3
     id_sinistre: 2
     degat_estime: 900
-
   - id_bien: 5
     id_sinistre: 1
     degat_estime: 400
+  - id_bien: 6
+    id_sinistre: 4
+    degat_estime: 1400
+  - id_bien: 8
+    id_sinistre: 5
+    degat_estime: 900
+  - id_bien: 9
+    id_sinistre: 6
+    degat_estime: 800
+  - id_bien: 10
+    id_sinistre: 6
+    degat_estime: 1200
+  - id_bien: 11
+    id_sinistre: 7
+    degat_estime: 1100
+
 
 justificatifs:
   - chemin_fichier: "assure_1/facture_tv.pdf"
     type_justificatif: "Facture"
     date_ajout: "2023-01-15"
     id_bien: 1
-
   - chemin_fichier: "assure_1/facture_canape.pdf"
     type_justificatif: "Facture"
     date_ajout: "2021-09-12"
     id_bien: 2
-
   - chemin_fichier: "assure_2/facture_pc.pdf"
     type_justificatif: "Facture"
     date_ajout: "2023-02-10"
     id_bien: 3
-
   - chemin_fichier: "assure_2/facture_table.pdf"
     type_justificatif: "Facture"
     date_ajout: "2020-05-20"
     id_bien: 4
-
   - chemin_fichier: "assure_3/facture_lave_linge.pdf"
     type_justificatif: "Facture"
     date_ajout: "2021-01-15"
     id_bien: 5
+  - chemin_fichier: "assure_6/facture_tv_lg.pdf"
+    type_justificatif: "Facture"
+    date_ajout: "2022-11-05"
+    id_bien: 6
+  - chemin_fichier: "assure_6/facture_lit.pdf"
+    type_justificatif: "Facture"
+    date_ajout: "2021-08-20"
+    id_bien: 7
+  - chemin_fichier: "assure_7/facture_frigo.pdf"
+    type_justificatif: "Facture"
+    date_ajout: "2023-04-01"
+    id_bien: 8
+  - chemin_fichier: "assure_2/facture_tv_sony.pdf"
+    type_justificatif: "Facture"
+    date_ajout: "2019-11-10"
+    id_bien: 9

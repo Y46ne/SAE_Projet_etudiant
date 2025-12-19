@@ -48,7 +48,7 @@
                 <div class="info-icon">🚨</div>
                 <div class="info-label">Nombre de sinistres déclarés</div>
                 <div class="info-value">
-                    {{ assure.sinistres|length if assure.sinistres else 0 }}
+                    {{ sinistres|length }}
                 </div>
             </div>
         </div>
@@ -76,9 +76,9 @@
 
         <div class="media-card">
             <h2>Sinistres déclarés</h2>
-            {% if assure.sinistres %}
+            {% if sinistres %}
                 <div class="sinistre-list">
-                    {% for sinistre in assure.sinistres %}
+                    {% for sinistre in sinistres %}
                         <div class="sinistre-item">
                             <div class="sinistre-info">
                                 <span class="sinistre-icon">🚨</span>
