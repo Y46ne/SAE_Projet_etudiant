@@ -123,6 +123,17 @@ def tableau_de_bord():
 @login_required
 def declarer_sinistre():
     form = DeclarerSinistre()
+    form.type_sinistre.choices = [
+        ('Dégât des eaux', 'Dégât des eaux'),
+        ('Incendie', 'Incendie'),
+        ('Vol', 'Vol'),
+        ('Bris de glace', 'Bris de glace'),
+        ('Catastrophe naturelle', 'Catastrophe naturelle'),
+        ('Tempête', 'Tempête'),
+        ('Dommages électriques', 'Dommages électriques'),
+        ('Responsabilité civile', 'Responsabilité civile'),
+        ('Autre', 'Autre')
+    ]
     assure = current_user.assure_profile
     logements = assure.logements
     pieces = []

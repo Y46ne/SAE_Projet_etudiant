@@ -46,6 +46,18 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="info-card" style="width: 100%; margin-top: 1.5rem;">
+                    <div class="card-header">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-blue">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        <label class="card-label">Description / Commentaire</label>
+                    </div>
+                    <div class="card-input">
+                        {{ form.description(class="select-input", style="width: 100%; height: auto; min-height: 100px; padding: 10px;", rows="4", placeholder="Décrivez les circonstances du sinistre...") }}
+                    </div>
+                </div>
             </section>
 
             <section class="biens-section">
