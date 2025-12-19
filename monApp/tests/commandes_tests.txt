@@ -1,0 +1,5 @@
+faut etre dans le dossier de la SAE pas de monApp
+PYTHONPATH=$(pwd) coverage run --source=monApp -m pytest monApp/tests/unit/
+coverage report -m
+exemple : 
+(.venv) o22401350@or-iut-i003-f27:~/SAE/SAE_Projet_etudiant$ PYTHONPATH=$(pwd) coverage run --source=monApp -m pytest monApp/tests/unit/

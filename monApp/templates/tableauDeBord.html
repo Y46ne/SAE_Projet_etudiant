@@ -7,14 +7,14 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
+{% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
-          <div class="alert alert-{{ category }}">{{ message }}</div>
+          <div class="alert alert-{{ category }} text-center">{{ message }}</div>
         {% endfor %}
       {% endif %}
     {% endwith %}
+<div class="container">
     <main class="main-content">
         <header> 
             <h1>Tableau de Bord</h1>
@@ -44,7 +44,8 @@
             <div class="logement-item">
                 <div class="logement-info">
                     
-                    <h3>{{ item.logement.adresse }}</h3> 
+                    <h3>{{ item.logement.nom_logement }}</h3>
+                    <p style="color: #666; font-size: 0.9em; margin-bottom: 5px;">{{ item.logement.adresse }}</p>
                     
                     <p>
                         {{ item.nb_pieces }} pièces - 
@@ -66,26 +67,5 @@
     </main>
 </div>
 
-<script>
-function confirmerSuppression(logementId) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce logement ?')) {
-        fetch(`{{ url_for('delete_logement', id=0) }}`.replace('0', logementId), {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Erreur lors de la suppression');
-            }
-        });
-    }
-}
-
-function afficherPlus() {
-    window.location.href = "{{ url_for('mes_logements') }}";
-}
-</script>
+<script src="{{ url_for('static', filename='js/tableauDeBord.js') }}"></script>
 {% endblock %}

@@ -3,6 +3,7 @@ from .app import app, db
 import yaml
 from datetime import datetime, date
 from decimal import Decimal
+from hashlib import sha256
 
 from .database import Assure, Assureur, Bien, Justificatif, Logement, Piece, Sinistre, User
 from .database.couvre import couvre
@@ -72,6 +73,7 @@ def loaddb(filename):
     for l in data.get('logements', []):
         logement = Logement(
             adresse=l['adresse'],
+            nom_logement=l.get('nom_logement'),
             type_logement=l.get('type_logement'),
             surface=Decimal(str(l['surface'])) if l.get('surface') is not None else None,
             description=l.get('description')
@@ -97,8 +99,6 @@ def loaddb(filename):
             categorie=b.get('categorie'),
             date_achat=date.fromisoformat(b['date_achat']) if b.get('date_achat') else None,
             prix_achat=Decimal(str(b['prix_achat'])) if b.get('prix_achat') is not None else None,
-            etat=b.get('etat'),
-            valeur_actuelle=Decimal(str(b['valeur_actuelle'])) if b.get('valeur_actuelle') is not None else None,
             id_piece=b['id_piece']
         )
         db.session.add(bien)
@@ -109,7 +109,8 @@ def loaddb(filename):
         justificatif = Justificatif(
             chemin_fichier=j['chemin_fichier'],
             type_justificatif=j.get('type_justificatif'),
-            date_ajout=datetime.fromisoformat(j['date_ajout']) if j.get('date_ajout') else None
+            date_ajout=datetime.fromisoformat(j['date_ajout']) if j.get('date_ajout') else None,
+            id_bien=int(j['id_bien']) if j.get('id_bien') else None
         )
         db.session.add(justificatif)
     db.session.commit()
@@ -121,7 +122,10 @@ def loaddb(filename):
             type_sinistre=s.get('type_sinistre'),
             description=s.get('description'),
             montant_estime=Decimal(str(s['montant_estime'])) if s.get('montant_estime') is not None else None,
+            montant_final=Decimal(str(s['montant_final'])) if s.get('montant_final') is not None else None,
             numero_sinistre=s['numero_sinistre'],
+            date_declaration=date.fromisoformat(s['date_declaration']) if s.get('date_declaration') else None,
+            statut=s.get('statut', 'Déclaré'),
             id_logement=s['id_logement']
         )
         db.session.add(sinistre)
@@ -164,7 +168,7 @@ def syncdb():
     Creates all missin tables
     """
     db.create_all()
-    lg.warning("Database sunchronized!")
+    click.echo("Database synchronized!")
 
 
 @app.cli.command()
@@ -179,7 +183,7 @@ def newuser(login, pwd):
     unUser = User(Login=login ,Password =m.hexdigest())
     db.session.add(unUser)
     db.session.commit()
-    lg.warning('User ' + login + ' created!')
+    click.echo('User ' + login + ' created!')
 
 import click
 from .app import db

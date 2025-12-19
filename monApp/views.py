@@ -1,22 +1,34 @@
-from flask import render_template, request, url_for, redirect, flash
+from flask import render_template, request, url_for, redirect, flash, make_response
 from flask_login import (
     login_user, logout_user, login_required, current_user
 )
 from hashlib import sha256
+from werkzeug.utils import secure_filename
+import os
 
 from .app import app, db, login_manager
 from config import *
-from monApp.database import User, Assure, Logement, Piece, Bien
+from monApp.database import User, Assure, Logement, Piece, Bien, Justificatif, Sinistre
+from monApp.database.impacte import impacte as impacte_table
 from monApp.forms import *
 from .forms import ChangePasswordForm
 
+# Import pour la génération de PDF
+try:
+    from weasyprint import HTML
+except ImportError:
+    HTML = None  # Gestion du cas où la librairie n'est pas installée
+import datetime
 
 
 
 @app.route('/')
 def index():
     if current_user.is_authenticated:
-        return redirect(url_for('tableau_de_bord'))
+        if not current_user.is_assureur :
+            return redirect(url_for('tableau_de_bord'))
+        else:
+            return redirect(url_for('tableau_de_bord_assureur'))
     return redirect(url_for('login'))
 
 @login_manager.user_loader
@@ -35,8 +47,13 @@ def login():
         if user:
             login_user(user)
             flash('Connexion réussie.', 'success')
-            next_page = request.args.get('next') or url_for('tableau_de_bord')
-            return redirect(next_page)
+            if not current_user.is_assureur :
+                next_page = request.args.get('next') or url_for('tableau_de_bord')
+                return redirect(next_page)
+            else:
+                next_page = request.args.get('next') or url_for('tableau_de_bord_assureur')
+                return redirect(next_page)
+
         else:
             flash('Identifiant ou mot de passe incorrect.', 'danger')
     return render_template('login.html', form=unForm)
@@ -46,7 +63,7 @@ def logout():
     logout_user()
     return redirect ( url_for ('login'))
 
-@app.route('/info_bien/')
+@app.route('/info_bien/<int:id>')
 @login_required
 def info_bien(id):
     bien = Bien.query.get_or_404(id)
@@ -80,9 +97,9 @@ def tableau_de_bord():
             biens_de_la_piece = getattr(p, 'biens', [])
             nb_biens_logement += len(biens_de_la_piece)
             for b in biens_de_la_piece:
-                if b.prix_achat is not None:
+                if b.valeur_actuelle is not None:
                     try:
-                        valeur_logement += float(b.prix_achat)
+                        valeur_logement += float(b.valeur_actuelle)
                     except (ValueError, TypeError):
                         pass
 
@@ -102,10 +119,69 @@ def tableau_de_bord():
                            valeur_totale=valeur_totale_globale, 
                            logements_stats=logements_avec_stats)
 
-@app.route('/declarer_sinstre')
+@app.route('/declarer_sinistre/', methods=['GET', 'POST'])
+@login_required
 def declarer_sinistre():
     form = DeclarerSinistre()
-    return render_template('declarer_sinistre.html', form=form)
+    form.type_sinistre.choices = [
+        ('Dégât des eaux', 'Dégât des eaux'),
+        ('Incendie', 'Incendie'),
+        ('Vol', 'Vol'),
+        ('Bris de glace', 'Bris de glace'),
+        ('Catastrophe naturelle', 'Catastrophe naturelle'),
+        ('Tempête', 'Tempête'),
+        ('Dommages électriques', 'Dommages électriques'),
+        ('Responsabilité civile', 'Responsabilité civile'),
+        ('Autre', 'Autre')
+    ]
+    assure = current_user.assure_profile
+    logements = assure.logements
+    pieces = []
+    biens = []
+    for logement in logements:
+        for piece in logement.pieces:
+            pieces.append(piece)
+            for bien in piece.biens:
+                bien.valeur_actuelle = bien.calculer_valeur_actuelle()
+                biens.append(bien)
+    if form.validate_on_submit():
+        sinistre = Sinistre(
+            date_sinistre=form.date_sinistre.data,
+            type_sinistre=form.type_sinistre.data,
+            description=form.description.data,
+            numero_sinistre="SIN-" + datetime.datetime.now().strftime("%Y%m%d%H%M%S"),
+            id_logement=int(request.form.get("logement_id"))
+        )
+        db.session.add(sinistre)
+        db.session.flush() 
+        biens_selectionnes = request.form.getlist("biens_selectionnes")
+        total = 0
+        for bien_id in biens_selectionnes:
+            etat = request.form.get(f"etat_bien_{bien_id}")
+            bien = Bien.query.get(int(bien_id))
+            if not bien:
+                continue
+            if etat == "perte_totale":
+                degat = bien.valeur_actuelle or 0
+            else:
+                degat = (bien.valeur_actuelle or 0) * 0.5
+            total += degat
+            db.session.execute(impacte_table.insert().values(
+                id_bien=bien.id_bien,
+                id_sinistre=sinistre.id_sinistre,
+                degat_estime=degat
+            ))
+        sinistre.montant_estime = total
+        db.session.commit()
+        flash("Sinistre déclaré avec succès", "success")
+        return redirect(url_for("tableau_de_bord"))
+    return render_template(
+        "declarer_sinistre.html",
+        form=form,
+        logements=logements,
+        pieces=pieces,
+        biens=biens
+    )
 
 @app.route('/ajouter_logement/', methods=['GET', 'POST'])
 @login_required
@@ -114,6 +190,7 @@ def ajouter_logement():
     if form.validate_on_submit():
 
         insertedLogement = Logement(
+            nom_logement=form.nom_logement.data,
             adresse=form.adresse.data,
             type_logement=form.type_logement.data,
             surface=form.surface.data, 
@@ -169,6 +246,9 @@ def view_logement_pieces(id):
 def gestion_bien(piece_id):
     piece = Piece.query.get_or_404(piece_id)
     biens = Bien.query.filter_by(id_piece=piece.id_piece).all()
+    # Met à jour la valeur actuelle pour chaque bien si besoin
+    for bien in biens:
+        bien.valeur_actuelle = bien.calculer_valeur_actuelle()
     return render_template('gestion_bien.html', piece=piece, biens=biens)
 
 
@@ -200,11 +280,6 @@ def creer_compte():
             flash(f'Erreur lors de la création du compte : {e}', 'danger')
     return render_template('creeruncompte.html', form=form)
     
-@app.route('/TableauDeBord/')
-@login_required
-def TableauDeBord():
-    return render_template('TableauDeBord.html')
-
 @app.route('/detail_bien/<int:id>')
 @login_required
 def detail_bien(id):
@@ -216,7 +291,14 @@ def detail_bien(id):
 @login_required
 def parametres():
     user = current_user
+    if user.is_assureur:
+        return redirect(url_for('parametres_assureur'))
+    
     assure = current_user.assure_profile
+    if assure is None:
+        flash("Profil d'assuré introuvable.", "danger")
+        return redirect(url_for('tableau_de_bord'))
+        
     print("Assure utilisé :", assure.nom, assure.prenom, assure.email, assure.telephone)
     form = ParametresForm(obj=assure)
     if form.validate_on_submit():
@@ -280,7 +362,7 @@ def changer_mot_de_passe():
 def ajouter_piece():
     form = PieceForm()
     logements = current_user.assure_profile.logements
-    form.logement_id.choices = [(l.id_logement, l.adresse) for l in logements]
+    form.logement_id.choices = [(l.id_logement, l.nom_logement) for l in logements]
 
     if form.validate_on_submit():
         try:
@@ -312,51 +394,61 @@ def ajouter_bien():
     for log in user_logements:
         user_pieces.extend(log.pieces)
 
-    form.logement_id.choices = [(l.id_logement, l.adresse) for l in user_logements]
+    form.logement_id.choices = [(l.id_logement, l.nom_logement) for l in user_logements]
     form.piece_id.choices = [(p.id_piece, p.nom_piece) for p in user_pieces]
 
     if form.validate_on_submit():
         try:
-            nouveau_bien = Bien(
-                nom_bien=form.nom_bien.data,
-                prix_achat=form.valeur.data,
-                categorie=form.categorie.data,
-                date_achat=form.date_achat.data,
-                etat=form.etat.data,
-                id_piece=form.piece_id.data
-            )
-            
-            db.session.add(nouveau_bien)
-            db.session.flush() 
-
             fichier_facture = form.facture.data
-            if fichier_facture:
+            if not fichier_facture:
+                flash("L'ajout d'un justificatif est obligatoire.", "danger")
+            else:
                 filename = secure_filename(fichier_facture.filename)
-                
-                user_folder = os.path.join(app.config['UPLOAD_FOLDER'], f"assure_{current_user.id}")
-                os.makedirs(user_folder, exist_ok=True)
-                
-                file_path = os.path.join(user_folder, f"bien_{nouveau_bien.id_bien}_{filename}")
-                fichier_facture.save(file_path)
-                
-                relative_path = os.path.join(f"assure_{current_user.id}", f"bien_{nouveau_bien.id_bien}_{filename}")
+                file_ext = os.path.splitext(filename)[1].lower()
 
-                nouveau_justificatif = Justificatif(
-                    chemin_fichier=relative_path,
-                    type_justificatif="Facture",
-                    bien=nouveau_bien 
-                )
-                db.session.add(nouveau_justificatif)
+                if file_ext not in ['.pdf', '.png', '.jpg', '.jpeg']:
+                    flash("Format de fichier non supporté. Veuillez utiliser PDF, PNG, JPG ou JPEG.", "danger")
+                else:
+                    nouveau_bien = Bien(
+                        nom_bien=form.nom_bien.data,
+                        prix_achat=form.prix_achat.data,
+                        categorie=form.categorie.data,
+                        date_achat=form.date_achat.data,
+                        id_piece=form.piece_id.data
+                    )
+                    
+                    db.session.add(nouveau_bien)
+                    db.session.flush() 
 
-            db.session.commit()
-            flash("Nouveau bien ajouté avec succès !", "success")
-            return redirect(url_for('mes_logements')) 
+                    user_folder = os.path.join(app.config['UPLOAD_FOLDER'], f"assure_{current_user.id_assure}")
+                    os.makedirs(user_folder, exist_ok=True)
+                    
+                    file_path = os.path.join(user_folder, f"bien_{nouveau_bien.id_bien}_{filename}")
+                    fichier_facture.save(file_path)
+                    
+                    relative_path = os.path.join(f"assure_{current_user.id_assure}", f"bien_{nouveau_bien.id_bien}_{filename}")
+
+                    nouveau_justificatif = Justificatif(
+                        chemin_fichier=relative_path,
+                        type_justificatif="Facture",
+                        id_bien=nouveau_bien.id_bien
+                    )
+                    db.session.add(nouveau_justificatif)
+
+                    db.session.commit()
+                    flash("Nouveau bien ajouté avec succès !", "success")
+                    # Récupérer la pièce et le logement associés
+                    piece = Piece.query.get(nouveau_bien.id_piece)
+                    if piece:
+                        return redirect(url_for('gestion_bien', piece_id=piece.id_piece))
+                    else:
+                        return redirect(url_for('mes_logements'))
 
         except Exception as e:
             db.session.rollback()
             flash(f"Erreur lors de l'ajout du bien : {e}", "danger")
 
-    liste_logement_pour_template = [{'id': l.id_logement, 'adresse': l.adresse} for l in user_logements]
+    liste_logement_pour_template = [{'id': l.id_logement, 'nom': l.nom_logement, 'adresse': l.adresse} for l in user_logements]
     liste_pieces_pour_template = [{'id': p.id_piece, 'nom_piece': p.nom_piece, 'id_logement': p.id_logement} for p in user_pieces]
     
     return render_template(
@@ -379,10 +471,12 @@ def modifier_logement(logement_id):
     logement = Logement.query.get_or_404(logement_id)
     form = ModifierLogementForm(obj=logement)
     if form.validate_on_submit():
+        logement.nom_logement = form.nom_logement.data
         logement.adresse = form.adresse.data
+        logement.description = form.description.data
         try:
             db.session.commit()
-            flash("Nom du logement modifié avec succès.", "success")
+            flash("Logement modifié avec succès.", "success")
             return redirect(url_for('mes_logements'))
         except Exception as e:
             db.session.rollback()
@@ -452,11 +546,14 @@ def modifier_bien(bien_id):
         bien.categorie = form.categorie.data
         bien.date_achat = form.date_achat.data
         bien.prix_achat = form.prix_achat.data
-        bien.etat = form.etat.data
         try:
             db.session.commit()
             flash("Bien modifié avec succès.", "success")
-            return redirect(url_for('gestion_bien', piece_id=bien.id_piece))
+            piece = Piece.query.get(bien.id_piece)
+            if piece:
+                return redirect(url_for('gestion_bien', piece_id=piece.id_piece))
+            else:
+                return redirect(url_for('mes_logements'))
         except Exception as e:
             db.session.rollback()
             flash(f"Erreur lors de la modification : {e}", "danger")
@@ -475,6 +572,268 @@ def supprimer_bien(bien_id):
         db.session.rollback()
         flash(f"Erreur lors de la suppression : {e}", "danger")
     return redirect(url_for('gestion_bien', piece_id=piece_id))
+
+
+# Fonction utilitaire pour préparer les données du rapport
+def get_rapport_data(logements):
+    rapport_data = []
+    total_global = 0.0
+    
+    for logement in logements:
+        logement_data = {
+            'logement': logement,
+            'pieces': [],
+            'total_logement': 0.0
+        }
+        
+        # On trie les pièces pour un affichage ordonné
+        pieces_sorted = sorted(logement.pieces, key=lambda x: x.nom_piece)
+        
+        for piece in pieces_sorted:
+            piece_data = {
+                'piece': piece,
+                'categories': {},
+                'total_piece': 0.0
+            }
+            
+            for bien in piece.biens:
+                valeur = bien.calculer_valeur_actuelle()
+                if valeur is None:
+                    valeur = 0.0
+                
+                cat = bien.categorie if bien.categorie else "Autre"
+                
+                if cat not in piece_data['categories']:
+                    piece_data['categories'][cat] = {'biens': [], 'total': 0.0}
+                
+                # On prépare un dictionnaire simple pour le template
+                bien_info = {
+                    'nom': bien.nom_bien,
+                    'date_achat': bien.date_achat,
+                    'prix_achat': bien.prix_achat,
+                    'valeur_actuelle': valeur
+                }
+                
+                piece_data['categories'][cat]['biens'].append(bien_info)
+                piece_data['categories'][cat]['total'] += valeur
+                piece_data['total_piece'] += valeur
+            
+            # On n'ajoute la pièce que si elle contient quelque chose
+            if piece_data['categories']:
+                 logement_data['pieces'].append(piece_data)
+                 logement_data['total_logement'] += piece_data['total_piece']
+        
+        rapport_data.append(logement_data)
+        total_global += logement_data['total_logement']
+        
+    return rapport_data, total_global
+
+@app.route('/generation_rapport')
+@login_required
+def generation_rapport():
+    logements = current_user.assure_profile.logements
+    return render_template('generation_rapport.html', logements=logements)
+
+@app.route('/generer_pdf_tous')
+@login_required
+def generer_pdf_tous():
+    if not HTML:
+        flash("Erreur : La librairie WeasyPrint n'est pas installée.", "danger")
+        return redirect(url_for('generation_rapport'))
+        
+    logements = current_user.assure_profile.logements
+    data, total = get_rapport_data(logements)
+    
+    html = render_template('pdf_rapport.html', data=data, total_global=total, title="Rapport Global", date_generation=datetime.date.today().strftime('%d/%m/%Y'))
+    pdf = HTML(string=html).write_pdf()
+    
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename=rapport_global.pdf'
+    return response
+
+@app.route('/generer_pdf_logement', methods=['POST'])
+@login_required
+def generer_pdf_logement():
+    if not HTML:
+        flash("Erreur : La librairie WeasyPrint n'est pas installée.", "danger")
+        return redirect(url_for('generation_rapport'))
+
+    id_logement = request.form.get('id_logement')
+    if not id_logement:
+        flash("Veuillez sélectionner un logement.", "warning")
+        return redirect(url_for('generation_rapport'))
+
+    logement = Logement.query.get_or_404(id_logement)
+    
+    # Vérification de sécurité
+    if logement not in current_user.assure_profile.logements:
+        flash("Accès interdit à ce logement.", "danger")
+        return redirect(url_for('generation_rapport'))
+        
+    data, total = get_rapport_data([logement])
+    
+    html = render_template('pdf_rapport.html', data=data, total_global=total, title=f"Rapport - {logement.adresse}", date_generation=datetime.date.today().strftime('%d/%m/%Y'))
+    pdf = HTML(string=html).write_pdf()
+    
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = f'attachment; filename=rapport_logement_{id_logement}.pdf'
+    return response
+
+
+
+
+
+
+
+
+
+#------Partie assureur------
+@app.route('/tableau_de_bord_assureur/')
+@login_required
+def tableau_de_bord_assureur():
+    if not current_user.assureur_profile:
+        flash("Accès non autorisé.", "danger")
+        return redirect(url_for('login'))
+
+    assureur = current_user.assureur_profile
+    
+    assures = Assure.query.filter_by(id_assureur=assureur.id_assureur).all()
+
+    all_logements = []
+    for assure in assures:
+        all_logements.extend(assure.logements)
+
+
+    logement_ids = [l.id_logement for l in all_logements]
+    sinistres = Sinistre.query.filter(Sinistre.id_logement.in_(logement_ids)).order_by(Sinistre.date_sinistre.desc()).all()
+
+    sinistres_en_attente = len([s for s in sinistres if s.statut == 'Déclaré'])
+    expertises_a_valider = len([s for s in sinistres if s.statut == 'Expertisé'])
+    total_demandes = len(sinistres)
+
+    valeur_totale = 0
+    for logement in all_logements:
+        for piece in logement.pieces:
+            for bien in piece.biens:
+                if bien.valeur_actuelle:
+                    valeur_totale += bien.valeur_actuelle
+
+    return render_template('assureur/tableau_bord_assureur.html',
+                           sinistres_en_attente=sinistres_en_attente,
+                           expertises_a_valider=expertises_a_valider,
+                           total_demandes=total_demandes,
+                           valeur_totale=valeur_totale,
+                           sinistres=sinistres)
+
+@app.route('/liste_sinistres/')
+@login_required
+def liste_sinistres():
+    if not current_user.assureur_profile:
+        flash("Accès non autorisé.", "danger")
+        return redirect(url_for('login'))
+    assureur = current_user.assureur_profile
+    assures = Assure.query.filter_by(id_assureur=assureur.id_assureur).all()
+    all_logements = []
+    for assure in assures:
+        all_logements.extend(assure.logements)
+    logement_ids = [l.id_logement for l in all_logements]
+    sinistres = Sinistre.query.filter(Sinistre.id_logement.in_(logement_ids)).order_by(Sinistre.date_sinistre.desc()).all()
+    return render_template('assureur/liste_sinistres.html', sinistres=sinistres)
+
+@app.route('/liste_assures/')
+@login_required
+def liste_assures():
+    if not current_user.assureur_profile:
+        flash("Accès non autorisé.", "danger")
+        return redirect(url_for('login'))
+
+    assureur = current_user.assureur_profile
+    assures = Assure.query.filter_by(id_assureur=assureur.id_assureur).all()
+
+    return render_template('assureur/liste_assures.html', assures=assures)
+
+
+@app.route('/parametres_assureur/')
+@login_required
+def parametres_assureur():
+    if not current_user.assureur_profile:
+        flash("Accès non autorisé.", "danger")
+        return redirect(url_for('login'))
+    
+    assureur = current_user.assureur_profile
+    form = ParametresForm(obj=assureur)
+
+    if form.validate_on_submit():
+        assureur.nom = form.nom.data
+        assureur.prenom = form.prenom.data
+        assureur.telephone = form.telephone.data
+        try:
+            db.session.commit()
+            flash("Paramètres modifiés avec succès.", "success")
+            return redirect(url_for('parametres_assureur'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erreur lors de la modification : {e}", "danger")
+    
+    return render_template('assureur/parametres_assureur.html', form=form)
+
+@app.route('/detail_sinistre/<int:id>', methods=['GET', 'POST'])
+@login_required
+def detail_sinistre(id):
+    if not current_user.assureur_profile:
+        flash("Accès non autorisé.", "danger")
+        return redirect(url_for('login'))
+    sinistre = Sinistre.query.get_or_404(id)
+    form = UpdateSinistreForm(obj=sinistre)
+
+    if form.validate_on_submit():
+        sinistre.statut = form.statut.data
+        sinistre.montant_estime = form.montant_estime.data
+        sinistre.montant_final = form.montant_final.data
+        try:
+            db.session.commit()
+            flash("Sinistre mis à jour avec succès.", "success")
+            return redirect(url_for('detail_sinistre', id=sinistre.id_sinistre))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erreur lors de la mise à jour : {e}", "danger")
+    
+    logement = sinistre.logement
+    assure = logement.assures[0] if logement.assures else None
+
+    return render_template('assureur/detail_sinistre.html', sinistre=sinistre, form=form, logement=logement, assure=assure)
+
+@app.route('/detail_assure/<int:id>')
+@login_required
+def detail_assure(id):
+    if not current_user.assureur_profile:
+        flash("Accès non autorisé.", "danger")
+        return redirect(url_for('login'))
+    assure = Assure.query.get_or_404(id)
+    total_valeur_biens = 0.0
+
+    if assure.date_naissance:
+        if isinstance(assure.date_naissance, str):
+            try:
+                assure.date_naissance = datetime.datetime.strptime(assure.date_naissance, '%Y-%m-%d').date()
+            except ValueError:
+                assure.date_naissance = None
+    
+    sinistres = []
+    for logement in assure.logements:
+        sinistres.extend(logement.sinistres)
+        for piece in logement.pieces:
+            for bien in piece.biens:
+                if bien.valeur_actuelle is not None:
+                    try:
+                        total_valeur_biens += float(bien.valeur_actuelle)
+                    except (ValueError, TypeError):
+                        pass
+                        
+    return render_template('assureur/detail_assure.html', assure=assure, total_valeur_biens=total_valeur_biens, sinistres=sinistres)
+
 
 # ------------------- MAIN -------------------
 if __name__ == '__main__':

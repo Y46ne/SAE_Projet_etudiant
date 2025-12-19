@@ -17,6 +17,14 @@
         <section class="form-section">
             <div class="card">
                 <form action="{{ url_for('ajouter_bien') }}" method="POST" enctype="multipart/form-data" class="form">
+                    {% set target_piece_id = request.args.get('piece_id') %}
+                    {% set ns = namespace(target_logement_id=None) %}
+                    {% if target_piece_id %}
+                        {% for p in liste_pieces %}
+                            {% if p.id|string == target_piece_id|string %}{% set ns.target_logement_id = p.id_logement %}{% endif %}
+                        {% endfor %}
+                    {% endif %}
+
                     {{ form.hidden_tag() }}
                     <div class="form-group">
                         {{ form.nom_bien.label(class="form-label") }}
@@ -24,47 +32,61 @@
                     </div>
 
                     <div class="form-group">
-                        {{ form.valeur.label(class="form-label") }}
-                        {{ form.valeur(class="form-input", placeholder="Valeur en €") }}
+                        {{ form.prix_achat.label(class="form-label") }}
+                        {{ form.prix_achat(class="form-input", placeholder="Prix d'achat en €") }}
+                        {% if form.prix_achat.errors %}
+                            <div class="text-red-500 text-sm mt-1">
+                                {% for error in form.prix_achat.errors %}<span>{{ error }}</span>{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
                     </div>
 
                     <div class="form-group">
                         {{ form.categorie.label(class="form-label") }}
-                        {{ form.categorie(class="form-input", placeholder="Ex : Électronique") }}
+                        <select name="{{ form.categorie.name }}" id="{{ form.categorie.id }}" class="form-input" required>
+                            <option value="" disabled selected>Sélectionner une catégorie</option>
+                            <option value="Electromenager" {% if form.categorie.data == 'Electromenager' %}selected{% endif %}>Électroménager</option>
+                            <option value="Mobilier" {% if form.categorie.data == 'Mobilier' %}selected{% endif %}>Mobilier</option>
+                            <option value="Multimedia" {% if form.categorie.data == 'Multimedia' %}selected{% endif %}>Multimédia</option>
+                            <option value="Vetements" {% if form.categorie.data == 'Vetements' %}selected{% endif %}>Vêtements</option>
+                            <option value="Bijoux" {% if form.categorie.data == 'Bijoux' %}selected{% endif %}>Bijoux</option>
+                            <option value="Loisirs" {% if form.categorie.data == 'Loisirs' %}selected{% endif %}>Loisirs</option>
+                            <option value="Vaisselle" {% if form.categorie.data == 'Vaisselle' %}selected{% endif %}>Vaisselle</option>
+                            <option value="Outillage" {% if form.categorie.data == 'Outillage' %}selected{% endif %}>Outillage</option>
+                            <option value="Autre" {% if form.categorie.data == 'Autre' %}selected{% endif %}>Autre</option>
+                            {# {% for value, label in form.categorie.choices %}
+                                <option value="{{ value }}" {% if form.categorie.data == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %} #}
+                        </select>
+                        {% if form.categorie.errors %}
+                            <div class="invalid-feedback">{{ form.categorie.errors[0] }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="form-group">
                         {{ form.date_achat.label(class="form-label") }}
                         {{ form.date_achat(class="form-input", type="date") }}
                     </div>
-
-                    <div class="form-group">
-                        <label for="etat" class="form-label">État</label>
-                        <select name="etat" id="etat" class="form-input" required>
-                            <option value="" disabled selected>Sélectionner un état</option>
-                            <option value="Excellent">Excellent</option>
-                            <option value="Bon">Bon</option>
-                            <option value="Acceptable">Acceptable</option>
-                            <option value="Usé">Usé</option>
-                        </select>
-                    </div>
-
+                    
                     <div class="form-group">
                         <label for="logement_id" class="form-label">Logement</label>
                         <select name="logement_id" id="logement_id" class="form-input" required>
-                            <option value="" disabled selected>Sélectionner un logement</option>
+                            <option value="" disabled {% if not form.logement_id.data and not ns.target_logement_id and not request.args.get('logement_id') %}selected{% endif %}>Sélectionner un logement</option>
                             {% for logement in liste_logement %}
-                                <option value="{{ logement.id }}">{{ logement.nom or logement.adresse }}</option>
+                                <option value="{{ logement.id }}" {% if (form.logement_id.data and form.logement_id.data|string == logement.id|string) or (not form.logement_id.data and ((ns.target_logement_id and ns.target_logement_id|string == logement.id|string) or (request.args.get('logement_id') == logement.id|string))) %}selected{% endif %}>{{ logement.nom or logement.adresse }}</option>
                             {% endfor %}
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label for="piece_id" class="form-label">Pièce</label>
-                        <select name="piece_id" id="piece_id" class="form-input" required disabled>
-                            <option value="" disabled selected>Sélectionner d'abord un logement</option>
+                        <select name="piece_id" id="piece_id" class="form-input" required {% if not target_piece_id %}disabled{% endif %}>
+                            <option value="" disabled {% if not target_piece_id %}selected{% endif %}>Sélectionner d'abord un logement</option>
                             {% for piece in liste_pieces %}
-                                <option value="{{ piece.id }}" data-logement-id="{{ piece.id_logement }}" class="piece-option">
+                                <option value="{{ piece.id }}" data-logement-id="{{ piece.id_logement }}" class="piece-option" {% if target_piece_id and piece.id|string == target_piece_id|string %}selected{% endif %}>
                                     {{ piece.nom_piece }}
                                 </option>
                             {% endfor %}
@@ -73,8 +95,8 @@
                     
                     <div class="form-group">
                         {{ form.facture.label(class="form-label") }}
-                        {{ form.facture(class="form-input-file") }}
-                        <small class="form-text">Joindre une facture pour prouver l'achat (PDF, JPG, PNG).</small>
+                        {{ form.facture(class="form-input-file", required=True) }}
+                        <small class="form-text" style="color: #d9534f;">* Justificatif obligatoire (PDF, JPG, PNG).</small>
                     </div>
 
 

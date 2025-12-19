@@ -1,0 +1,6 @@
+/* Styles spécifiques pour l'impression */
+@media print {
+    .no-print { display: none !important; }
+    .card { border: none !important; }
+    .card-header { background-color: #f8f9fa !important; color: black !important; border-bottom: 2px solid #333 !important; }
+}

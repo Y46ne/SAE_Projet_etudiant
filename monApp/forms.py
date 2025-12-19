@@ -1,11 +1,12 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, HiddenField, SubmitField, FloatField, SelectField, DateField, TextAreaField, DecimalField
-from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
+from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional, ValidationError, Regexp
 from hashlib import sha256 
 from .database import *
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField
 from monApp.database.assure import get_tous_les_assures
 from flask_wtf.file import FileField, FileAllowed
+from datetime import datetime
 
 class LoginForm(FlaskForm):
     Login = StringField('Identifiant', validators=[DataRequired()])
@@ -28,14 +29,43 @@ class LoginForm(FlaskForm):
         return None
 
 class SignUpForm(FlaskForm):
-    nom = StringField('Nom', validators=[DataRequired()])
-    prenom = StringField('Prénom', validators=[DataRequired()])
-    date_naissance = StringField('Date de naissance (YYYY-MM-DD)', validators=[DataRequired()])
-    telephone = StringField('Téléphone', validators=[DataRequired()])
-    email = StringField('Adresse e-mail', validators=[DataRequired(), Email()])
-    Password = PasswordField('Mot de passe', validators=[DataRequired()])
-    confirm = PasswordField('Confirmer le mot de passe', validators=[DataRequired(), EqualTo('Password')])
+    nom = StringField('Nom', validators=[DataRequired(message="Le nom est requis.")])
+    prenom = StringField('Prénom', validators=[DataRequired(message="Le prénom est requis.")])
+    date_naissance = StringField(
+        'Date de naissance (YYYY-MM-DD)', 
+        validators=[DataRequired(message="La date de naissance est requise.")]
+    )
+    telephone = StringField(
+        'Téléphone', 
+        validators=[
+            DataRequired(message="Le téléphone est requis."),
+            Regexp(r'^\d{10}$', message="Le numéro doit contenir exactement 10 chiffres (ex: 0612345678).")
+        ]
+    )
+    email = StringField(
+        'Adresse e-mail', 
+        validators=[
+            DataRequired(message="L'email est requis."), 
+            Email(message="Adresse email invalide.")
+        ]
+    )
+    Password = PasswordField('Mot de passe', validators=[DataRequired(message="Le mot de passe est requis.")])
+    confirm = PasswordField('Confirmer le mot de passe', validators=[
+        DataRequired(), 
+        EqualTo('Password', message="Les mots de passe ne correspondent pas.")
+    ])
     submit = SubmitField('Créer mon compte')
+
+    def validate_date_naissance(self, field):
+        date_str = field.data
+        try:
+            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
+            raise ValidationError("Date invalide ou format incorrect. Utilisez AAAA-MM-JJ (ex: 2000-01-31).")
+        if date_obj.year < 1900:
+            raise ValidationError("La date de naissance ne peut pas être antérieure à 1900.")
+        if date_obj > datetime.now().date():
+            raise ValidationError("La date de naissance ne peut pas être dans le futur.")
 
 
 class ResetPasswordForm(FlaskForm):
@@ -46,14 +76,15 @@ class ResetPasswordForm(FlaskForm):
 
 
 class LogementForm(FlaskForm):
+    nom_logement = StringField('Nom du logement', validators=[DataRequired()])
     adresse = StringField('Adresse du logement', validators=[DataRequired()])
     type_logement = StringField('Type de logement (Appartement, Maison...)', validators=[DataRequired()])
-    surface = FloatField('Surface (m²)', validators=[DataRequired()])
+    surface = FloatField('Surface (m²)', validators=[DataRequired(message="Veuillez renseigner une surface valide.")])
     description = StringField('Description')
     assures = QuerySelectMultipleField(
         'Assures',
         query_factory=get_tous_les_assures,
-        get_label=lambda x: f"{x.prenom}  {x.nom} - {x.email}",            
+        get_label="email",
         allow_blank=False            
     )
     submit = SubmitField('Ajouter le logement')
@@ -61,7 +92,7 @@ class LogementForm(FlaskForm):
 
 class PieceForm(FlaskForm):
     nom_piece = StringField('Nom de la pièce', validators=[DataRequired()])
-    surface = FloatField('Surface (m²)', validators=[DataRequired()])
+    surface = FloatField('Surface (m²)', validators=[DataRequired(message="Veuillez renseigner une surface valide.")])
     logement_id = SelectField('Logement associé', coerce=int, validators=[DataRequired()])
     submit = SubmitField('Ajouter la pièce')
 
@@ -72,8 +103,7 @@ class BienForm(FlaskForm):
     categorie = StringField('Catégorie', validators=[DataRequired()])
     date_achat = DateField("Date d'achat", format='%Y-%m-%d', validators=[DataRequired()])
     prix_achat = FloatField("Prix d'achat (€)", validators=[DataRequired()])
-    etat = StringField('État (Neuf, Bon, Usé...)', validators=[DataRequired()])
-    valeur_actuelle = FloatField('Valeur actuelle (€)', validators=[DataRequired()])
+    valeur_actuelle = FloatField('Valeur actuelle (€)', render_kw={'readonly': True})
     logement_id = SelectField('Logement associé', coerce=int, validators=[DataRequired()])
     piece_id = SelectField('Pièce associée', coerce=int, validators=[DataRequired()])
     submit = SubmitField('Ajouter le bien')
@@ -119,9 +149,9 @@ class AjouterBienForm(FlaskForm):
         "Nom du bien", 
         validators=[DataRequired(message="Le nom est requis.")]
     )
-    valeur = DecimalField(
-        "Valeur (€)", 
-        validators=[DataRequired(message="La valeur est requise.")]
+    prix_achat = FloatField(
+        "Prix d'achat (€)",
+        validators=[DataRequired(message="Veuillez renseigner un prix valide.")]
     )
     categorie = StringField(
         "Catégorie", 
@@ -130,17 +160,6 @@ class AjouterBienForm(FlaskForm):
     date_achat = DateField(
         "Date d'achat", 
         validators=[DataRequired(message="La date est requise.")]
-    )
-    etat = SelectField(
-        "État",
-        choices=[
-            ("", "Sélectionner un état"),
-            ("Excellent", "Excellent"),
-            ("Bon", "Bon"),
-            ("Acceptable", "Acceptable"),
-            ("Usé", "Usé")
-        ],
-        validators=[DataRequired(message="L'état est requis.")]
     )
     logement_id = SelectField(
         "Logement", 
@@ -180,35 +199,36 @@ class DeclarerSinistre(FlaskForm):
         validators=[DataRequired(message="Veuillez sélectionner un type de sinistre.")]
     )
 
+    description = TextAreaField(
+        "Description",
+        validators=[Optional()]
+    )
+
     biens_selectionnes = QuerySelectMultipleField(
         "Biens sélectionnés",
         query_factory=lambda: Bien.query.all(),
-        get_label="nom",
-        allow_blank=True
+        get_label="nom_bien"
     )
 
     submit = SubmitField("Générer l'état financier des biens")
 
 class ModifierLogementForm(FlaskForm):
-    adresse = StringField('Nom du logement', validators=[DataRequired()])
+    nom_logement = StringField('Nom du logement', validators=[DataRequired()])
+    adresse = StringField('Adresse', validators=[DataRequired()])
+    description = TextAreaField('Description')
     submit = SubmitField('Enregistrer')
 
 class ModifierPieceForm(FlaskForm):
     nom_piece = StringField('Nom de la pièce', validators=[DataRequired()])
-    surface = FloatField('Surface (m²)', validators=[DataRequired()])
+    surface = FloatField('Surface (m²)', validators=[DataRequired(message="Veuillez renseigner une surface valide.")])
     submit = SubmitField('Enregistrer')
 
 class ModifierBienForm(FlaskForm):
     nom_bien = StringField('Nom du bien', validators=[DataRequired()])
     categorie = StringField('Catégorie', validators=[DataRequired()])
     date_achat = DateField('Date d\'achat', format='%Y-%m-%d', validators=[Optional()])
-    prix_achat = FloatField('Valeur (€)', validators=[DataRequired()])
-    etat = SelectField('État', choices=[
-            ("Excellent", "Excellent"),
-            ("Bon", "Bon"),
-            ("Acceptable", "Acceptable"),
-            ("Usé", "Usé")
-    ], validators=[DataRequired()])
+    prix_achat = FloatField("Prix d'achat (€)", validators=[DataRequired(message="Veuillez renseigner un prix valide.")])
+    valeur_actuelle = FloatField('Valeur actuelle (€)', render_kw={'readonly': True})
     submit = SubmitField('Enregistrer')
 
 class ParametresForm(FlaskForm):
@@ -217,3 +237,18 @@ class ParametresForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     telephone = StringField('Téléphone', validators=[Optional()])
     submit = SubmitField('Enregistrer')
+
+class UpdateSinistreForm(FlaskForm):
+    statut = SelectField(
+        'Statut du sinistre',
+        choices=[
+            ('Déclaré', 'Déclaré'),
+            ('En cours d\'expertise', 'En cours d\'expertise'),
+            ('Expertisé', 'Expertisé'),
+            ('Clos', 'Clos')
+        ],
+        validators=[DataRequired()]
+    )
+    montant_estime = DecimalField('Montant estimé', validators=[Optional()])
+    montant_final = DecimalField('Montant final', validators=[Optional()])
+    submit = SubmitField('Mettre à jour le sinistre')
