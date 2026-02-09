@@ -23,6 +23,7 @@ class Bien(db.Model):
         self.prix_achat = prix_achat
         self.id_piece = id_piece
         self.valeur_actuelle = self.calculer_valeur_actuelle()
+        
     def calculer_valeur_actuelle(self):
         """
         Calcule la valeur actuelle du bien en fonction de la date d'achat, de la catégorie et du prix d'achat.
