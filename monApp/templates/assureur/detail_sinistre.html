@@ -73,6 +73,28 @@
         {%endif%}
 
         <div class="media-card">
+            <h2>Biens impactés</h2>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Nom du Bien</th>
+                            <th class="text-right">Dégât Estimé</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bien, degat in biens_impactes %}
+                        <tr>
+                            <td class="font-weight-medium">{{ bien.nom_bien }}</td>
+                            <td class="text-right text-danger font-weight-bold">{{ "%.2f"|format(degat) }} €</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="media-card">
             <h2>Description du sinistre</h2>
             <p>{{ sinistre.description or 'Aucune description fournie.' }}</p>
         </div>
