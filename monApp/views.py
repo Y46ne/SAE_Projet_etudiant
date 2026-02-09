@@ -172,8 +172,10 @@ def declarer_sinistre():
 
             etat = request.form.get(f"etat_bien_{bien_id}")
             
+            valeur_actuelle = bien.calculer_valeur_actuelle()
+
             if etat == "perte_totale":
-                degat = bien.valeur_actuelle or 0
+                degat = valeur_actuelle or 0
             else:
                 degat = (bien.valeur_actuelle or 0) * 0.5
             
@@ -188,6 +190,7 @@ def declarer_sinistre():
         db.session.commit()
         flash("Sinistre déclaré avec succès", "success")
         return redirect(url_for("tableau_de_bord"))
+    
     return render_template(
         "declarer_sinistre.html",
         form=form,
@@ -826,7 +829,12 @@ def detail_sinistre(id):
     logement = sinistre.logement
     assure = logement.assures[0] if logement.assures else None
 
-    return render_template('assureur/detail_sinistre.html', sinistre=sinistre, form=form, logement=logement, assure=assure)
+    # Récupération des biens impactés et de leurs dégâts estimés pour affichage dans le détail
+    biens_impactes = db.session.query(Bien, impacte_table.c.degat_estime).join(
+        impacte_table, Bien.id_bien == impacte_table.c.id_bien
+    ).filter(impacte_table.c.id_sinistre == sinistre.id_sinistre).all()
+
+    return render_template('assureur/detail_sinistre.html', sinistre=sinistre, form=form, logement=logement, assure=assure, biens_impactes=biens_impactes)
 
 @app.route('/detail_assure/<int:id>')
 @login_required
