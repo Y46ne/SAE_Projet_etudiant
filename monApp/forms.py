@@ -189,17 +189,27 @@ class PieceForm(FlaskForm):
     logement_id = SelectField('Logement associé', coerce=int, validators=[DataRequired()])
     submit = SubmitField('Ajouter la pièce')
 
+    def validate_nom_piece(self, field):
+        valeur = field.data.strip()
+        
+        if len(valeur) < 2:
+            raise ValidationError("Le nom de la pièce est trop court.")
 
-class BienForm(FlaskForm):
-    nom_bien = StringField('Nom du bien', validators=[DataRequired()])
-    description = TextAreaField('Description')
-    categorie = StringField('Catégorie', validators=[DataRequired()])
-    date_achat = DateField("Date d'achat", format='%Y-%m-%d', validators=[DataRequired()])
-    prix_achat = FloatField("Prix d'achat (€)", validators=[DataRequired()])
-    valeur_actuelle = FloatField('Valeur actuelle (€)', render_kw={'readonly': True})
-    logement_id = SelectField('Logement associé', coerce=int, validators=[DataRequired()])
-    piece_id = SelectField('Pièce associée', coerce=int, validators=[DataRequired()])
-    submit = SubmitField('Ajouter le bien')
+        if not any(char.isalpha() for char in valeur):
+            raise ValidationError("Le nom de la pièce doit contenir au moins une lettre.")
+
+        for char in valeur:
+            if not (char.isalnum() or char in " -"):
+                raise ValidationError(f"Caractère interdit : '{char}'.")
+
+        if valeur.startswith('-') or valeur.endswith('-'):
+            raise ValidationError("Le nom ne peut pas commencer ou finir par un tiret.")
+
+    def validate_surface(self, field):
+        if field.data <= 0:
+            raise ValidationError("La surface doit être positive.")
+        if field.data > 1000:
+            raise ValidationError("La surface semble incohérente pour une seule pièce.")
 
 
 class SinistreForm(FlaskForm):
@@ -238,40 +248,58 @@ class ChangePasswordForm(FlaskForm):
     submit = SubmitField('Changer le mot de passe')
 
 class AjouterBienForm(FlaskForm):
-    nom_bien = StringField(
-        "Nom du bien", 
-        validators=[DataRequired(message="Le nom est requis.")]
-    )
-    prix_achat = FloatField(
-        "Prix d'achat (€)",
-        validators=[DataRequired(message="Veuillez renseigner un prix valide.")]
-    )
-    categorie = StringField(
+    nom_bien = StringField("Nom du bien", validators=[DataRequired(message="Le nom est requis.")])
+    prix_achat = FloatField("Prix d'achat (€)",validators=[DataRequired(message="Veuillez renseigner un prix valide.")])
+    categorie = SelectField(
         "Catégorie", 
+        choices=[
+            ('', 'Sélectionner une catégorie'),
+            ('Electromenager', 'Électroménager'),
+            ('Mobilier', 'Mobilier'),
+            ('Multimedia', 'Multimédia'),
+            ('Vetements', 'Vêtements'),
+            ('Bijoux', 'Bijoux'),
+            ('Loisirs', 'Loisirs'),
+            ('Vaisselle', 'Vaisselle'),
+            ('Outillage', 'Outillage'),
+            ('Autre', 'Autre')
+        ],
         validators=[DataRequired(message="La catégorie est requise.")]
     )
-    date_achat = DateField(
-        "Date d'achat", 
-        validators=[DataRequired(message="La date est requise.")]
-    )
-    logement_id = SelectField(
-        "Logement", 
-        coerce=int, 
-        validators=[DataRequired(message="Le logement est requis.")]
-    )
-    piece_id = SelectField(
-        "Pièce", 
-        coerce=int, 
-        validators=[DataRequired(message="La pièce est requise.")]
-    )
+    date_achat = DateField("Date d'achat", validators=[DataRequired(message="La date est requise.")])
+    logement_id = SelectField("Logement", coerce=int, validators=[DataRequired(message="Le logement est requis.")])
+    piece_id = SelectField("Pièce", coerce=int, validators=[DataRequired(message="La pièce est requise.")])
     facture = FileField(
         "Joindre une facture (Facture, Preuve d'achat...)",
-        validators=[
-            Optional(),
-            FileAllowed(['pdf', 'png', 'jpg', 'jpeg'], 'Seuls les images et PDF sont autorisés!')
-        ]
+        validators=[Optional(),FileAllowed(['pdf', 'png', 'jpg', 'jpeg'], 'Seuls les images et PDF sont autorisés!')]
     )
     submit = SubmitField("Enregistrer le bien")
+
+    def validate_nom_bien(self, field):
+        valeur = field.data.strip()
+        
+        if not any(char.isalpha() for char in valeur):
+            raise ValidationError("Le nom du bien doit contenir au moins une lettre.")
+
+        for char in valeur:
+            if not (char.isalnum() or char in " -'"):
+                raise ValidationError(f"Caractère interdit dans le nom : '{char}'.")
+        
+        if valeur.startswith('-') or valeur.endswith('-'):
+            raise ValidationError("Le nom ne peut pas commencer ou finir par un tiret.")
+
+    def validate_date_achat(self, field):
+        if field.data:
+            today = datetime.now().date()
+            if field.data > today:
+                raise ValidationError("La date d'achat ne peut pas être dans le futur.")
+            
+            if field.data.year < 1900:
+                raise ValidationError("La date d'achat semble incorrecte (trop ancienne).")
+
+    def validate_prix_achat(self, field):
+        if field.data is not None and field.data < 0:
+            raise ValidationError("Le prix d'achat ne peut pas être négatif.")
 
 class DeclarerSinistre(FlaskForm):
     date_sinistre = DateField(
@@ -351,6 +379,28 @@ class ModifierPieceForm(FlaskForm):
     nom_piece = StringField('Nom de la pièce', validators=[DataRequired()])
     surface = FloatField('Surface (m²)', validators=[DataRequired(message="Veuillez renseigner une surface valide.")])
     submit = SubmitField('Enregistrer')
+
+    def validate_nom_piece(self, field):
+        valeur = field.data.strip()
+        
+        if len(valeur) < 2:
+            raise ValidationError("Le nom de la pièce est trop court.")
+
+        if not any(char.isalpha() for char in valeur):
+            raise ValidationError("Le nom doit contenir au moins une lettre.")
+
+        for char in valeur:
+            if not (char.isalnum() or char in " -"):
+                raise ValidationError(f"Caractère interdit : '{char}'.")
+
+        if valeur.startswith('-') or valeur.endswith('-'):
+            raise ValidationError("Le nom ne peut pas commencer ou finir par un tiret.")
+
+    def validate_surface(self, field):
+        if field.data <= 0:
+            raise ValidationError("La surface doit être positive.")
+        if field.data > 1000:
+            raise ValidationError("La surface semble incohérente.")
 
 class ModifierBienForm(FlaskForm):
     nom_bien = StringField('Nom du bien', validators=[DataRequired()])
