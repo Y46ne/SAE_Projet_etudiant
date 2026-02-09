@@ -94,3 +94,19 @@ h1 {
     background: #fef9c3;
     color: #92400e;
 }
+
+
+.form-error {
+    color: #e74c3c;
+    font-size: 0.85em;
+    margin-top: 5px;
+    display: block;
+    font-weight: 500;
+}
+
+.has-error input,
+.has-error select,
+.has-error textarea {
+    border-color: #e74c3c !important;
+    background-color: #fff5f5;
+}
