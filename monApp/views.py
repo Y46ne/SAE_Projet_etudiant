@@ -574,6 +574,9 @@ def supprimer_piece(piece_id):
         
     try:
         for bien in piece.biens:
+            justificatifs = Justificatif.query.filter_by(id_bien=bien.id_bien).all()
+            for j in justificatifs:
+                db.session.delete(j)
             db.session.delete(bien)
         db.session.delete(piece)
         db.session.commit()
@@ -598,6 +601,9 @@ def delete_logement(id):
             db.session.delete(sinistre)
         for piece in logement.pieces:
             for bien in piece.biens:
+                justificatifs = Justificatif.query.filter_by(id_bien=bien.id_bien).all()
+                for j in justificatifs:
+                    db.session.delete(j)
                 db.session.delete(bien)
             db.session.delete(piece)
         db.session.delete(logement)
@@ -653,6 +659,9 @@ def supprimer_bien(bien_id):
         
     piece_id = bien.id_piece
     try:
+        justificatifs = Justificatif.query.filter_by(id_bien=bien.id_bien).all()
+        for j in justificatifs:
+            db.session.delete(j)
         db.session.delete(bien)
         db.session.commit()
         flash("Bien supprimé avec succès.", "success")
