@@ -21,6 +21,10 @@ except ImportError:
 import datetime
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
 
 @app.route('/')
 def index():
@@ -67,6 +71,13 @@ def logout():
 @login_required
 def info_bien(id):
     bien = Bien.query.get_or_404(id)
+    
+    # Vérification de sécurité
+    piece = Piece.query.get(bien.id_piece)
+    if piece.id_logement not in [l.id_logement for l in current_user.assure_profile.logements]:
+        flash("Vous n'avez pas accès à ce bien.", "danger")
+        return redirect(url_for('mes_logements'))
+        
     return render_template('info_bien.html', bien=bien)
 
 
@@ -267,6 +278,12 @@ def liste_sinistres_client():
 @login_required
 def view_logement_pieces(id):
     logement = Logement.query.get_or_404(id)
+    
+    # Vérification de sécurité
+    if current_user.assure_profile not in logement.assures:
+        flash("Vous n'avez pas accès à ce logement.", "danger")
+        return redirect(url_for('mes_logements'))
+        
     return render_template('logement_pieces.html', logement=logement)
 
 
@@ -274,6 +291,11 @@ def view_logement_pieces(id):
 @login_required
 def gestion_bien(piece_id):
     piece = Piece.query.get_or_404(piece_id)
+    # Vérification de sécurité
+    if piece.id_logement not in [l.id_logement for l in current_user.assure_profile.logements]:
+        flash("Vous n'avez pas accès à cette pièce.", "danger")
+        return redirect(url_for('mes_logements'))
+        
     biens = Bien.query.filter_by(id_piece=piece.id_piece).all()
     # Met à jour la valeur actuelle pour chaque bien si besoin
     for bien in biens:
@@ -313,6 +335,13 @@ def creer_compte():
 @login_required
 def detail_bien(id):
     bien = Bien.query.get_or_404(id)
+    
+    # Vérification de sécurité
+    piece = Piece.query.get(bien.id_piece)
+    if piece.id_logement not in [l.id_logement for l in current_user.assure_profile.logements]:
+        flash("Vous n'avez pas accès à ce bien.", "danger")
+        return redirect(url_for('mes_logements'))
+        
     return render_template('detail_bien.html', bien=bien)
 
 
@@ -491,6 +520,13 @@ def ajouter_bien():
 @login_required
 def voir_bien(bien_id):
     bien = Bien.query.get_or_404(bien_id)
+    
+    # Vérification de sécurité
+    piece = Piece.query.get(bien.id_piece)
+    if piece.id_logement not in [l.id_logement for l in current_user.assure_profile.logements]:
+        flash("Vous n'avez pas accès à ce bien.", "danger")
+        return redirect(url_for('mes_logements'))
+        
     return render_template('info_bien.html', bien=bien)
 
 
@@ -498,6 +534,12 @@ def voir_bien(bien_id):
 @login_required
 def modifier_logement(logement_id):
     logement = Logement.query.get_or_404(logement_id)
+    
+    # Vérification de sécurité
+    if current_user.assure_profile not in logement.assures:
+        flash("Vous n'avez pas les droits pour modifier ce logement.", "danger")
+        return redirect(url_for('mes_logements'))
+        
     form = ModifierLogementForm(obj=logement)
     if form.validate_on_submit():
         logement.nom_logement = form.nom_logement.data
@@ -516,6 +558,12 @@ def modifier_logement(logement_id):
 @login_required
 def modifier_piece(piece_id):
     piece = Piece.query.get_or_404(piece_id)
+    
+    # Vérification de sécurité
+    if piece.id_logement not in [l.id_logement for l in current_user.assure_profile.logements]:
+        flash("Vous n'avez pas les droits pour modifier cette pièce.", "danger")
+        return redirect(url_for('mes_logements'))
+        
     form = ModifierPieceForm(obj=piece)
     if form.validate_on_submit():
         piece.nom_piece = form.nom_piece.data
@@ -533,6 +581,12 @@ def modifier_piece(piece_id):
 @login_required
 def supprimer_piece(piece_id):
     piece = Piece.query.get_or_404(piece_id)
+    
+    # Vérification de sécurité
+    if piece.id_logement not in [l.id_logement for l in current_user.assure_profile.logements]:
+        flash("Vous n'avez pas les droits pour supprimer cette pièce.", "danger")
+        return redirect(url_for('mes_logements'))
+        
     try:
         for bien in piece.biens:
             db.session.delete(bien)
@@ -548,6 +602,12 @@ def supprimer_piece(piece_id):
 @login_required
 def delete_logement(id):
     logement = Logement.query.get_or_404(id)
+    
+    # Vérification de sécurité
+    if current_user.assure_profile not in logement.assures:
+        flash("Vous n'avez pas les droits pour supprimer ce logement.", "danger")
+        return redirect(url_for('mes_logements'))
+        
     try:
         for sinistre in logement.sinistres:
             db.session.delete(sinistre)
@@ -568,6 +628,13 @@ def delete_logement(id):
 @login_required
 def modifier_bien(bien_id):
     bien = Bien.query.get_or_404(bien_id)
+    
+    # Vérification de sécurité
+    piece = Piece.query.get(bien.id_piece)
+    if piece.id_logement not in [l.id_logement for l in current_user.assure_profile.logements]:
+        flash("Vous n'avez pas les droits pour modifier ce bien.", "danger")
+        return redirect(url_for('mes_logements'))
+        
     form = ModifierBienForm(obj=bien)
 
     if form.validate_on_submit():
@@ -592,6 +659,13 @@ def modifier_bien(bien_id):
 @login_required
 def supprimer_bien(bien_id):
     bien = Bien.query.get_or_404(bien_id)
+    
+    # Vérification de sécurité
+    piece = Piece.query.get(bien.id_piece)
+    if piece.id_logement not in [l.id_logement for l in current_user.assure_profile.logements]:
+        flash("Vous n'avez pas les droits pour supprimer ce bien.", "danger")
+        return redirect(url_for('mes_logements'))
+        
     piece_id = bien.id_piece
     try:
         db.session.delete(bien)
