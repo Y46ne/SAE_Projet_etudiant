@@ -187,6 +187,8 @@ def declarer_sinistre():
 
             etat = request.form.get(f"etat_bien_{bien_id}")
             
+            valeur_actuelle = bien.calculer_valeur_actuelle()
+
             if etat == "perte_totale":
                 degat = valeur_actuelle or 0
             else:
@@ -203,6 +205,7 @@ def declarer_sinistre():
         db.session.commit()
         flash("Sinistre déclaré avec succès", "success")
         return redirect(url_for("tableau_de_bord"))
+    
     return render_template(
         "declarer_sinistre.html",
         form=form,
