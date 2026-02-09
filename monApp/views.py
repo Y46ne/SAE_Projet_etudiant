@@ -234,6 +234,19 @@ def mes_logements():
     return render_template('mes_logements.html', logements=rows)
 
 
+@app.route('/liste_sinistres_client/')
+@login_required
+def liste_sinistres_client():
+    if not current_user.assure_profile:
+        flash("Accès non autorisé.", "danger")
+        return redirect(url_for('tableau_de_bord'))
+    
+    assure = current_user.assure_profile
+    logement_ids = [l.id_logement for l in assure.logements]
+    sinistres = Sinistre.query.filter(Sinistre.id_logement.in_(logement_ids)).order_by(Sinistre.date_sinistre.desc()).all() if logement_ids else []
+    return render_template('liste_sinistres_client.html', sinistres=sinistres)
+
+
 @app.route('/logement/<int:id>/pieces/')
 @login_required
 def view_logement_pieces(id):
@@ -688,7 +701,6 @@ def generer_pdf_logement():
 
 
 
-
 #------Partie assureur------
 @app.route('/tableau_de_bord_assureur/')
 @login_required
@@ -782,9 +794,7 @@ def parametres_assureur():
 @app.route('/detail_sinistre/<int:id>', methods=['GET', 'POST'])
 @login_required
 def detail_sinistre(id):
-    if not current_user.assureur_profile:
-        flash("Accès non autorisé.", "danger")
-        return redirect(url_for('login'))
+    
     sinistre = Sinistre.query.get_or_404(id)
     form = UpdateSinistreForm(obj=sinistre)
 

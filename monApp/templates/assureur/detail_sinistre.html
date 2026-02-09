@@ -58,6 +58,7 @@
     </div>
 
     <div class="bottom-grid">
+        {% if current_user.is_assureur %}
         <div class="media-card">
             <h2>Actions de l'assureur</h2>
             <form method="POST" action="{{ url_for('detail_sinistre', id=sinistre.id_sinistre) }}">
@@ -69,6 +70,7 @@
                 {{ form.submit(class="btn btn-primary mt-3") }}
             </form>
         </div>
+        {%endif%}
 
         <div class="media-card">
             <h2>Description du sinistre</h2>
