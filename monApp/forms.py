@@ -63,9 +63,9 @@ class SignUpForm(FlaskForm):
         except ValueError:
             raise ValidationError("Date invalide ou format incorrect. Utilisez AAAA-MM-JJ (ex: 2000-01-31).")
         if date_obj.year < 1900:
-            raise ValidationError("La date de naissance ne peut pas être antérieure à 1900.")
+            raise ValidationError("Date de naissance invalide. (Incohérente)")
         if date_obj > datetime.now().date():
-            raise ValidationError("La date de naissance ne peut pas être dans le futur.")
+            raise ValidationError("Date de naissance invalide. (Incohérente)")
 
 
 class ResetPasswordForm(FlaskForm):
