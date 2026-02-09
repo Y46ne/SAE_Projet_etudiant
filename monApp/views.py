@@ -108,9 +108,10 @@ def tableau_de_bord():
             biens_de_la_piece = getattr(p, 'biens', [])
             nb_biens_logement += len(biens_de_la_piece)
             for b in biens_de_la_piece:
-                if b.valeur_actuelle is not None:
+                valeur_reelle = b.calculer_valeur_actuelle()
+                if valeur_reelle is not None:
                     try:
-                        valeur_logement += float(b.valeur_actuelle)
+                        valeur_logement += float(valeur_reelle)
                     except (ValueError, TypeError):
                         pass
 
@@ -251,13 +252,17 @@ def mes_logements():
         nb_biens = 0
         for piece in logement.pieces:
             for bien in piece.biens:
-                valeur_totale += bien.prix_achat or 0
+                valeur_reelle = bien.calculer_valeur_actuelle()
+                if valeur_reelle is not None:
+                    valeur_totale += float(valeur_reelle)
+                    bien.valeur_actuelle = valeur_reelle
                 nb_biens += 1
         rows.append({
             'logement': logement,
             'nb_biens': nb_biens,
             'valeur': valeur_totale
         })
+    db.session.commit()
     return render_template('mes_logements.html', logements=rows)
 
 
@@ -300,6 +305,7 @@ def gestion_bien(piece_id):
     # Met à jour la valeur actuelle pour chaque bien si besoin
     for bien in biens:
         bien.valeur_actuelle = bien.calculer_valeur_actuelle()
+    db.session.commit()
     return render_template('gestion_bien.html', piece=piece, biens=biens)
 
 
@@ -648,6 +654,7 @@ def modifier_bien(bien_id):
         bien.categorie = form.categorie.data
         bien.date_achat = form.date_achat.data
         bien.prix_achat = form.prix_achat.data
+        bien.valeur_actuelle = bien.calculer_valeur_actuelle()
         try:
             db.session.commit()
             flash("Bien modifié avec succès.", "success")
