@@ -56,16 +56,57 @@ class SignUpForm(FlaskForm):
     ])
     submit = SubmitField('Créer mon compte')
 
-    def validate_date_naissance(self, field):
-        date_str = field.data
-        try:
-            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
-        except ValueError:
-            raise ValidationError("Date invalide ou format incorrect. Utilisez AAAA-MM-JJ (ex: 2000-01-31).")
-        if date_obj.year < 1900:
-            raise ValidationError("Date de naissance invalide. (Incohérente)")
-        if date_obj > datetime.now().date():
-            raise ValidationError("Date de naissance invalide. (Incohérente)")
+    def validate_nom(self, field):
+        valeur = field.data.strip()
+        
+        for char in valeur:
+            if not (char.isalpha() or char in " -"):
+                raise ValidationError("Le nom ne doit contenir que des lettres.")
+
+        segments = valeur.split('-')
+        for s in segments:
+            nettoyé = s.strip()
+            if len(nettoyé) < 2:
+                raise ValidationError("Chaque partie du nom doit avoir au moins 2 lettres.")
+        
+        if valeur.startswith('-') or valeur.endswith('-'):
+            raise ValidationError("Le nom ne peut pas commencer ou finir par un tiret.")
+
+    def validate_prenom(self, field):
+        valeur = field.data.strip()
+        
+        for char in valeur:
+            if not (char.isalpha() or char in " -"):
+                raise ValidationError("Le prénom ne doit contenir que des lettres.")
+
+        segments = valeur.split('-')
+        for s in segments:
+            nettoyé = s.strip()
+            if len(nettoyé) < 3:
+                raise ValidationError("Chaque partie du prénom doit avoir au moins 3 lettres.")
+
+        if valeur.startswith('-') or valeur.endswith('-'):
+            raise ValidationError("Le prénom ne peut pas commencer ou finir par un tiret.")
+
+
+    def validate_date_naissance(self, field): 
+        date_str = field.data 
+        try: 
+            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date() 
+        except ValueError: 
+            raise ValidationError("Date invalide ou format incorrect. Utilisez AAAA-MM-JJ (ex: 2000-01-31).") 
+
+        if date_obj.year < 1900: 
+            raise ValidationError("Date de naissance invalide. (Incohérente)") 
+        
+        today = datetime.now().date()
+        if date_obj > today: 
+            raise ValidationError("La date de naissance ne peut pas être dans le futur.") 
+        
+        age_minimum = 18
+        if (today.year - date_obj.year - ((today.month, today.day) < (date_obj.month, date_obj.day))) < age_minimum:
+            raise ValidationError(f"Vous devez avoir au moins {age_minimum} ans pour vous inscrire.")
+
 
 
 class ResetPasswordForm(FlaskForm):
@@ -78,7 +119,17 @@ class ResetPasswordForm(FlaskForm):
 class LogementForm(FlaskForm):
     nom_logement = StringField('Nom du logement', validators=[DataRequired()])
     adresse = StringField('Adresse du logement', validators=[DataRequired()])
-    type_logement = StringField('Type de logement (Appartement, Maison...)', validators=[DataRequired()])
+    type_logement = SelectField(
+        'Type de logement', 
+        choices=[
+            ('', 'Sélectionner un type'), 
+            ('Maison', 'Maison'), 
+            ('Appartement', 'Appartement'), 
+            ('Studio', 'Studio'), 
+            ('Autre', 'Autre')
+        ],
+        validators=[DataRequired(message="Veuillez choisir un type de logement.")]
+    )
     surface = FloatField('Surface (m²)', validators=[DataRequired(message="Veuillez renseigner une surface valide.")])
     description = StringField('Description')
     assures = QuerySelectMultipleField(
@@ -88,6 +139,48 @@ class LogementForm(FlaskForm):
         allow_blank=False            
     )
     submit = SubmitField('Ajouter le logement')
+
+    def validate_nom_logement(self, field):
+        valeur = field.data.strip()
+        lettres = [char for char in valeur if char.isalpha()]
+        if len(lettres) < 3:
+            raise ValidationError("Le nom du logement doit contenir au moins 3 lettres.")
+        
+        for char in valeur:
+            if not (char.isalnum() or char in " -'"):
+                raise ValidationError("Le nom contient des caractères non autorisés.")
+
+    def validate_adresse(self, field):
+        valeur = field.data.strip()
+        
+        if len(valeur) < 7:
+            raise ValidationError("L'adresse semble trop courte.")
+
+        derniers_est_espace = False
+        for char in valeur:
+            if not (char.isalnum() or char in " -,'"):
+                raise ValidationError(f"Le caractère '{char}' n'est pas autorisé dans une adresse.")
+            
+            if char == " " and derniers_est_espace:
+                raise ValidationError("L'adresse contient trop d'espaces consécutifs.")
+            derniers_est_espace = (char == " ")
+
+        contient_chiffre = any(char.isdigit() for char in valeur)
+        contient_lettre = any(char.isalpha() for char in valeur)
+        
+        if not contient_chiffre:
+            raise ValidationError("L'adresse doit inclure un numéro (ex: 12 rue...).")
+        if not contient_lettre:
+            raise ValidationError("L'adresse doit inclure un nom de rue.")
+
+        if valeur[0] in "-,' " or valeur[-1] in "-,' ":
+            raise ValidationError("L'adresse ne peut pas commencer ou finir par un symbole ou un espace.")
+
+    def validate_surface(self, field):
+        if field.data <= 0:
+            raise ValidationError("La surface doit être un nombre positif.")
+        if field.data > 10000:
+            raise ValidationError("Surface incohérente.")
 
 
 class PieceForm(FlaskForm):
@@ -217,6 +310,42 @@ class ModifierLogementForm(FlaskForm):
     adresse = StringField('Adresse', validators=[DataRequired()])
     description = TextAreaField('Description')
     submit = SubmitField('Enregistrer')
+
+    def validate_nom_logement(self, field):
+        valeur = field.data.strip()
+        lettres = [char for char in valeur if char.isalpha()]
+        if len(lettres) < 3:
+            raise ValidationError("Le nom du logement doit contenir au moins 3 lettres.")
+        
+        for char in valeur:
+            if not (char.isalnum() or char in " -'"):
+                raise ValidationError("Le nom contient des caractères non autorisés.")
+
+    def validate_adresse(self, field):
+        valeur = field.data.strip()
+        
+        if len(valeur) < 10:
+            raise ValidationError("L'adresse semble trop courte.")
+
+        derniers_est_espace = False
+        for char in valeur:
+            if not (char.isalnum() or char in " -,'"):
+                raise ValidationError(f"Le caractère '{char}' n'est pas autorisé dans une adresse.")
+            
+            if char == " " and derniers_est_espace:
+                raise ValidationError("L'adresse contient trop d'espaces consécutifs.")
+            derniers_est_espace = (char == " ")
+
+        contient_chiffre = any(char.isdigit() for char in valeur)
+        contient_lettre = any(char.isalpha() for char in valeur)
+        
+        if not contient_chiffre:
+            raise ValidationError("L'adresse doit inclure un numéro.")
+        if not contient_lettre:
+            raise ValidationError("L'adresse doit inclure un nom de rue.")
+
+        if valeur[0] in "-,' " or valeur[-1] in "-,' ":
+            raise ValidationError("L'adresse ne peut pas commencer ou finir par un symbole ou un espace.")
 
 class ModifierPieceForm(FlaskForm):
     nom_piece = StringField('Nom de la pièce', validators=[DataRequired()])
