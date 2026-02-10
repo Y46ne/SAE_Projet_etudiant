@@ -49,7 +49,13 @@ class SignUpForm(FlaskForm):
             Email(message="Adresse email invalide.")
         ]
     )
-    Password = PasswordField('Mot de passe', validators=[DataRequired(message="Le mot de passe est requis.")])
+    Password = PasswordField(
+        'Mot de passe', 
+        validators=[
+            DataRequired(message="Le mot de passe est requis."),
+            Length(min=8, message="Le mot de passe doit faire au moins 8 caractères.")
+        ]
+    )
     confirm = PasswordField('Confirmer le mot de passe', validators=[
         DataRequired(), 
         EqualTo('Password', message="Les mots de passe ne correspondent pas.")
@@ -212,14 +218,6 @@ class PieceForm(FlaskForm):
             raise ValidationError("La surface semble incohérente pour une seule pièce.")
 
 
-class SinistreForm(FlaskForm):
-    date_sinistre = DateField('Date du sinistre', format='%Y-%m-%d', validators=[DataRequired()])
-    type_sinistre = StringField('Type de sinistre (Dégât des eaux, Vol, ...)', validators=[DataRequired()])
-    description = TextAreaField('Description détaillée', validators=[DataRequired()])
-    numero_sinistre = StringField('Numéro de dossier (si connu)')
-    submit = SubmitField('Déclarer le sinistre')
-
-
 class DeleteForm(FlaskForm):
     submit = SubmitField('Supprimer')
 
@@ -294,7 +292,7 @@ class AjouterBienForm(FlaskForm):
             if field.data > today:
                 raise ValidationError("La date d'achat ne peut pas être dans le futur.")
             
-            if field.data.year < 1900:
+            if field.data.year < 0:
                 raise ValidationError("La date d'achat semble incorrecte (trop ancienne).")
 
     def validate_prix_achat(self, field):
@@ -403,12 +401,69 @@ class ModifierPieceForm(FlaskForm):
             raise ValidationError("La surface semble incohérente.")
 
 class ModifierBienForm(FlaskForm):
-    nom_bien = StringField('Nom du bien', validators=[DataRequired()])
-    categorie = StringField('Catégorie', validators=[DataRequired()])
-    date_achat = DateField('Date d\'achat', format='%Y-%m-%d', validators=[Optional()])
-    prix_achat = FloatField("Prix d'achat (€)", validators=[DataRequired(message="Veuillez renseigner un prix valide.")])
+    nom_bien = StringField(
+        "Nom du bien", 
+        validators=[DataRequired(message="Le nom est requis.")]
+    )
+    
+    categorie = SelectField(
+        "Catégorie", 
+        choices=[
+            ('', 'Sélectionner une catégorie'),
+            ('Electromenager', 'Électroménager'),
+            ('Mobilier', 'Mobilier'),
+            ('Multimedia', 'Multimédia'),
+            ('Vetements', 'Vêtements'),
+            ('Bijoux', 'Bijoux'),
+            ('Loisirs', 'Loisirs'),
+            ('Vaisselle', 'Vaisselle'),
+            ('Outillage', 'Outillage'),
+            ('Autre', 'Autre')
+        ],
+        validators=[DataRequired(message="La catégorie est requise.")]
+    )
+    
+    date_achat = DateField(
+        "Date d'achat", 
+        format='%Y-%m-%d', 
+        validators=[DataRequired(message="La date est requise.")]
+    )
+    
+    prix_achat = FloatField(
+        "Prix d'achat (€)", 
+        validators=[DataRequired(message="Veuillez renseigner un prix valide.")]
+    )
+    
     valeur_actuelle = FloatField('Valeur actuelle (€)', render_kw={'readonly': True})
+    
     submit = SubmitField('Enregistrer')
+
+    def validate_nom_bien(self, field):
+        valeur = field.data.strip()
+        
+        if not any(char.isalpha() for char in valeur):
+            raise ValidationError("Le nom du bien doit contenir au moins une lettre.")
+
+        for char in valeur:
+            if not (char.isalnum() or char in " -'"):
+                raise ValidationError(f"Caractère interdit dans le nom : '{char}'.")
+        
+        if valeur.startswith('-') or valeur.endswith('-'):
+            raise ValidationError("Le nom ne peut pas commencer ou finir par un tiret.")
+
+    def validate_date_achat(self, field):
+        if field.data:
+            today = datetime.now().date()
+            if field.data > today:
+                raise ValidationError("La date d'achat ne peut pas être dans le futur.")
+            
+            if field.data.year < 0:
+                raise ValidationError("La date d'achat semble incorrecte (trop ancienne).")
+
+    def validate_prix_achat(self, field):
+        if field.data is not None and field.data < 0:
+            raise ValidationError("Le prix d'achat ne peut pas être négatif.")
+        
 
 class ParametresForm(FlaskForm):
     nom = StringField('Nom', validators=[DataRequired()])

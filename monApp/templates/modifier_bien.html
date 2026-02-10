@@ -11,44 +11,60 @@
     <h1>Modifier le bien</h1>
     <form method="POST">
         {{ form.hidden_tag() }}
-        <div class="form-group">
+
+        <div class="form-group {% if form.nom_bien.errors %}has-error{% endif %}">
             {{ form.nom_bien.label(class="form-label") }}
             {{ form.nom_bien(class="form-control") }}
+            
+            {% if form.nom_bien.errors %}
+                {% for error in form.nom_bien.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
         </div>
-        <div class="form-group">
+
+        <div class="form-group {% if form.categorie.errors %}has-error{% endif %}">
             {{ form.categorie.label(class="form-label") }}
-            <select name="{{ form.categorie.name }}" id="{{ form.categorie.id }}" class="form-control" required>
-                <option value="" disabled>Sélectionner une catégorie</option>
-                <option value="Electromenager" {% if form.categorie.data == 'Electromenager' %}selected{% endif %}>Électroménager</option>
-                <option value="Mobilier" {% if form.categorie.data == 'Mobilier' %}selected{% endif %}>Mobilier</option>
-                <option value="Multimedia" {% if form.categorie.data == 'Multimedia' %}selected{% endif %}>Multimédia</option>
-                <option value="Vetements" {% if form.categorie.data == 'Vetements' %}selected{% endif %}>Vêtements</option>
-                <option value="Bijoux" {% if form.categorie.data == 'Bijoux' %}selected{% endif %}>Bijoux</option>
-                <option value="Loisirs" {% if form.categorie.data == 'Loisirs' %}selected{% endif %}>Loisirs</option>
-                <option value="Vaisselle" {% if form.categorie.data == 'Vaisselle' %}selected{% endif %}>Vaisselle</option>
-                <option value="Outillage" {% if form.categorie.data == 'Outillage' %}selected{% endif %}>Outillage</option>
-                <option value="Autre" {% if form.categorie.data == 'Autre' %}selected{% endif %}>Autre</option>
-            </select>
+            {{ form.categorie(class="form-control") }}
+            
             {% if form.categorie.errors %}
-                <div class="invalid-feedback">{{ form.categorie.errors[0] }}</div>
+                {% for error in form.categorie.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="form-group {% if form.date_achat.errors %}has-error{% endif %}">
+            {{ form.date_achat.label(class="form-label") }}
+            {{ form.date_achat(class="form-control", type="date") }}
+            
+            {% if form.date_achat.errors %}
+                {% for error in form.date_achat.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="form-group {% if form.prix_achat.errors %}has-error{% endif %}">
+            {{ form.prix_achat.label(class="form-label") }}
+            {{ form.prix_achat(class="form-control") }}
+            
+            {% if form.prix_achat.errors %}
+                {% for error in form.prix_achat.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
             {% endif %}
         </div>
 
         <div class="form-group">
-            {{ form.date_achat.label(class="form-label") }}
-            {{ form.date_achat(class="form-control") }}
+            {{ form.valeur_actuelle.label(class="form-label") }}
+            {{ form.valeur_actuelle(class="form-control", disabled=True) }}
         </div>
-        <div class="form-group">
-            {{ form.prix_achat.label(class="form-label") }}
-            {{ form.prix_achat(class="form-control") }}
-            {% if form.prix_achat.errors %}
-                <div class="text-red-500 text-sm mt-1">
-                    {% for error in form.prix_achat.errors %}<span>{{ error }}</span>{% endfor %}
-                </div>
-            {% endif %}
+
+        <div class="form-actions mt-3">
+            {{ form.submit(class="btn btn-primary") }}
+            <a href="{{ url_for('gestion_bien', piece_id=bien.id_piece) }}" class="btn btn-secondary">Annuler</a>
         </div>
-        <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
-        <a href="{{ url_for('gestion_bien', piece_id=bien.id_piece) }}" class="btn btn-secondary">Annuler</a>
     </form>
 </div>
 {% endblock %}
