@@ -107,7 +107,9 @@
                 <p><strong>Prénom:</strong> {{ assure.prenom }}</p>
                 <p><strong>Email:</strong> {{ assure.email }}</p>
                 <p><strong>Téléphone:</strong> {{ assure.telephone or 'Non renseigné' }}</p>
+            {% if current_user.is_assureur %}
                 <a href="{{ url_for('detail_assure', id=assure.id_assure) }}" class="btn btn-info">Voir l'assuré</a>
+            {%endif%}
             </div>
             {% else %}
             <div class="empty-state"><p>Aucun assuré lié à ce sinistre.</p></div>

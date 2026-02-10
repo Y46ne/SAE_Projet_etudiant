@@ -178,6 +178,8 @@ def declarer_sinistre():
             bien = Bien.query.get(int(bien_id))
             if not bien:
                 continue
+            
+            valeur_actuelle = bien.calculer_valeur_actuelle()
 
             if bien.piece.id_logement != selected_logement_id:
                 print(f"Le bien {bien.id_bien} n'appartient pas au logement {selected_logement_id}")
