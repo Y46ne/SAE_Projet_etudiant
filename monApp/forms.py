@@ -6,7 +6,7 @@ from .database import *
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField
 from monApp.database.assure import get_tous_les_assures
 from flask_wtf.file import FileField, FileAllowed
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class LoginForm(FlaskForm):
     Login = StringField('Identifiant', validators=[DataRequired()])
@@ -299,6 +299,8 @@ class AjouterBienForm(FlaskForm):
         if field.data is not None and field.data < 0:
             raise ValidationError("Le prix d'achat ne peut pas être négatif.")
 
+
+
 class DeclarerSinistre(FlaskForm):
     date_sinistre = DateField(
         "Date du sinistre",
@@ -330,6 +332,17 @@ class DeclarerSinistre(FlaskForm):
     )
 
     submit = SubmitField("Générer l'état financier des biens")
+
+    def validate_date_sinistre(self, field):
+        if field.data:
+            today = datetime.now().date()
+            
+            if field.data > today:
+                raise ValidationError("La date du sinistre ne peut pas être dans le futur.")
+            
+            un_an_passe = today - timedelta(days=365)
+            if field.data < un_an_passe:
+                raise ValidationError("Vous ne pouvez pas déclarer un sinistre vieux de plus d'un an.")
 
 class ModifierLogementForm(FlaskForm):
     nom_logement = StringField('Nom du logement', validators=[DataRequired()])

@@ -145,32 +145,45 @@ def declarer_sinistre():
                 bien.valeur_actuelle = bien.calculer_valeur_actuelle()
                 biens.append(bien)
     if form.validate_on_submit():
+        # On récupère l'ID du logement choisi par l'utilisateur
+        selected_logement_id = int(request.form.get("logement_id"))
+
         sinistre = Sinistre(
             date_sinistre=form.date_sinistre.data,
             type_sinistre=form.type_sinistre.data,
             description=form.description.data,
             numero_sinistre="SIN-" + datetime.datetime.now().strftime("%Y%m%d%H%M%S"),
-            id_logement=int(request.form.get("logement_id"))
+            id_logement=selected_logement_id
         )
         db.session.add(sinistre)
         db.session.flush() 
+
         biens_selectionnes = request.form.getlist("biens_selectionnes")
         total = 0
+        
         for bien_id in biens_selectionnes:
-            etat = request.form.get(f"etat_bien_{bien_id}")
             bien = Bien.query.get(int(bien_id))
             if not bien:
                 continue
+
+            if bien.piece.id_logement != selected_logement_id:
+                print(f"Le bien {bien.id_bien} n'appartient pas au logement {selected_logement_id}")
+                continue
+
+            etat = request.form.get(f"etat_bien_{bien_id}")
+            
             if etat == "perte_totale":
                 degat = bien.valeur_actuelle or 0
             else:
                 degat = (bien.valeur_actuelle or 0) * 0.5
+            
             total += degat
             db.session.execute(impacte_table.insert().values(
                 id_bien=bien.id_bien,
                 id_sinistre=sinistre.id_sinistre,
                 degat_estime=degat
             ))
+            
         sinistre.montant_estime = total
         db.session.commit()
         flash("Sinistre déclaré avec succès", "success")
