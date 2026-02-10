@@ -479,11 +479,63 @@ class ModifierBienForm(FlaskForm):
         
 
 class ParametresForm(FlaskForm):
-    nom = StringField('Nom', validators=[DataRequired()])
-    prenom = StringField('Prénom', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    telephone = StringField('Téléphone', validators=[Optional()])
+    nom = StringField(
+        'Nom', 
+        validators=[DataRequired(message="Le nom est requis.")]
+    )
+    
+    prenom = StringField(
+        'Prénom', 
+        validators=[DataRequired(message="Le prénom est requis.")]
+    )
+    
+    email = StringField(
+        'Email', 
+        render_kw={'disabled': True} 
+    )
+    
+    telephone = StringField(
+        'Téléphone', 
+        validators=[
+            DataRequired(message="Le téléphone est requis."),
+            Regexp(r'^\d{10}$', message="Le numéro doit contenir exactement 10 chiffres (ex: 0612345678).")
+        ]
+    )
+    
     submit = SubmitField('Enregistrer')
+
+    def validate_nom(self, field):
+        valeur = field.data.strip()
+        
+        for char in valeur:
+            if not (char.isalpha() or char in " -"):
+                raise ValidationError("Le nom ne doit contenir que des lettres.")
+
+        segments = valeur.split('-')
+        for s in segments:
+            nettoyé = s.strip()
+            if len(nettoyé) < 2:
+                raise ValidationError("Chaque partie du nom doit avoir au moins 2 lettres.")
+        
+        if valeur.startswith('-') or valeur.endswith('-'):
+            raise ValidationError("Le nom ne peut pas commencer ou finir par un tiret.")
+
+    def validate_prenom(self, field):
+        valeur = field.data.strip()
+        
+        for char in valeur:
+            if not (char.isalpha() or char in " -"):
+                raise ValidationError("Le prénom ne doit contenir que des lettres.")
+
+        segments = valeur.split('-')
+        for s in segments:
+            nettoyé = s.strip()
+            if len(nettoyé) < 3:
+                raise ValidationError("Chaque partie du prénom doit avoir au moins 3 lettres.")
+
+        if valeur.startswith('-') or valeur.endswith('-'):
+            raise ValidationError("Le prénom ne peut pas commencer ou finir par un tiret.")
+        
 
 class UpdateSinistreForm(FlaskForm):
     statut = SelectField(
