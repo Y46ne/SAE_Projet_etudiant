@@ -199,10 +199,10 @@ class PieceForm(FlaskForm):
         valeur = field.data.strip()
         
         if len(valeur) < 2:
-            raise ValidationError("Le nom de la pièce est trop court.")
+            raise ValidationError("Le nom de la pièce est trop court. (2 caractères minimum)")
 
         if not any(char.isalpha() for char in valeur):
-            raise ValidationError("Le nom de la pièce doit contenir au moins une lettre.")
+            raise ValidationError("Le nom de la pièce doit contenir au moins une lettre. (2 caractères minimum)")
 
         for char in valeur:
             if not (char.isalnum() or char in " -"):
@@ -395,10 +395,10 @@ class ModifierPieceForm(FlaskForm):
         valeur = field.data.strip()
         
         if len(valeur) < 2:
-            raise ValidationError("Le nom de la pièce est trop court.")
+            raise ValidationError("Le nom de la pièce est trop court. (au moins deux caractères)")
 
         if not any(char.isalpha() for char in valeur):
-            raise ValidationError("Le nom doit contenir au moins une lettre.")
+            raise ValidationError("Le nom doit contenir au moins une lettre. (au moins 2 caractères)")
 
         for char in valeur:
             if not (char.isalnum() or char in " -"):
