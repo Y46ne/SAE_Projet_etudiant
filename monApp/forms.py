@@ -33,7 +33,7 @@ class SignUpForm(FlaskForm):
     prenom = StringField('Prénom', validators=[DataRequired(message="Le prénom est requis.")])
     date_naissance = StringField(
         'Date de naissance (YYYY-MM-DD)', 
-        validators=[DataRequired(message="La date de naissance est requise.")]
+        validators=[Optional()]
     )
     telephone = StringField(
         'Téléphone', 
@@ -58,6 +58,8 @@ class SignUpForm(FlaskForm):
 
     def validate_date_naissance(self, field):
         date_str = field.data
+        if not date_str:
+            return
         try:
             date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
         except ValueError:
@@ -252,3 +254,29 @@ class UpdateSinistreForm(FlaskForm):
     montant_estime = DecimalField('Montant estimé', validators=[Optional()])
     montant_final = DecimalField('Montant final', validators=[Optional()])
     submit = SubmitField('Mettre à jour le sinistre')
+
+class ModifierAssureForm(FlaskForm):
+    nom = StringField('Nom', validators=[DataRequired(message="Le nom est requis.")])
+    prenom = StringField('Prénom', validators=[DataRequired(message="Le prénom est requis.")])
+    date_naissance = StringField(
+        'Date de naissance (YYYY-MM-DD)', 
+        validators=[Optional()]
+    )
+    telephone = StringField(
+        'Téléphone', 
+        validators=[
+            DataRequired(message="Le téléphone est requis."),
+            Regexp(r'^\d{10}$', message="Le numéro doit contenir exactement 10 chiffres.")
+        ]
+    )
+    email = StringField('Adresse e-mail', validators=[DataRequired(), Email()])
+    submit = SubmitField('Enregistrer les modifications')
+
+    def validate_date_naissance(self, field):
+        date_str = field.data
+        if not date_str:
+            return
+        try:
+            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
+            raise ValidationError("Format incorrect. Utilisez AAAA-MM-JJ.")

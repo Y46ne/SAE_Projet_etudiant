@@ -8,7 +8,7 @@ import os
 
 from .app import app, db, login_manager
 from config import *
-from monApp.database import User, Assure, Logement, Piece, Bien, Justificatif, Sinistre
+from monApp.database import User, Assure, Assureur, Logement, Piece, Bien, Justificatif, Sinistre
 from monApp.database.impacte import impacte as impacte_table
 from monApp.forms import *
 from .forms import ChangePasswordForm
@@ -19,6 +19,7 @@ try:
 except ImportError:
     HTML = None  # Gestion du cas où la librairie n'est pas installée
 import datetime
+import random
 
 
 @app.errorhandler(404)
@@ -297,6 +298,8 @@ def gestion_bien(piece_id):
 @app.route('/creer-compte/', methods=['GET', 'POST'])
 def creer_compte():
     form = SignUpForm()
+    assureurs = Assureur.query.all()
+    random_assureur = random.choice(assureurs) if assureurs else None
     if form.validate_on_submit():
         try:
             new_user = User(
@@ -310,7 +313,7 @@ def creer_compte():
                 telephone=form.telephone.data,
                 email=form.email.data,
                 mdp_assure= form.Password.data,
-                id_assureur= 1
+                id_assureur= random_assureur.id_assureur if random_assureur else 1
             )
             db.session.add(new_user)
             db.session.add(new_assure)
@@ -940,6 +943,109 @@ def detail_assure(id):
                         
     return render_template('assureur/detail_assure.html', assure=assure, total_valeur_biens=total_valeur_biens, sinistres=sinistres)
 
+
+@app.route('/creer_compte_assureur/', methods=['GET', 'POST'])
+@login_required
+def creer_compte_assureur():
+    if not current_user.is_assureur:
+        flash("Accès non autorisé.", "danger")
+        return redirect(url_for('login'))
+
+    form = SignUpForm()
+    if form.validate_on_submit():
+        try:
+            new_user = User(
+                Login=form.email.data,
+                Password=sha256(form.Password.data.encode()).hexdigest()
+            )
+            new_assureur = Assureur(
+                nom=form.nom.data,
+                prenom=form.prenom.data,
+                email=form.email.data,
+                telephone=form.telephone.data,
+                mot_de_passe=sha256(form.Password.data.encode()).hexdigest()
+            )
+            db.session.add(new_user)
+            db.session.add(new_assureur)
+            db.session.commit()
+            flash('Le compte assureur a été créé avec succès !', 'success')
+            return redirect(url_for('tableau_de_bord_assureur'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Erreur lors de la création du compte : {e}', 'danger')
+    elif request.method == 'POST':
+        # Useful for debugging why validation failed
+        print(form.errors)
+        
+    return render_template('assureur/creer_compte_assureur.html', form=form)
+
+@app.route('/creer_compte_utilisateur/', methods=['GET', 'POST'])
+@login_required
+def creer_compte_utilisateur():
+    if not current_user.is_assureur:
+        flash("Accès non autorisé.", "danger")
+        return redirect(url_for('login'))
+
+    form = SignUpForm()
+    assureurs = Assureur.query.all()
+    random_assureur = random.choice(assureurs) if assureurs else None
+    if form.validate_on_submit():
+        try:
+            new_user = User(
+                Login=form.email.data,
+                Password=sha256(form.Password.data.encode()).hexdigest()
+            )
+            new_assure = Assure(
+                nom=form.nom.data,
+                prenom=form.prenom.data,
+                date_naissance=form.date_naissance.data,
+                telephone=form.telephone.data,
+                email=form.email.data,
+                mdp_assure= form.Password.data,
+                id_assureur= random_assureur.id_assureur if random_assureur else 1
+            )
+            db.session.add(new_user)
+            db.session.add(new_assure)
+            db.session.commit()
+            flash('Le compte assuré a été créé avec succès !', 'success')
+            return redirect(url_for('liste_assures'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Erreur lors de la création du compte : {e}', 'danger')
+    return render_template('assureur/creer_compte_utilisateur.html', form=form)
+
+
+@app.route('/modifier_assure/<int:id>', methods=['GET', 'POST'])
+@login_required
+def modifier_infos_compte(id):
+    if not current_user.is_assureur:
+        flash("Accès non autorisé.", "danger")
+        return redirect(url_for('login'))
+
+    assure = Assure.query.get_or_404(id)
+    
+    # Sécurité : vérifier que l'assureur gère bien cet assuré
+    if assure.id_assureur != current_user.assureur_profile.id_assureur:
+        flash("Vous n'avez pas les droits pour modifier cet assuré.", "danger")
+        return redirect(url_for('liste_assures'))
+
+    form = ModifierAssureForm(obj=assure)
+    if form.validate_on_submit():
+        assure.nom = form.nom.data
+        assure.prenom = form.prenom.data
+        assure.email = form.email.data
+        assure.telephone = form.telephone.data
+        assure.date_naissance = form.date_naissance.data
+
+        try:
+            db.session.commit()
+            flash("Informations de l'assuré modifiées avec succès.", "success")
+            return redirect(url_for('detail_assure', id=assure.id_assure))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erreur lors de la modification : {e}", "danger")
+            
+    return render_template('assureur/modifier_infos_compte.html', form=form, assure=assure)
 
 # ------------------- MAIN -------------------
 if __name__ == '__main__':
