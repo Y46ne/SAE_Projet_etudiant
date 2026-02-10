@@ -15,14 +15,6 @@
 <a href="{{ url_for('ajouter_logement') }}" class="btn btn-success mb-3">Ajouter un logement</a>
 {% endif %}
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-{% endwith %}
-
 <div class="search-filter">
     <input type="text" id="searchLogements" placeholder="Rechercher un logement...">
 </div>

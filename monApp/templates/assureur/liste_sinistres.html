@@ -9,13 +9,7 @@
 
 {% block content %}
 <div class="p-8">
-{% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-{% endwith %}
+
 <table class="table table-striped table-bordered table-hover assures-table">
     <caption><strong>Nombre total de sinistres : {{ sinistres|length }}</strong></caption>
     <thead>

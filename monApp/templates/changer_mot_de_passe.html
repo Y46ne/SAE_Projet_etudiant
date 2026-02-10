@@ -8,14 +8,6 @@
 
 {% block content %}
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      <div class="alert alert-{{ category }}">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
-
 <div class="card shadow-sm">
     <div class="card-body">
         <h1>Changer mon mot de passe</h1>

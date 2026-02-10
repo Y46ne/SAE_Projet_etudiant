@@ -11,15 +11,6 @@
 <div class="p-8">
 <p><strong>Nombre total d'assurés : {{ assures|length }}</strong></p>
 
-
-
-{% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-{% endwith %}
 <table class="table table-striped table-bordered table-hover assures-table">
     <thead>
         <tr>

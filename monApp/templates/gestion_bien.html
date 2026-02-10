@@ -8,17 +8,7 @@
 
 {% block content %}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-
-
-
-    <div class="p-8">
+<div class="p-8">
         <a href="{{ url_for('view_logement_pieces', id=piece.id_logement) }}" class="btn btn-danger">
             ← Retour aux pièces
         </a>
