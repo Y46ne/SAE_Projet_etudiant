@@ -4,6 +4,13 @@
 
 {% block head %}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/declarer_sinistre.css') }}">
+  <style>
+      /* Petit ajout pour que le select devienne aussi rouge si erreur, 
+         car votre CSS actuel ne cible que 'input' */
+      .has-error input, .has-error select, .has-error textarea {
+          border-color: #e74c3c !important;
+      }
+  </style>
 {% endblock %}
 
 {% block content %}
@@ -19,6 +26,7 @@
 
             <section class="form-section">
                 <div class="info-cards">
+                    
                     <div class="info-card">
                         <div class="card-header">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-blue">
@@ -27,8 +35,14 @@
                             </svg>
                             <label class="card-label">Date de sinistre</label>
                         </div>
-                        <div class="card-input">
+                        <div class="card-input {% if form.date_sinistre.errors %}has-error{% endif %}">
                             {{ form.date_sinistre(class="date-input", placeholder="jj / mm / aaaa") }}
+                            
+                            {% if form.date_sinistre.errors %}
+                                {% for error in form.date_sinistre.errors %}
+                                    <span class="form-error">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
                         </div>
                     </div>
 
@@ -41,8 +55,14 @@
                             </svg>
                             <label class="card-label">Type de sinistre</label>
                         </div>
-                        <div class="card-input">
+                        <div class="card-input {% if form.type_sinistre.errors %}has-error{% endif %}">
                             {{ form.type_sinistre(class="select-input") }}
+                            
+                            {% if form.type_sinistre.errors %}
+                                {% for error in form.type_sinistre.errors %}
+                                    <span class="form-error">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -54,8 +74,14 @@
                         </svg>
                         <label class="card-label">Description / Commentaire</label>
                     </div>
-                    <div class="card-input">
+                    <div class="card-input {% if form.description.errors %}has-error{% endif %}">
                         {{ form.description(class="select-input", style="width: 100%; height: auto; min-height: 100px; padding: 10px;", rows="4", placeholder="Décrivez les circonstances du sinistre...") }}
+                        
+                        {% if form.description.errors %}
+                            {% for error in form.description.errors %}
+                                <span class="form-error">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
                     </div>
                 </div>
             </section>
@@ -68,7 +94,7 @@
                     <div class="filter-group">
                         <label>Résidence</label>
                         <select id="filter-residence" class="filter-select" name="logement_id" required>
-                            <option value="">Sélectionner</option>
+                            <option value="" disabled selected>Sélectionner un logement</option>
                             {% for logement in logements %}
                                 <option value="{{ logement.id_logement }}">{{ logement.nom_logement or logement.adresse }}</option>
                             {% endfor %}
@@ -77,10 +103,12 @@
 
                     <div class="filter-group">
                         <label>Pièce</label>
-                        <select id="filter-piece" class="filter-select">
-                            <option value="">Sélectionner</option>
+                        <select id="filter-piece" class="filter-select" disabled>
+                            <option value="">Toutes les pièces</option>
                             {% for piece in pieces %}
-                                <option value="{{ piece.id_piece }}">{{ piece.nom_piece }}</option>
+                                <option value="{{ piece.id_piece }}" data-logement="{{ piece.id_logement }}">
+                                    {{ piece.nom_piece }}
+                                </option>
                             {% endfor %}
                         </select>
                     </div>
@@ -98,7 +126,7 @@
                         </thead>
                         <tbody id="biens-tbody">
                             {% for bien in biens %}
-                            <tr data-residence="{{ bien.piece.id_logement }}" data-piece="{{ bien.id_piece }}">
+                            <tr data-residence="{{ bien.piece.id_logement }}" data-piece="{{ bien.id_piece }}" style="display: none;">
                                 <td>
                                     <input type="checkbox" name="biens_selectionnes" value="{{ bien.id_bien }}" class="checkbox-bien" data-valeur="{{ bien.valeur_actuelle }}">
                                 </td>
@@ -148,76 +176,5 @@
     </main>
 </div>
 
-<script> // Fais avec l'aide de l'IA
-document.addEventListener('DOMContentLoaded', function() {
-    const residenceSelect = document.getElementById('filter-residence');
-    const pieceSelect = document.getElementById('filter-piece');
-    const rows = document.querySelectorAll('#biens-tbody tr');
-    const totalDisplay = document.getElementById('total-indemnisation');
-    const checkboxes = document.querySelectorAll('.checkbox-bien');
-    const etatSelects = document.querySelectorAll('.etat-select');
-    const summarySection = document.getElementById('summary-section');
-    const summaryTbody = document.getElementById('summary-tbody');
-    let isDirty = false;
-
-    // Détection des modifications pour l'alerte de sortie
-    document.querySelector('.sinistre-form').addEventListener('change', () => isDirty = true);
-    document.querySelector('.sinistre-form').addEventListener('submit', () => isDirty = false);
-    
-    window.addEventListener('beforeunload', (e) => {
-        if (isDirty) {
-            e.preventDefault();
-            e.returnValue = "Vous avez commencé une déclaration. Si vous quittez, vos données seront perdues.";
-        }
-    });
-
-    function filterBiens() {
-        const residenceId = residenceSelect.value;
-        const pieceId = pieceSelect.value;
-
-        rows.forEach(row => {
-            const rowResidence = row.dataset.residence;
-            const rowPiece = row.dataset.piece;
-
-            let show = true;
-            if (residenceId && rowResidence !== residenceId) show = false;
-            if (pieceId && rowPiece !== pieceId) show = false;
-
-            row.style.display = show ? '' : 'none';
-        });
-    }
-
-    function calculateTotal() {
-        let total = 0;
-        let summaryHTML = '';
-
-        checkboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                const row = checkbox.closest('tr');
-                const valeur = parseFloat(checkbox.dataset.valeur) || 0;
-                const etatSelect = row.querySelector('.etat-select');
-                const etat = etatSelect.value;
-                const indemnisation = (etat === 'perte_totale') ? valeur : valeur * 0.5;
-                
-                total += indemnisation;
-
-                summaryHTML += `<tr>
-                    <td>${row.cells[1].textContent}</td>
-                    <td>${row.cells[2].textContent}</td>
-                    <td>${etatSelect.options[etatSelect.selectedIndex].text}</td>
-                    <td>${indemnisation.toFixed(2)}€</td>
-                </tr>`;
-            }
-        });
-        summaryTbody.innerHTML = summaryHTML;
-        summarySection.style.display = summaryHTML ? 'block' : 'none';
-        totalDisplay.textContent = total.toFixed(2) + '€';
-    }
-
-    residenceSelect.addEventListener('change', filterBiens);
-    pieceSelect.addEventListener('change', filterBiens);
-    checkboxes.forEach(cb => cb.addEventListener('change', calculateTotal));
-    etatSelects.forEach(select => select.addEventListener('change', calculateTotal));
-});
-</script>
+<script src="{{ url_for('static', filename='js/declarer_sinistre.js') }}"></script>
 {% endblock %}
