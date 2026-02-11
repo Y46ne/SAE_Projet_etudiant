@@ -414,7 +414,6 @@ class ParametresForm(FlaskForm):
     
     submit = SubmitField('Enregistrer')
 
-
     def validate_nom(self, field):
         valeur = field.data.strip()
         for char in valeur:
@@ -444,7 +443,7 @@ class ParametresForm(FlaskForm):
             nettoyé = s.strip()
             if len(nettoyé) < 3:
                 raise ValidationError("Chaque partie du prénom doit avoir au moins 3 lettres.")
-        
+
 
 class UpdateSinistreForm(FlaskForm):
     statut = SelectField(
@@ -460,6 +459,7 @@ class UpdateSinistreForm(FlaskForm):
     montant_estime = DecimalField('Montant estimé', validators=[Optional()])
     montant_final = DecimalField('Montant final', validators=[Optional()])
     submit = SubmitField('Mettre à jour le sinistre')
+
 
 class ModifierAssureForm(FlaskForm):
     nom = StringField('Nom', validators=[DataRequired(message="Le nom est requis.")])
