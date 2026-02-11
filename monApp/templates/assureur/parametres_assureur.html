@@ -55,7 +55,6 @@
         <div class="form-group {% if form.telephone.errors %}has-error{% endif %}">
             {{ form.telephone.label(class="form-label") }}
             {{ form.telephone(class="form-control") }}
-            
             {% if form.telephone.errors %}
                 {% for error in form.telephone.errors %}
                     <span class="form-error">{{ error }}</span>
