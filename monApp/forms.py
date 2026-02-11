@@ -413,14 +413,36 @@ class ParametresForm(FlaskForm):
     
     submit = SubmitField('Enregistrer')
 
-
     def validate_nom(self, field):
-        check_name_format(field.data, "Le nom", 2)
+        valeur = field.data.strip()
+        for char in valeur:
+            if not (char.isalpha() or char in " -"):
+                raise ValidationError("Le nom ne doit contenir que des lettres.")
+        
+        if valeur.startswith('-') or valeur.endswith('-'):
+            raise ValidationError("Le nom ne peut pas commencer ou finir par un tiret.")
+
+        segments = valeur.split('-')
+        for s in segments:
+            nettoyé = s.strip()
+            if len(nettoyé) < 2:
+                raise ValidationError("Chaque partie du nom doit avoir au moins 2 lettres.")
 
     def validate_prenom(self, field):
-        check_name_format(field.data, "Le prénom", 3)
-
+        valeur = field.data.strip()
+        for char in valeur:
+            if not (char.isalpha() or char in " -"):
+                raise ValidationError("Le prénom ne doit contenir que des lettres.")
         
+        if valeur.startswith('-') or valeur.endswith('-'):
+            raise ValidationError("Le prénom ne peut pas commencer ou finir par un tiret.")
+
+        segments = valeur.split('-')
+        for s in segments:
+            nettoyé = s.strip()
+            if len(nettoyé) < 3:
+                raise ValidationError("Chaque partie du prénom doit avoir au moins 3 lettres.")
+
 
 class UpdateSinistreForm(FlaskForm):
     statut = SelectField(
@@ -437,7 +459,6 @@ class UpdateSinistreForm(FlaskForm):
     montant_final = DecimalField('Montant final', validators=[Optional()])
     submit = SubmitField('Mettre à jour le sinistre')
 
-    
 
 class ModifierAssureForm(FlaskForm):
     nom = StringField('Nom', validators=[DataRequired(message="Le nom est requis.")])
@@ -459,7 +480,6 @@ class ModifierAssureForm(FlaskForm):
 
     def validate_nom(self, field):
         valeur = field.data.strip()
-        
         for char in valeur:
             if not (char.isalpha() or char in " -"):
                 raise ValidationError("Le nom ne doit contenir que des lettres.")
@@ -475,7 +495,6 @@ class ModifierAssureForm(FlaskForm):
 
     def validate_prenom(self, field):
         valeur = field.data.strip()
-        
         for char in valeur:
             if not (char.isalpha() or char in " -"):
                 raise ValidationError("Le prénom ne doit contenir que des lettres.")
