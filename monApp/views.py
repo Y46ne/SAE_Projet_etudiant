@@ -21,6 +21,21 @@ except ImportError:
 import datetime
 import random
 
+# --- Fonctions utilitaires de sécurité (Refactoring) ---
+def verifier_droit_logement(logement):
+    """Vérifie si l'utilisateur connecté a accès au logement."""
+    if current_user.assure_profile not in logement.assures:
+        flash("Vous n'avez pas accès à ce logement.", "danger")
+        return False
+    return True
+
+def verifier_droit_piece(piece):
+    """Vérifie si l'utilisateur connecté a accès à la pièce (via le logement)."""
+    user_logement_ids = [l.id_logement for l in current_user.assure_profile.logements]
+    if piece.id_logement not in user_logement_ids:
+        flash("Vous n'avez pas accès à cette pièce.", "danger")
+        return False
+    return True
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -74,9 +89,7 @@ def info_bien(id):
     bien = Bien.query.get_or_404(id)
     
     # Vérification de sécurité
-    piece = Piece.query.get(bien.id_piece)
-    if piece.id_logement not in [l.id_logement for l in current_user.assure_profile.logements]:
-        flash("Vous n'avez pas accès à ce bien.", "danger")
+    if not verifier_droit_piece(Piece.query.get(bien.id_piece)):
         return redirect(url_for('mes_logements'))
         
     return render_template('info_bien.html', bien=bien)
@@ -287,9 +300,8 @@ def liste_sinistres_client():
 def view_logement_pieces(id):
     logement = Logement.query.get_or_404(id)
     
-    # Vérification de sécurité
-    if current_user.assure_profile not in logement.assures:
-        flash("Vous n'avez pas accès à ce logement.", "danger")
+    # Vérification de sécurité (Refactoring)
+    if not verifier_droit_logement(logement):
         return redirect(url_for('mes_logements'))
         
     return render_template('logement_pieces.html', logement=logement)
@@ -299,9 +311,8 @@ def view_logement_pieces(id):
 @login_required
 def gestion_bien(piece_id):
     piece = Piece.query.get_or_404(piece_id)
-    # Vérification de sécurité
-    if piece.id_logement not in [l.id_logement for l in current_user.assure_profile.logements]:
-        flash("Vous n'avez pas accès à cette pièce.", "danger")
+    # Vérification de sécurité (Refactoring)
+    if not verifier_droit_piece(piece):
         return redirect(url_for('mes_logements'))
         
     biens = Bien.query.filter_by(id_piece=piece.id_piece).all()
@@ -348,9 +359,7 @@ def detail_bien(id):
     bien = Bien.query.get_or_404(id)
     
     # Vérification de sécurité
-    piece = Piece.query.get(bien.id_piece)
-    if piece.id_logement not in [l.id_logement for l in current_user.assure_profile.logements]:
-        flash("Vous n'avez pas accès à ce bien.", "danger")
+    if not verifier_droit_piece(Piece.query.get(bien.id_piece)):
         return redirect(url_for('mes_logements'))
         
     return render_template('detail_bien.html', bien=bien)
@@ -537,9 +546,7 @@ def voir_bien(bien_id):
     bien = Bien.query.get_or_404(bien_id)
     
     # Vérification de sécurité
-    piece = Piece.query.get(bien.id_piece)
-    if piece.id_logement not in [l.id_logement for l in current_user.assure_profile.logements]:
-        flash("Vous n'avez pas accès à ce bien.", "danger")
+    if not verifier_droit_piece(Piece.query.get(bien.id_piece)):
         return redirect(url_for('mes_logements'))
         
     return render_template('info_bien.html', bien=bien)
@@ -551,8 +558,7 @@ def modifier_logement(logement_id):
     logement = Logement.query.get_or_404(logement_id)
     
     # Vérification de sécurité
-    if current_user.assure_profile not in logement.assures:
-        flash("Vous n'avez pas les droits pour modifier ce logement.", "danger")
+    if not verifier_droit_logement(logement):
         return redirect(url_for('mes_logements'))
         
     form = ModifierLogementForm(obj=logement)
@@ -574,9 +580,8 @@ def modifier_logement(logement_id):
 def modifier_piece(piece_id):
     piece = Piece.query.get_or_404(piece_id)
     
-    # Vérification de sécurité
-    if piece.id_logement not in [l.id_logement for l in current_user.assure_profile.logements]:
-        flash("Vous n'avez pas les droits pour modifier cette pièce.", "danger")
+    # Vérification de sécurité (Refactoring)
+    if not verifier_droit_piece(piece):
         return redirect(url_for('mes_logements'))
         
     form = ModifierPieceForm(obj=piece)
@@ -597,9 +602,8 @@ def modifier_piece(piece_id):
 def supprimer_piece(piece_id):
     piece = Piece.query.get_or_404(piece_id)
     
-    # Vérification de sécurité
-    if piece.id_logement not in [l.id_logement for l in current_user.assure_profile.logements]:
-        flash("Vous n'avez pas les droits pour supprimer cette pièce.", "danger")
+    # Vérification de sécurité (Refactoring)
+    if not verifier_droit_piece(piece):
         return redirect(url_for('mes_logements'))
         
     try:
@@ -622,8 +626,7 @@ def delete_logement(id):
     logement = Logement.query.get_or_404(id)
     
     # Vérification de sécurité
-    if current_user.assure_profile not in logement.assures:
-        flash("Vous n'avez pas les droits pour supprimer ce logement.", "danger")
+    if not verifier_droit_logement(logement):
         return redirect(url_for('mes_logements'))
         
     try:
@@ -651,9 +654,7 @@ def modifier_bien(bien_id):
     bien = Bien.query.get_or_404(bien_id)
     
     # Vérification de sécurité
-    piece = Piece.query.get(bien.id_piece)
-    if piece.id_logement not in [l.id_logement for l in current_user.assure_profile.logements]:
-        flash("Vous n'avez pas les droits pour modifier ce bien.", "danger")
+    if not verifier_droit_piece(Piece.query.get(bien.id_piece)):
         return redirect(url_for('mes_logements'))
         
     form = ModifierBienForm(obj=bien)
@@ -683,9 +684,7 @@ def supprimer_bien(bien_id):
     bien = Bien.query.get_or_404(bien_id)
     
     # Vérification de sécurité
-    piece = Piece.query.get(bien.id_piece)
-    if piece.id_logement not in [l.id_logement for l in current_user.assure_profile.logements]:
-        flash("Vous n'avez pas les droits pour supprimer ce bien.", "danger")
+    if not verifier_droit_piece(Piece.query.get(bien.id_piece)):
         return redirect(url_for('mes_logements'))
         
     piece_id = bien.id_piece
@@ -795,8 +794,7 @@ def generer_pdf_logement():
     logement = Logement.query.get_or_404(id_logement)
     
     # Vérification de sécurité
-    if logement not in current_user.assure_profile.logements:
-        flash("Accès interdit à ce logement.", "danger")
+    if not verifier_droit_logement(logement):
         return redirect(url_for('generation_rapport'))
         
     data, total = get_rapport_data([logement])

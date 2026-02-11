@@ -44,7 +44,7 @@ p {
 .btn-primary {
     display: inline-block;
     background-color: #2563eb;
-    color: white !important; 
+    color: white; 
     padding: 0.8rem 1.5rem;
     border-radius: 0.5rem;
     text-decoration: none;
@@ -56,6 +56,5 @@ p {
 
 .btn-primary:hover {
     background-color: #1d4ed8;
-    transform: translateY(-2px);
     box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
 }
