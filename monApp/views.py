@@ -12,6 +12,7 @@ from monApp.database import User, Assure, Assureur, Logement, Piece, Bien, Justi
 from monApp.database.impacte import impacte as impacte_table
 from monApp.forms import *
 from .forms import ChangePasswordForm
+from monApp.utils import verifier_droit_logement, verifier_droit_piece
 
 # Import pour la génération de PDF
 try:
@@ -21,21 +22,6 @@ except ImportError:
 import datetime
 import random
 
-# --- Fonctions utilitaires de sécurité (Refactoring) ---
-def verifier_droit_logement(logement):
-    """Vérifie si l'utilisateur connecté a accès au logement."""
-    if current_user.assure_profile not in logement.assures:
-        flash("Vous n'avez pas accès à ce logement.", "danger")
-        return False
-    return True
-
-def verifier_droit_piece(piece):
-    """Vérifie si l'utilisateur connecté a accès à la pièce (via le logement)."""
-    user_logement_ids = [l.id_logement for l in current_user.assure_profile.logements]
-    if piece.id_logement not in user_logement_ids:
-        flash("Vous n'avez pas accès à cette pièce.", "danger")
-        return False
-    return True
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -103,7 +89,7 @@ def info_bien(id):
         flash("Vous n'avez pas accès à ce bien.", "danger")
         return redirect(url_for('mes_logements'))
         
-    return render_template('info_bien.html', bien=bien)
+    return render_template('assure/info_bien.html', bien=bien)
 
 
 @app.route('/reinitialiser/')
@@ -150,7 +136,7 @@ def tableau_de_bord():
             'valeur_logement': valeur_logement
         })
 
-    return render_template('tableauDeBord.html', 
+    return render_template('assure/tableauDeBord.html', 
                            nb_logements=nb_logements_total, 
                            nb_biens_total=nb_biens_total, 
                            valeur_totale=valeur_totale_globale, 
@@ -231,7 +217,7 @@ def declarer_sinistre():
         return redirect(url_for("tableau_de_bord"))
     
     return render_template(
-        "declarer_sinistre.html",
+        "assure/declarer_sinistre.html",
         form=form,
         logements=logements,
         pieces=pieces,
@@ -274,7 +260,9 @@ def ajouter_logement(id_assure=None):
             return redirect(url_for('logements_assure', id_assure=assure_concerne.id_assure))
         return redirect(url_for('mes_logements'))
 
-    return render_template('ajouter_logement.html', form=form, assure_concerne=assure_concerne)
+    print("-------------------------probleme----------------------")
+    return render_template('assure/ajouter_logement.html', form=form, assure_concerne=assure_concerne)
+
     
 
 @app.route('/mes_logements/')
@@ -286,7 +274,7 @@ def mes_logements():
         return redirect(url_for('liste_assures'))
 
     if current_user.assure_profile.logements == None:
-        return render_template('mes_logements.html', logements=[])
+        return render_template('assure/mes_logements.html', logements=[])
     logements = current_user.assure_profile.logements
     rows = []
     for logement in logements:
@@ -305,7 +293,7 @@ def mes_logements():
             'valeur': valeur_totale
         })
     db.session.commit()
-    return render_template('mes_logements.html', logements=rows)
+    return render_template('assure/mes_logements.html', logements=rows)
 
 
 @app.route('/liste_sinistres_client/')
@@ -318,7 +306,7 @@ def liste_sinistres_client():
     assure = current_user.assure_profile
     logement_ids = [l.id_logement for l in assure.logements]
     sinistres = Sinistre.query.filter(Sinistre.id_logement.in_(logement_ids)).order_by(Sinistre.date_sinistre.desc()).all() if logement_ids else []
-    return render_template('liste_sinistres_client.html', sinistres=sinistres)
+    return render_template('assure/liste_sinistres_client.html', sinistres=sinistres)
 
 
 @app.route('/logement/<int:id>/pieces/')
@@ -344,13 +332,9 @@ def view_logement_pieces(id):
         if current_user.is_assureur:
             return redirect(url_for('liste_assures'))
         return redirect(url_for('mes_logements'))
-
-    return render_template(
-        'logement_pieces.html', 
-        logement=logement, 
-        origin=origin,
-        sinistre_id=sinistre_id
-    )
+        
+    return render_template('assure/logement_pieces.html', logement=logement, origin=origin,
+        sinistre_id=sinistre_id)
 
 
 @app.route('/piece/<int:piece_id>/biens/')
@@ -381,8 +365,7 @@ def gestion_bien(piece_id):
     for bien in biens:
         bien.valeur_actuelle = bien.calculer_valeur_actuelle()
     db.session.commit()
-    
-    return render_template('gestion_bien.html', piece=piece, biens=biens)
+    return render_template('assure/gestion_bien.html', piece=piece, biens=biens)
 
 
 @app.route('/creer-compte/', methods=['GET', 'POST'])
@@ -440,7 +423,7 @@ def detail_bien(id):
             return redirect(url_for('liste_assures'))
         return redirect(url_for('mes_logements'))
         
-    return render_template('detail_bien.html', bien=bien)
+    return render_template('assure/detail_bien.html', bien=bien)
 
 
 @app.route('/parametres/', methods=['GET', 'POST'])
@@ -471,7 +454,7 @@ def parametres():
             db.session.rollback()
             flash(f"Erreur lors de la modification : {e}", "danger")
             
-    return render_template('parametres.html', form=form)
+    return render_template('assure/parametres.html', form=form)
 
 
 @app.route('/changer_mot_de_passe/', methods=['GET', 'POST'])
@@ -541,7 +524,7 @@ def ajouter_piece():
         flash("Nouvelle pièce ajoutée.", "success")
         return redirect(url_for('view_logement_pieces', id=form.logement_id.data))
             
-    return render_template('ajouter_piece.html', form=form, logement_concerne=logement_concerne)
+    return render_template('assure/ajouter_piece.html', form=form, logement_concerne=logement_concerne)
 
 @app.route('/ajouter_bien/', methods=['GET', 'POST'])
 @login_required
@@ -622,7 +605,7 @@ def ajouter_bien():
     liste_pieces_pour_template = [{'id': p.id_piece, 'nom_piece': p.nom_piece, 'id_logement': p.id_logement} for p in user_pieces]
     
     return render_template(
-        'ajouter_bien.html', 
+        'assure/ajouter_bien.html', 
         form=form, 
         liste_logement=liste_logement_pour_template, 
         liste_pieces=liste_pieces_pour_template
@@ -648,7 +631,7 @@ def voir_bien(bien_id):
         flash("Vous n'avez pas accès à ce bien.", "danger")
         return redirect(url_for('mes_logements'))
         
-    return render_template('info_bien.html', bien=bien)
+    return render_template('assure/info_bien.html', bien=bien)
 
 
 @app.route('/modifier_logement/<int:logement_id>/', methods=['GET', 'POST'])
@@ -685,7 +668,7 @@ def modifier_logement(logement_id):
         except Exception as e:
             db.session.rollback()
             flash(f"Erreur lors de la modification : {e}", "danger")
-    return render_template('modifier_logement.html', form=form, logement=logement)
+    return render_template('assure/modifier_logement.html', form=form, logement=logement)
 
 @app.route('/modifier_piece/<int:piece_id>/', methods=['GET', 'POST'])
 @login_required
@@ -715,7 +698,7 @@ def modifier_piece(piece_id):
         except Exception as e:
             db.session.rollback()
             flash(f"Erreur : {e}", "danger")
-    return render_template('modifier_piece.html', form=form, piece=piece)
+    return render_template('assure/modifier_piece.html', form=form, piece=piece)
 
 @app.route('/supprimer_piece/<int:piece_id>/', methods=['POST', 'GET'])
 @login_required
@@ -837,7 +820,7 @@ def modifier_bien(bien_id):
         except Exception as e:
             db.session.rollback()
             flash(f"Erreur : {e}", "danger")
-    return render_template('modifier_bien.html', form=form, bien=bien)
+    return render_template('assure/modifier_bien.html', form=form, bien=bien)
 
 @app.route('/supprimer_bien/<int:bien_id>/', methods=['POST'])
 @login_required
@@ -939,7 +922,7 @@ def get_rapport_data(logements):
 @login_required
 def generation_rapport():
     logements = current_user.assure_profile.logements
-    return render_template('generation_rapport.html', logements=logements)
+    return render_template('assure/generation_rapport.html', logements=logements)
 
 @app.route('/generer_pdf_tous')
 @login_required
@@ -951,7 +934,7 @@ def generer_pdf_tous():
     logements = current_user.assure_profile.logements
     data, total = get_rapport_data(logements)
     
-    html = render_template('pdf_rapport.html', data=data, total_global=total, title="Rapport Global", date_generation=datetime.date.today().strftime('%d/%m/%Y'))
+    html = render_template('assure/pdf_rapport.html', data=data, total_global=total, title="Rapport Global", date_generation=datetime.date.today().strftime('%d/%m/%Y'))
     pdf = HTML(string=html).write_pdf()
     
     response = make_response(pdf)
@@ -979,7 +962,7 @@ def generer_pdf_logement():
         
     data, total = get_rapport_data([logement])
     
-    html = render_template('pdf_rapport.html', data=data, total_global=total, title=f"Rapport - {logement.adresse}", date_generation=datetime.date.today().strftime('%d/%m/%Y'))
+    html = render_template('assure/pdf_rapport.html', data=data, total_global=total, title=f"Rapport - {logement.adresse}", date_generation=datetime.date.today().strftime('%d/%m/%Y'))
     pdf = HTML(string=html).write_pdf()
     
     response = make_response(pdf)
