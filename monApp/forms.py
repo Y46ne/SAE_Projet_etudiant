@@ -507,9 +507,14 @@ class ParametresForm(FlaskForm):
     def validate_nom(self, field):
         valeur = field.data.strip()
         
+        
         for char in valeur:
             if not (char.isalpha() or char in " -"):
                 raise ValidationError("Le nom ne doit contenir que des lettres.")
+            
+
+        if valeur.startswith('-') or valeur.endswith('-'):
+            raise ValidationError("Le nom ne peut pas commencer ou finir par un tiret.")
 
         segments = valeur.split('-')
         for s in segments:
@@ -517,8 +522,7 @@ class ParametresForm(FlaskForm):
             if len(nettoyé) < 2:
                 raise ValidationError("Chaque partie du nom doit avoir au moins 2 lettres.")
         
-        if valeur.startswith('-') or valeur.endswith('-'):
-            raise ValidationError("Le nom ne peut pas commencer ou finir par un tiret.")
+        
 
     def validate_prenom(self, field):
         valeur = field.data.strip()
@@ -526,6 +530,10 @@ class ParametresForm(FlaskForm):
         for char in valeur:
             if not (char.isalpha() or char in " -"):
                 raise ValidationError("Le prénom ne doit contenir que des lettres.")
+            
+        
+        if valeur.startswith('-') or valeur.endswith('-'):
+            raise ValidationError("Le prénom ne peut pas commencer ou finir par un tiret.")
 
         segments = valeur.split('-')
         for s in segments:
@@ -533,8 +541,6 @@ class ParametresForm(FlaskForm):
             if len(nettoyé) < 3:
                 raise ValidationError("Chaque partie du prénom doit avoir au moins 3 lettres.")
 
-        if valeur.startswith('-') or valeur.endswith('-'):
-            raise ValidationError("Le prénom ne peut pas commencer ou finir par un tiret.")
         
 
 class UpdateSinistreForm(FlaskForm):
