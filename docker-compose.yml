@@ -5,20 +5,9 @@ services:
     build: .
     container_name: mobilist_web
     ports:
-      - "5000:5000"
+      - "8088:5000"
     volumes:
       - .:/app
     environment:
       - FLASK_ENV=development
     restart: always
-
-
-
-
-
-
-
-
-
-
-
