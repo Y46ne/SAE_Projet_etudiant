@@ -9,12 +9,12 @@ RUN apt-get update && apt-get install -y \
     libharfbuzz0b libpangoft2-1.0-0 libpangocairo-1.0-0 \
     && apt-get clean
 
+# Installation des dépendances Python
 # On va chercher le requirements qui est dans monApp/
 COPY monApp/requirements.txt .
-
 RUN pip install --no-cache-dir -r requirements.txt
 
-# On copie tout le contenu
+# On copie tout le contenu (y compris config.py et le dossier monApp)
 COPY . .
 
 # Elle permet à 'import config' de fonctionner même si app.py est dans un sous-dossier
@@ -26,6 +26,8 @@ EXPOSE 5000
 
 # Commande de lancement
 CMD python -m flask loaddb monApp/data/data.yml && python -m flask run --host=0.0.0.0
+
+#CMD ["python", "-m", "flask", "run", "--host=0.0.0.0"] # je la met en commentaire parce que je sais pas si c'est celle la qu'il faut garder a cause des conflit
 
 
 
