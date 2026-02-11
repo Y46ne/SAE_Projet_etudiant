@@ -287,12 +287,31 @@ def liste_sinistres_client():
 def view_logement_pieces(id):
     logement = Logement.query.get_or_404(id)
     
-    # Vérification de sécurité
-    if current_user.assure_profile not in logement.assures:
+    origin = request.args.get('origin')
+    sinistre_id = request.args.get('sinistre_id')
+    
+    access_granted = False
+    
+    if current_user.assure_profile and current_user.assure_profile in logement.assures:
+        access_granted = True
+    
+    elif current_user.is_assureur:
+        proprio = logement.assures[0] if logement.assures else None
+        if proprio and proprio.id_assureur == current_user.assureur_profile.id_assureur:
+            access_granted = True
+            
+    if not access_granted:
         flash("Vous n'avez pas accès à ce logement.", "danger")
+        if current_user.is_assureur:
+            return redirect(url_for('liste_assures'))
         return redirect(url_for('mes_logements'))
-        
-    return render_template('logement_pieces.html', logement=logement)
+
+    return render_template(
+        'logement_pieces.html', 
+        logement=logement, 
+        origin=origin,
+        sinistre_id=sinistre_id
+    )
 
 
 @app.route('/piece/<int:piece_id>/biens/')
@@ -1049,6 +1068,7 @@ def creer_compte_utilisateur():
     return render_template('assureur/creer_compte_utilisateur.html', form=form)
 
 
+
 @app.route('/modifier_assure/<int:id>', methods=['GET', 'POST'])
 @login_required
 def modifier_infos_compte(id):
@@ -1080,6 +1100,45 @@ def modifier_infos_compte(id):
             flash(f"Erreur lors de la modification : {e}", "danger")
             
     return render_template('assureur/modifier_infos_compte.html', form=form, assure=assure)
+
+
+
+@app.route('/assureur/assure/<int:id_assure>/logements')
+@login_required
+def logements_assure(id_assure):
+    if not current_user.is_assureur:
+        flash("Accès non autorisé.", "danger")
+        return redirect(url_for('tableau_de_bord'))
+
+    assureur = current_user.assureur_profile
+    assure_cible = Assure.query.get_or_404(id_assure)
+
+    if assure_cible.id_assureur != assureur.id_assureur:
+        flash("Vous n'avez pas les droits sur ce client.", "danger")
+        return redirect(url_for('liste_assures'))
+
+    logements = assure_cible.logements
+    rows = []
+    for logement in logements:
+        valeur_totale = 0
+        nb_biens = 0
+        for piece in logement.pieces:
+            for bien in piece.biens:
+                valeur_reelle = bien.calculer_valeur_actuelle()
+                if valeur_reelle is not None:
+                    valeur_totale += float(valeur_reelle)
+                nb_biens += 1
+        rows.append({
+            'logement': logement,
+            'nb_biens': nb_biens,
+            'valeur': valeur_totale
+        })
+
+    return render_template('mes_logements.html', logements=rows, assure_cible=assure_cible)
+
+
+
+
 
 # ------------------- MAIN -------------------
 if __name__ == '__main__':
