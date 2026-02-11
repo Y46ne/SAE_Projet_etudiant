@@ -878,7 +878,7 @@ def liste_assures():
     return render_template('assureur/liste_assures.html', assures=assures)
 
 
-@app.route('/parametres_assureur/')
+@app.route('/parametres_assureur/', methods=['GET', 'POST'])
 @login_required
 def parametres_assureur():
     if not current_user.assureur_profile:
@@ -886,20 +886,24 @@ def parametres_assureur():
         return redirect(url_for('login'))
     
     assureur = current_user.assureur_profile
+    
     form = ParametresForm(obj=assureur)
 
     if form.validate_on_submit():
         assureur.nom = form.nom.data
         assureur.prenom = form.prenom.data
         assureur.telephone = form.telephone.data
+        
         try:
             db.session.commit()
             flash("Paramètres modifiés avec succès.", "success")
-            return redirect(url_for('parametres_assureur'))
         except Exception as e:
             db.session.rollback()
             flash(f"Erreur lors de la modification : {e}", "danger")
     
+    if form.errors:
+        print("Erreurs de validation Assureur :", form.errors)
+
     return render_template('assureur/parametres_assureur.html', form=form)
 
 @app.route('/detail_sinistre/<int:id>', methods=['GET', 'POST'])
