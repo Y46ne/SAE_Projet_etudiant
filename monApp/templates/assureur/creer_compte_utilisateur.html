@@ -13,60 +13,81 @@
     <form method="POST" class="mt-4">
         {{ form.hidden_tag() }}
         
-        <div class="form-group">
+        <div class="form-group {% if form.nom.errors %}has-error{% endif %}">
             {{ form.nom.label(class="form-label") }}
             {{ form.nom(class="form-control", placeholder="Nom de l'assuré") }}
-            {% for error in form.nom.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
+            
+            {% if form.nom.errors %}
+                {% for error in form.nom.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
         </div>
 
-        <div class="form-group">
+        <div class="form-group {% if form.prenom.errors %}has-error{% endif %}">
             {{ form.prenom.label(class="form-label") }}
             {{ form.prenom(class="form-control", placeholder="Prénom de l'assuré") }}
-            {% for error in form.prenom.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
+            
+            {% if form.prenom.errors %}
+                {% for error in form.prenom.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
         </div>
 
-        <div class="form-group">
+        <div class="form-group {% if form.date_naissance.errors %}has-error{% endif %}">
             {{ form.date_naissance.label(class="form-label") }}
             {{ form.date_naissance(class="form-control", type="date") }}
-            {% for error in form.date_naissance.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
+            
+            {% if form.date_naissance.errors %}
+                {% for error in form.date_naissance.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
         </div>
 
-        <div class="form-group">
+        <div class="form-group {% if form.email.errors %}has-error{% endif %}">
             {{ form.email.label(class="form-label") }}
             {{ form.email(class="form-control", placeholder="exemple@mail.com") }}
-            {% for error in form.email.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
+            
+            {% if form.email.errors %}
+                {% for error in form.email.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
         </div>
 
-        <div class="form-group">
+        <div class="form-group {% if form.telephone.errors %}has-error{% endif %}">
             {{ form.telephone.label(class="form-label") }}
             {{ form.telephone(class="form-control", placeholder="0601020304") }}
-            {% for error in form.telephone.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
+            
+            {% if form.telephone.errors %}
+                {% for error in form.telephone.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
         </div>
 
-        <div class="form-group">
+        <div class="form-group {% if form.Password.errors %}has-error{% endif %}">
             {{ form.Password.label(class="form-label") }}
             {{ form.Password(class="form-control", placeholder="Mot de passe temporaire") }}
-            {% for error in form.Password.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
+            
+            {% if form.Password.errors %}
+                {% for error in form.Password.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
         </div>
 
-        <div class="form-group">
+        <div class="form-group {% if form.confirm.errors %}has-error{% endif %}">
             {{ form.confirm.label(class="form-label") }}
             {{ form.confirm(class="form-control", placeholder="Confirmer le mot de passe") }}
-            {% for error in form.confirm.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
+            
+            {% if form.confirm.errors %}
+                {% for error in form.confirm.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
         </div>
 
         <div class="mt-4">
