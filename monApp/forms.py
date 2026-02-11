@@ -387,7 +387,6 @@ class ModifierBienForm(FlaskForm):
         
 
 
-
 class ParametresForm(FlaskForm):
     nom = StringField(
         'Nom', 
