@@ -21,21 +21,6 @@ except ImportError:
 import datetime
 import random
 
-# --- Fonctions utilitaires de sécurité (Refactoring) ---
-def verifier_droit_logement(logement):
-    """Vérifie si l'utilisateur connecté a accès au logement."""
-    if current_user.assure_profile not in logement.assures:
-        flash("Vous n'avez pas accès à ce logement.", "danger")
-        return False
-    return True
-
-def verifier_droit_piece(piece):
-    """Vérifie si l'utilisateur connecté a accès à la pièce (via le logement)."""
-    user_logement_ids = [l.id_logement for l in current_user.assure_profile.logements]
-    if piece.id_logement not in user_logement_ids:
-        flash("Vous n'avez pas accès à cette pièce.", "danger")
-        return False
-    return True
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -89,7 +74,18 @@ def info_bien(id):
     bien = Bien.query.get_or_404(id)
     
     # Vérification de sécurité
-    if not verifier_droit_piece(Piece.query.get(bien.id_piece)):
+    piece = Piece.query.get(bien.id_piece)
+    
+    access_granted = False
+    if current_user.assure_profile and piece.id_logement in [l.id_logement for l in current_user.assure_profile.logements]:
+        access_granted = True
+    elif current_user.is_assureur:
+        proprio = piece.logement.assures[0] if piece.logement.assures else None
+        if proprio and proprio.id_assureur == current_user.assureur_profile.id_assureur:
+            access_granted = True
+            
+    if not access_granted:
+        flash("Vous n'avez pas accès à ce bien.", "danger")
         return redirect(url_for('mes_logements'))
         
     return render_template('info_bien.html', bien=bien)
@@ -269,6 +265,11 @@ def ajouter_logement(id_assure=None):
 @app.route('/mes_logements/')
 @login_required
 def mes_logements():
+    # Vérification sécurité : si assureur, accès refusé sauf via route dédiée
+    if current_user.is_assureur:
+        # On redirige vers la liste des clients car 'mes_logements' est pour l'assuré
+        return redirect(url_for('liste_assures'))
+
     if current_user.assure_profile.logements == None:
         return render_template('mes_logements.html', logements=[])
     logements = current_user.assure_profile.logements
@@ -618,7 +619,18 @@ def voir_bien(bien_id):
     bien = Bien.query.get_or_404(bien_id)
     
     # Vérification de sécurité
-    if not verifier_droit_piece(Piece.query.get(bien.id_piece)):
+    piece = Piece.query.get(bien.id_piece)
+    
+    access_granted = False
+    if current_user.assure_profile and piece.id_logement in [l.id_logement for l in current_user.assure_profile.logements]:
+        access_granted = True
+    elif current_user.is_assureur:
+        proprio = piece.logement.assures[0] if piece.logement.assures else None
+        if proprio and proprio.id_assureur == current_user.assureur_profile.id_assureur:
+            access_granted = True
+            
+    if not access_granted:
+        flash("Vous n'avez pas accès à ce bien.", "danger")
         return redirect(url_for('mes_logements'))
         
     return render_template('info_bien.html', bien=bien)
@@ -947,7 +959,8 @@ def generer_pdf_logement():
     logement = Logement.query.get_or_404(id_logement)
     
     # Vérification de sécurité
-    if not verifier_droit_logement(logement):
+    if logement not in current_user.assure_profile.logements:
+        flash("Accès interdit à ce logement.", "danger")
         return redirect(url_for('generation_rapport'))
         
     data, total = get_rapport_data([logement])
@@ -1267,10 +1280,6 @@ def logements_assure(id_assure):
         })
 
     return render_template('mes_logements.html', logements=rows, assure_cible=assure_cible)
-
-
-
-
 
 # ------------------- MAIN -------------------
 if __name__ == '__main__':
