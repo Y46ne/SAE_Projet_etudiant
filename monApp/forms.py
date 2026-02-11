@@ -142,7 +142,7 @@ class LogementForm(FlaskForm):
         'Assures',
         query_factory=get_tous_les_assures,
         get_label="email",
-        allow_blank=False            
+        allow_blank=True
     )
     submit = SubmitField('Ajouter le logement')
 

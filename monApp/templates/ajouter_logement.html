@@ -16,7 +16,7 @@
 
         <section class="form-section">
             <div class="card">
-                <form action="{{ url_for('ajouter_logement') }}" method="POST" class="form">
+                <form method="POST" class="form">
                     {{ form.hidden_tag() }}
 
                     <div class="form-group {% if form.nom_logement.errors %}has-error{% endif %}">
@@ -39,7 +39,8 @@
 
                     <div class="form-group {% if form.type_logement.errors %}has-error{% endif %}">
                         {{ form.type_logement.label(class="form-label") }}
-                        {{ form.type_logement(class="form-input") }} {% for error in form.type_logement.errors %}
+                        {{ form.type_logement(class="form-input") }} 
+                        {% for error in form.type_logement.errors %}
                             <span class="form-error">{{ error }}</span>
                         {% endfor %}
                     </div>
@@ -64,7 +65,12 @@
 
                     <div class="form-actions">
                         {{ form.submit(class="btn-primary") }}
-                        <a href="{{ url_for('tableau_de_bord') }}" class="btn-secondary">Annuler</a>
+                        
+                        {% if current_user.is_assureur and assure_concerne %}
+                            <a href="{{ url_for('logements_assure', id_assure=assure_concerne.id_assure) }}" class="btn-secondary">Annuler</a>
+                        {% else %}
+                            <a href="{{ url_for('mes_logements') }}" class="btn-secondary">Annuler</a>
+                        {% endif %}
                     </div>
                 </form>
             </div>
