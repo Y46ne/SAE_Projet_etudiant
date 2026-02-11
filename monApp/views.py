@@ -75,7 +75,18 @@ def info_bien(id):
     bien = Bien.query.get_or_404(id)
     
     # Vérification de sécurité
-    if not verifier_droit_piece(Piece.query.get(bien.id_piece)):
+    piece = Piece.query.get(bien.id_piece)
+    
+    access_granted = False
+    if current_user.assure_profile and piece.id_logement in [l.id_logement for l in current_user.assure_profile.logements]:
+        access_granted = True
+    elif current_user.is_assureur:
+        proprio = piece.logement.assures[0] if piece.logement.assures else None
+        if proprio and proprio.id_assureur == current_user.assureur_profile.id_assureur:
+            access_granted = True
+            
+    if not access_granted:
+        flash("Vous n'avez pas accès à ce bien.", "danger")
         return redirect(url_for('mes_logements'))
         
     return render_template('assure/info_bien.html', bien=bien)
@@ -214,11 +225,25 @@ def declarer_sinistre():
     )
 
 @app.route('/ajouter_logement/', methods=['GET', 'POST'])
+@app.route('/ajouter_logement/<int:id_assure>', methods=['GET', 'POST'])
 @login_required
-def ajouter_logement():
+def ajouter_logement(id_assure=None):
     form = LogementForm()
-    if form.validate_on_submit():
+    assure_concerne = None
+    
+    if current_user.is_assureur:
+        if id_assure:
+            assure_concerne = Assure.query.get_or_404(id_assure)
+            if assure_concerne.id_assureur != current_user.assureur_profile.id_assureur:
+                flash("Accès interdit.", "danger")
+                return redirect(url_for('liste_assures'))
+        else:
+            flash("Erreur : Client non spécifié.", "danger")
+            return redirect(url_for('liste_assures'))
+    else:
+        assure_concerne = current_user.assure_profile
 
+    if form.validate_on_submit():
         insertedLogement = Logement(
             nom_logement=form.nom_logement.data,
             adresse=form.adresse.data,
@@ -226,25 +251,28 @@ def ajouter_logement():
             surface=form.surface.data, 
             description=form.description.data
         )
-
-        assure_connecte = current_user.assure_profile
-        insertedLogement.assures.append(assure_connecte)
-
+        insertedLogement.assures.append(assure_concerne)
         db.session.add(insertedLogement)
         db.session.commit()
+        flash("Logement ajouté avec succès.", "success")
         
-        print("-------------------------logement ajoute----------------------")
-
+        if current_user.is_assureur:
+            return redirect(url_for('logements_assure', id_assure=assure_concerne.id_assure))
         return redirect(url_for('mes_logements'))
 
     print("-------------------------probleme----------------------")
-    return render_template('assure/ajouter_logement.html', form=form)
+    return render_template('assure/ajouter_logement.html', form=form, assure_concerne=assure_concerne)
 
     
 
 @app.route('/mes_logements/')
 @login_required
 def mes_logements():
+    # Vérification sécurité : si assureur, accès refusé sauf via route dédiée
+    if current_user.is_assureur:
+        # On redirige vers la liste des clients car 'mes_logements' est pour l'assuré
+        return redirect(url_for('liste_assures'))
+
     if current_user.assure_profile.logements == None:
         return render_template('assure/mes_logements.html', logements=[])
     logements = current_user.assure_profile.logements
@@ -286,23 +314,54 @@ def liste_sinistres_client():
 def view_logement_pieces(id):
     logement = Logement.query.get_or_404(id)
     
-    # Vérification de sécurité (Refactoring)
-    if not verifier_droit_logement(logement):
+    origin = request.args.get('origin')
+    sinistre_id = request.args.get('sinistre_id')
+    
+    access_granted = False
+    
+    if current_user.assure_profile and current_user.assure_profile in logement.assures:
+        access_granted = True
+    
+    elif current_user.is_assureur:
+        proprio = logement.assures[0] if logement.assures else None
+        if proprio and proprio.id_assureur == current_user.assureur_profile.id_assureur:
+            access_granted = True
+            
+    if not access_granted:
+        flash("Vous n'avez pas accès à ce logement.", "danger")
+        if current_user.is_assureur:
+            return redirect(url_for('liste_assures'))
         return redirect(url_for('mes_logements'))
         
-    return render_template('assure/logement_pieces.html', logement=logement)
+    return render_template('assure/logement_pieces.html', logement=logement, origin=origin,
+        sinistre_id=sinistre_id)
 
 
 @app.route('/piece/<int:piece_id>/biens/')
 @login_required
 def gestion_bien(piece_id):
     piece = Piece.query.get_or_404(piece_id)
-    # Vérification de sécurité (Refactoring)
-    if not verifier_droit_piece(piece):
+    
+    access_granted = False
+    
+    if current_user.assure_profile:
+        if piece.id_logement in [l.id_logement for l in current_user.assure_profile.logements]:
+            access_granted = True
+            
+    elif current_user.is_assureur:
+        logement = piece.logement
+        proprio = logement.assures[0] if logement.assures else None
+        
+        if proprio and proprio.id_assureur == current_user.assureur_profile.id_assureur:
+            access_granted = True
+    
+    if not access_granted:
+        flash("Vous n'avez pas accès à cette pièce.", "danger")
+        if current_user.is_assureur:
+            return redirect(url_for('liste_assures'))
         return redirect(url_for('mes_logements'))
         
     biens = Bien.query.filter_by(id_piece=piece.id_piece).all()
-    # Met à jour la valeur actuelle pour chaque bien si besoin
     for bien in biens:
         bien.valeur_actuelle = bien.calculer_valeur_actuelle()
     db.session.commit()
@@ -344,8 +403,24 @@ def creer_compte():
 def detail_bien(id):
     bien = Bien.query.get_or_404(id)
     
-    # Vérification de sécurité
-    if not verifier_droit_piece(Piece.query.get(bien.id_piece)):
+    piece = bien.piece
+    access_granted = False
+    
+    if current_user.assure_profile:
+        if piece.id_logement in [l.id_logement for l in current_user.assure_profile.logements]:
+            access_granted = True
+            
+    elif current_user.is_assureur:
+        logement = piece.logement
+        proprio = logement.assures[0] if logement.assures else None
+        
+        if proprio and proprio.id_assureur == current_user.assureur_profile.id_assureur:
+            access_granted = True
+    
+    if not access_granted:
+        flash("Vous n'avez pas accès à ce bien.", "danger")
+        if current_user.is_assureur:
+            return redirect(url_for('liste_assures'))
         return redirect(url_for('mes_logements'))
         
     return render_template('assure/detail_bien.html', bien=bien)
@@ -429,34 +504,49 @@ def changer_mot_de_passe():
 @login_required
 def ajouter_piece():
     form = PieceForm()
-    logements = current_user.assure_profile.logements
-    form.logement_id.choices = [(l.id_logement, l.nom_logement) for l in logements]
+    logement_id_arg = request.args.get('logement_id')
+    logement_concerne = None
+    
+    if logement_id_arg:
+        logement_concerne = Logement.query.get(logement_id_arg)
+        form.logement_id.choices = [(logement_concerne.id_logement, logement_concerne.nom_logement)]
+    elif current_user.assure_profile:
+        form.logement_id.choices = [(l.id_logement, l.nom_logement) for l in current_user.assure_profile.logements]
 
     if form.validate_on_submit():
-        try:
-            nouvelle_piece = Piece(
-                nom_piece=form.nom_piece.data,
-                surface=form.surface.data,
-                id_logement=form.logement_id.data
-            )
-            db.session.add(nouvelle_piece)
-            db.session.commit()
-            flash("Nouvelle pièce ajoutée avec succès !", "success")
-            return redirect(url_for('mes_logements'))
-        except Exception as e:
-            db.session.rollback()
-            flash(f"Erreur lors de l'ajout de la pièce : {e}", "danger")
-    if form.errors:
-        print("Erreurs du formulaire :", form.errors)
-    return render_template('assure/ajouter_piece.html', form=form)
+        nouvelle_piece = Piece(
+            nom_piece=form.nom_piece.data,
+            surface=form.surface.data,
+            id_logement=form.logement_id.data
+        )
+        db.session.add(nouvelle_piece)
+        db.session.commit()
+        flash("Nouvelle pièce ajoutée.", "success")
+        return redirect(url_for('view_logement_pieces', id=form.logement_id.data))
+            
+    return render_template('assure/ajouter_piece.html', form=form, logement_concerne=logement_concerne)
 
 @app.route('/ajouter_bien/', methods=['GET', 'POST'])
 @login_required
 def ajouter_bien():
-
     form = AjouterBienForm()
-    assure_profil = current_user.assure_profile
-    user_logements = assure_profil.logements
+    
+    user_logements = []
+    
+    target_piece_id = request.args.get('piece_id')
+    target_logement_id = request.args.get('logement_id')
+    
+    if current_user.is_assureur:
+        if target_piece_id:
+            piece = Piece.query.get(target_piece_id)
+            if piece:
+                user_logements = [piece.logement]
+        elif target_logement_id:
+            logement = Logement.query.get(target_logement_id)
+            if logement:
+                user_logements = [logement]
+    elif current_user.assure_profile:
+        user_logements = current_user.assure_profile.logements
     
     user_pieces = []
     for log in user_logements:
@@ -469,52 +559,47 @@ def ajouter_bien():
         try:
             fichier_facture = form.facture.data
             if not fichier_facture:
-                flash("L'ajout d'un justificatif est obligatoire.", "danger")
+                flash("Justificatif obligatoire.", "danger")
             else:
                 filename = secure_filename(fichier_facture.filename)
-                file_ext = os.path.splitext(filename)[1].lower()
 
-                if file_ext not in ['.pdf', '.png', '.jpg', '.jpeg']:
-                    flash("Format de fichier non supporté. Veuillez utiliser PDF, PNG, JPG ou JPEG.", "danger")
+                nouveau_bien = Bien(
+                    nom_bien=form.nom_bien.data,
+                    prix_achat=form.prix_achat.data,
+                    categorie=form.categorie.data,
+                    date_achat=form.date_achat.data,
+                    id_piece=form.piece_id.data
+                )
+                db.session.add(nouveau_bien)
+                db.session.flush()
+                
+                owner_id = 0
+                if current_user.assure_profile:
+                    owner_id = current_user.id_assure
                 else:
-                    nouveau_bien = Bien(
-                        nom_bien=form.nom_bien.data,
-                        prix_achat=form.prix_achat.data,
-                        categorie=form.categorie.data,
-                        date_achat=form.date_achat.data,
-                        id_piece=form.piece_id.data
-                    )
-                    
-                    db.session.add(nouveau_bien)
-                    db.session.flush() 
-
-                    user_folder = os.path.join(app.config['UPLOAD_FOLDER'], f"assure_{current_user.id_assure}")
-                    os.makedirs(user_folder, exist_ok=True)
-                    
-                    file_path = os.path.join(user_folder, f"bien_{nouveau_bien.id_bien}_{filename}")
-                    fichier_facture.save(file_path)
-                    
-                    relative_path = os.path.join(f"assure_{current_user.id_assure}", f"bien_{nouveau_bien.id_bien}_{filename}")
-
-                    nouveau_justificatif = Justificatif(
-                        chemin_fichier=relative_path,
-                        type_justificatif="Facture",
-                        id_bien=nouveau_bien.id_bien
-                    )
-                    db.session.add(nouveau_justificatif)
-
-                    db.session.commit()
-                    flash("Nouveau bien ajouté avec succès !", "success")
-                    # Récupérer la pièce et le logement associés
                     piece = Piece.query.get(nouveau_bien.id_piece)
-                    if piece:
-                        return redirect(url_for('gestion_bien', piece_id=piece.id_piece))
-                    else:
-                        return redirect(url_for('mes_logements'))
+                    owner_id = piece.logement.assures[0].id_assure
+
+                user_folder = os.path.join(app.config['UPLOAD_FOLDER'], f"assure_{owner_id}")
+                os.makedirs(user_folder, exist_ok=True)
+                file_path = os.path.join(user_folder, f"bien_{nouveau_bien.id_bien}_{filename}")
+                fichier_facture.save(file_path)
+                
+                relative_path = os.path.join(f"assure_{owner_id}", f"bien_{nouveau_bien.id_bien}_{filename}")
+                nouveau_justificatif = Justificatif(
+                    chemin_fichier=relative_path,
+                    type_justificatif="Facture",
+                    id_bien=nouveau_bien.id_bien
+                )
+                db.session.add(nouveau_justificatif)
+                db.session.commit()
+                
+                flash("Bien ajouté avec succès !", "success")
+                return redirect(url_for('gestion_bien', piece_id=nouveau_bien.id_piece))
 
         except Exception as e:
             db.session.rollback()
-            flash(f"Erreur lors de l'ajout du bien : {e}", "danger")
+            flash(f"Erreur ajout bien : {e}", "danger")
 
     liste_logement_pour_template = [{'id': l.id_logement, 'nom': l.nom_logement, 'adresse': l.adresse} for l in user_logements]
     liste_pieces_pour_template = [{'id': p.id_piece, 'nom_piece': p.nom_piece, 'id_logement': p.id_logement} for p in user_pieces]
@@ -532,7 +617,18 @@ def voir_bien(bien_id):
     bien = Bien.query.get_or_404(bien_id)
     
     # Vérification de sécurité
-    if not verifier_droit_piece(Piece.query.get(bien.id_piece)):
+    piece = Piece.query.get(bien.id_piece)
+    
+    access_granted = False
+    if current_user.assure_profile and piece.id_logement in [l.id_logement for l in current_user.assure_profile.logements]:
+        access_granted = True
+    elif current_user.is_assureur:
+        proprio = piece.logement.assures[0] if piece.logement.assures else None
+        if proprio and proprio.id_assureur == current_user.assureur_profile.id_assureur:
+            access_granted = True
+            
+    if not access_granted:
+        flash("Vous n'avez pas accès à ce bien.", "danger")
         return redirect(url_for('mes_logements'))
         
     return render_template('assure/info_bien.html', bien=bien)
@@ -543,8 +639,16 @@ def voir_bien(bien_id):
 def modifier_logement(logement_id):
     logement = Logement.query.get_or_404(logement_id)
     
-    # Vérification de sécurité
-    if not verifier_droit_logement(logement):
+    access_granted = False
+    if current_user.assure_profile and current_user.assure_profile in logement.assures:
+        access_granted = True
+    elif current_user.is_assureur:
+        proprio = logement.assures[0] if logement.assures else None
+        if proprio and proprio.id_assureur == current_user.assureur_profile.id_assureur:
+            access_granted = True
+            
+    if not access_granted:
+        flash("Vous n'avez pas les droits pour modifier ce logement.", "danger")
         return redirect(url_for('mes_logements'))
         
     form = ModifierLogementForm(obj=logement)
@@ -555,7 +659,12 @@ def modifier_logement(logement_id):
         try:
             db.session.commit()
             flash("Logement modifié avec succès.", "success")
+            
+            if current_user.is_assureur:
+                proprio = logement.assures[0]
+                return redirect(url_for('logements_assure', id_assure=proprio.id_assure))
             return redirect(url_for('mes_logements'))
+            
         except Exception as e:
             db.session.rollback()
             flash(f"Erreur lors de la modification : {e}", "danger")
@@ -566,8 +675,16 @@ def modifier_logement(logement_id):
 def modifier_piece(piece_id):
     piece = Piece.query.get_or_404(piece_id)
     
-    # Vérification de sécurité (Refactoring)
-    if not verifier_droit_piece(piece):
+    access_granted = False
+    if current_user.assure_profile and piece.id_logement in [l.id_logement for l in current_user.assure_profile.logements]:
+        access_granted = True
+    elif current_user.is_assureur:
+        proprio = piece.logement.assures[0] if piece.logement.assures else None
+        if proprio and proprio.id_assureur == current_user.assureur_profile.id_assureur:
+            access_granted = True
+            
+    if not access_granted:
+        flash("Accès refusé.", "danger")
         return redirect(url_for('mes_logements'))
         
     form = ModifierPieceForm(obj=piece)
@@ -580,58 +697,96 @@ def modifier_piece(piece_id):
             return redirect(url_for('view_logement_pieces', id=piece.id_logement))
         except Exception as e:
             db.session.rollback()
-            flash(f"Erreur lors de la modification : {e}", "danger")
+            flash(f"Erreur : {e}", "danger")
     return render_template('assure/modifier_piece.html', form=form, piece=piece)
 
 @app.route('/supprimer_piece/<int:piece_id>/', methods=['POST', 'GET'])
 @login_required
 def supprimer_piece(piece_id):
     piece = Piece.query.get_or_404(piece_id)
+    logement_id = piece.id_logement
     
-    # Vérification de sécurité (Refactoring)
-    if not verifier_droit_piece(piece):
+    access_granted = False
+    if current_user.assure_profile and logement_id in [l.id_logement for l in current_user.assure_profile.logements]:
+        access_granted = True
+    elif current_user.is_assureur:
+        proprio = piece.logement.assures[0] if piece.logement.assures else None
+        if proprio and proprio.id_assureur == current_user.assureur_profile.id_assureur:
+            access_granted = True
+            
+    if not access_granted:
+        flash("Accès refusé.", "danger")
         return redirect(url_for('mes_logements'))
         
     try:
         for bien in piece.biens:
             justificatifs = Justificatif.query.filter_by(id_bien=bien.id_bien).all()
             for j in justificatifs:
+                if j.chemin_fichier:
+                    full_path = os.path.join(app.config['UPLOAD_FOLDER'], j.chemin_fichier)
+                    if os.path.exists(full_path):
+                        try:
+                            os.remove(full_path)
+                        except Exception:
+                            pass
                 db.session.delete(j)
             db.session.delete(bien)
+        
         db.session.delete(piece)
         db.session.commit()
-        flash("Pièce et tous ses biens supprimés avec succès.", "success")
+        flash("Pièce et fichiers associés supprimés.", "success")
     except Exception as e:
         db.session.rollback()
-        flash(f"Erreur lors de la suppression : {e}", "danger")
-    return redirect(url_for('view_logement_pieces', id=piece.id_logement))
+        flash(f"Erreur suppression : {e}", "danger")
+    return redirect(url_for('view_logement_pieces', id=logement_id))
 
 @app.route('/logement/<int:id>/delete', methods=['POST'])
 @login_required
 def delete_logement(id):
     logement = Logement.query.get_or_404(id)
     
-    # Vérification de sécurité
-    if not verifier_droit_logement(logement):
+    access_granted = False
+    if current_user.assure_profile and current_user.assure_profile in logement.assures:
+        access_granted = True
+    elif current_user.is_assureur:
+        proprio = logement.assures[0] if logement.assures else None
+        if proprio and proprio.id_assureur == current_user.assureur_profile.id_assureur:
+            access_granted = True
+            
+    if not access_granted:
+        flash("Vous n'avez pas les droits pour supprimer ce logement.", "danger")
         return redirect(url_for('mes_logements'))
         
+    proprio_id = logement.assures[0].id_assure if logement.assures else None
+
     try:
         for sinistre in logement.sinistres:
             db.session.delete(sinistre)
+            
         for piece in logement.pieces:
             for bien in piece.biens:
                 justificatifs = Justificatif.query.filter_by(id_bien=bien.id_bien).all()
                 for j in justificatifs:
+                    if j.chemin_fichier:
+                        full_path = os.path.join(app.config['UPLOAD_FOLDER'], j.chemin_fichier)
+                        if os.path.exists(full_path):
+                            try:
+                                os.remove(full_path)
+                            except Exception:
+                                pass
                     db.session.delete(j)
                 db.session.delete(bien)
             db.session.delete(piece)
+            
         db.session.delete(logement)
         db.session.commit()
-        flash('Logement et toutes ses pièces et biens supprimés.', 'success')
+        flash('Logement et tous les fichiers associés supprimés.', 'success')
     except Exception as e:
         db.session.rollback()
-        print("Erreur suppression :", e)
         flash(f'Erreur lors de la suppression : {e}', 'danger')
+    
+    if current_user.is_assureur and proprio_id:
+        return redirect(url_for('logements_assure', id_assure=proprio_id))
     return redirect(url_for('mes_logements'))
 
 @app.route('/modifier_bien/<int:bien_id>/', methods=['GET', 'POST'])
@@ -639,12 +794,19 @@ def delete_logement(id):
 def modifier_bien(bien_id):
     bien = Bien.query.get_or_404(bien_id)
     
-    # Vérification de sécurité
-    if not verifier_droit_piece(Piece.query.get(bien.id_piece)):
+    access_granted = False
+    if current_user.assure_profile and bien.piece.id_logement in [l.id_logement for l in current_user.assure_profile.logements]:
+        access_granted = True
+    elif current_user.is_assureur:
+        proprio = bien.piece.logement.assures[0] if bien.piece.logement.assures else None
+        if proprio and proprio.id_assureur == current_user.assureur_profile.id_assureur:
+            access_granted = True
+    
+    if not access_granted:
+        flash("Accès refusé.", "danger")
         return redirect(url_for('mes_logements'))
         
     form = ModifierBienForm(obj=bien)
-
     if form.validate_on_submit():
         bien.nom_bien = form.nom_bien.data
         bien.categorie = form.categorie.data
@@ -653,37 +815,52 @@ def modifier_bien(bien_id):
         bien.valeur_actuelle = bien.calculer_valeur_actuelle()
         try:
             db.session.commit()
-            flash("Bien modifié avec succès.", "success")
-            piece = Piece.query.get(bien.id_piece)
-            if piece:
-                return redirect(url_for('gestion_bien', piece_id=piece.id_piece))
-            else:
-                return redirect(url_for('mes_logements'))
+            flash("Bien modifié.", "success")
+            return redirect(url_for('gestion_bien', piece_id=bien.id_piece))
         except Exception as e:
             db.session.rollback()
-            flash(f"Erreur lors de la modification : {e}", "danger")
+            flash(f"Erreur : {e}", "danger")
     return render_template('assure/modifier_bien.html', form=form, bien=bien)
 
 @app.route('/supprimer_bien/<int:bien_id>/', methods=['POST'])
 @login_required
 def supprimer_bien(bien_id):
     bien = Bien.query.get_or_404(bien_id)
+    piece_id = bien.id_piece
     
-    # Vérification de sécurité
-    if not verifier_droit_piece(Piece.query.get(bien.id_piece)):
+    access_granted = False
+    if current_user.assure_profile and bien.piece.id_logement in [l.id_logement for l in current_user.assure_profile.logements]:
+        access_granted = True
+    elif current_user.is_assureur:
+        proprio = bien.piece.logement.assures[0] if bien.piece.logement.assures else None
+        if proprio and proprio.id_assureur == current_user.assureur_profile.id_assureur:
+            access_granted = True
+            
+    if not access_granted:
+        flash("Accès refusé.", "danger")
         return redirect(url_for('mes_logements'))
         
-    piece_id = bien.id_piece
     try:
         justificatifs = Justificatif.query.filter_by(id_bien=bien.id_bien).all()
         for j in justificatifs:
+            if j.chemin_fichier:
+                full_path = os.path.join(app.config['UPLOAD_FOLDER'], j.chemin_fichier)
+                if os.path.exists(full_path):
+                    try:
+                        os.remove(full_path)
+                    except Exception as e:
+                        print(f"Erreur suppression fichier : {e}")
+            # -----------------------------------------------
+
             db.session.delete(j)
+        
         db.session.delete(bien)
         db.session.commit()
-        flash("Bien supprimé avec succès.", "success")
+        flash("Bien et justificatifs supprimés.", "success")
     except Exception as e:
         db.session.rollback()
-        flash(f"Erreur lors de la suppression : {e}", "danger")
+        flash(f"Erreur : {e}", "danger")
+    
     return redirect(url_for('gestion_bien', piece_id=piece_id))
 
 
@@ -1033,6 +1210,7 @@ def creer_compte_utilisateur():
     return render_template('assureur/creer_compte_utilisateur.html', form=form)
 
 
+
 @app.route('/modifier_assure/<int:id>', methods=['GET', 'POST'])
 @login_required
 def modifier_infos_compte(id):
@@ -1064,6 +1242,41 @@ def modifier_infos_compte(id):
             flash(f"Erreur lors de la modification : {e}", "danger")
             
     return render_template('assureur/modifier_infos_compte.html', form=form, assure=assure)
+
+
+
+@app.route('/assureur/assure/<int:id_assure>/logements')
+@login_required
+def logements_assure(id_assure):
+    if not current_user.is_assureur:
+        flash("Accès non autorisé.", "danger")
+        return redirect(url_for('tableau_de_bord'))
+
+    assureur = current_user.assureur_profile
+    assure_cible = Assure.query.get_or_404(id_assure)
+
+    if assure_cible.id_assureur != assureur.id_assureur:
+        flash("Vous n'avez pas les droits sur ce client.", "danger")
+        return redirect(url_for('liste_assures'))
+
+    logements = assure_cible.logements
+    rows = []
+    for logement in logements:
+        valeur_totale = 0
+        nb_biens = 0
+        for piece in logement.pieces:
+            for bien in piece.biens:
+                valeur_reelle = bien.calculer_valeur_actuelle()
+                if valeur_reelle is not None:
+                    valeur_totale += float(valeur_reelle)
+                nb_biens += 1
+        rows.append({
+            'logement': logement,
+            'nb_biens': nb_biens,
+            'valeur': valeur_totale
+        })
+
+    return render_template('mes_logements.html', logements=rows, assure_cible=assure_cible)
 
 # ------------------- MAIN -------------------
 if __name__ == '__main__':

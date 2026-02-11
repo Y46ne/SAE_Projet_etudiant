@@ -20,10 +20,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class="action-buttons">
-                
-            </div>
         </div>
 
         <div class="info-grid">
@@ -62,15 +58,27 @@
         <div class="media-card">
             <h2>Actions de l'assureur</h2>
             <form method="POST" action="{{ url_for('detail_sinistre', id=sinistre.id_sinistre) }}">
-                {% from "_formhelpers.html" import render_field %}
                 {{ form.hidden_tag() }}
-                {{ render_field(form.statut) }}
-                {{ render_field(form.montant_estime) }}
-                {{ render_field(form.montant_final) }}
-                {{ form.submit(class="btn btn-primary mt-3") }}
+                
+                <div class="form-group mb-3">
+                    {{ form.statut.label(class="form-label") }}
+                    {{ form.statut(class="form-control") }}
+                </div>
+                
+                <div class="form-group mb-3">
+                    {{ form.montant_estime.label(class="form-label") }}
+                    {{ form.montant_estime(class="form-control") }}
+                </div>
+                
+                <div class="form-group mb-3">
+                    {{ form.montant_final.label(class="form-label") }}
+                    {{ form.montant_final(class="form-control") }}
+                </div>
+
+                {{ form.submit(class="btn btn-primary mt-2") }}
             </form>
         </div>
-        {%endif%}
+        {% endif %}
 
         <div class="media-card">
             <h2>Biens impactés</h2>
@@ -87,6 +95,10 @@
                         <tr>
                             <td class="font-weight-medium">{{ bien.nom_bien }}</td>
                             <td class="text-right text-danger font-weight-bold">{{ "%.2f"|format(degat) }} €</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="2">Aucun bien listé pour ce sinistre.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -107,9 +119,10 @@
                 <p><strong>Prénom:</strong> {{ assure.prenom }}</p>
                 <p><strong>Email:</strong> {{ assure.email }}</p>
                 <p><strong>Téléphone:</strong> {{ assure.telephone or 'Non renseigné' }}</p>
-            {% if current_user.is_assureur %}
-                <a href="{{ url_for('detail_assure', id=assure.id_assure) }}" class="btn btn-info">Voir l'assuré</a>
-            {%endif%}
+                
+                {% if current_user.is_assureur %}
+                    <a href="{{ url_for('detail_assure', id=assure.id_assure) }}" class="btn btn-info mt-2">Voir l'assuré</a>
+                {% endif %}
             </div>
             {% else %}
             <div class="empty-state"><p>Aucun assuré lié à ce sinistre.</p></div>
@@ -121,7 +134,10 @@
             {% if logement %}
             <div class="logement-info-card">
                 <p><strong>Adresse:</strong> {{ logement.adresse }}</p>
-                <a href="{{ url_for('view_logement_pieces', id=logement.id_logement) }}" class="btn btn-info">Voir le logement</a>
+                
+                <a href="{{ url_for('view_logement_pieces', id=logement.id_logement, origin='sinistre', sinistre_id=sinistre.id_sinistre) }}" class="btn btn-info mt-2">
+                    Voir le logement
+                </a>
             </div>
             {% else %}
             <div class="empty-state"><p>Aucun logement lié à ce sinistre.</p></div>
@@ -130,7 +146,11 @@
     </div>
 
     <div class="back-button mt-4">
-        <a href="{{ url_for('liste_sinistres') }}" class="btn btn-secondary">Retour à la liste des sinistres</a>
+        {% if current_user.is_assureur %}
+            <a href="{{ url_for('liste_sinistres') }}" class="btn btn-secondary">Retour à la liste des sinistres</a>
+        {% else %}
+            <a href="{{ url_for('liste_sinistres_client') }}" class="btn btn-secondary">Retour à mes sinistres</a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
