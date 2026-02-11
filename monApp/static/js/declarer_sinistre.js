@@ -9,6 +9,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const summaryTbody = document.getElementById('summary-tbody');
     let isDirty = false;
 
+    // --- Accessibilité RGAA ---
+    // On ajoute aria-live pour que les changements de total soient annoncés
+    if (totalDisplay) {
+        totalDisplay.setAttribute('aria-live', 'polite');
+    }
+
     // --- Gestion Saleté formulaire ---
     const form = document.querySelector('.sinistre-form');
     if(form){
