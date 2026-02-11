@@ -72,10 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             row.style.display = show ? '' : 'none';
 
-            // --- CORRECTION ICI ---
-            // J'ai supprimé la ligne qui décochait la case si show == false.
-            // Maintenant, le bien reste coché même s'il est masqué, 
-            // tant qu'il appartient au bon logement.
         });
 
         calculateTotal();
@@ -90,10 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         checkboxes.forEach(checkbox => {
             const row = checkbox.closest('tr');
-            
-            // On ne compte que si :
-            // 1. La case est cochée
-            // 2. Le bien appartient au logement ACTUELLEMENT sélectionné (Sécurité)
+
             if (checkbox.checked && row.dataset.residence === currentLogementId) {
                 hasChecked = true;
                 
@@ -128,7 +121,6 @@ document.addEventListener('DOMContentLoaded', function() {
         pieceSelect.disabled = true;
         rows.forEach(r => r.style.display = 'none');
     } else {
-        // Cas rechargement page après erreur
         pieceSelect.disabled = false;
         applyFilters(); 
     }
