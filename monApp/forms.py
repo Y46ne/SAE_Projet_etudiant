@@ -478,6 +478,7 @@ class ModifierBienForm(FlaskForm):
             raise ValidationError("Le prix d'achat ne peut pas être négatif.")
         
 
+
 class ParametresForm(FlaskForm):
     nom = StringField(
         'Nom', 
@@ -491,7 +492,7 @@ class ParametresForm(FlaskForm):
     
     email = StringField(
         'Email', 
-        render_kw={'disabled': True} 
+        validators=[DataRequired(), Email()] 
     )
     
     telephone = StringField(
@@ -504,12 +505,18 @@ class ParametresForm(FlaskForm):
     
     submit = SubmitField('Enregistrer')
 
+
     def validate_nom(self, field):
         valeur = field.data.strip()
+        
         
         for char in valeur:
             if not (char.isalpha() or char in " -"):
                 raise ValidationError("Le nom ne doit contenir que des lettres.")
+            
+
+        if valeur.startswith('-') or valeur.endswith('-'):
+            raise ValidationError("Le nom ne peut pas commencer ou finir par un tiret.")
 
         segments = valeur.split('-')
         for s in segments:
@@ -517,8 +524,7 @@ class ParametresForm(FlaskForm):
             if len(nettoyé) < 2:
                 raise ValidationError("Chaque partie du nom doit avoir au moins 2 lettres.")
         
-        if valeur.startswith('-') or valeur.endswith('-'):
-            raise ValidationError("Le nom ne peut pas commencer ou finir par un tiret.")
+        
 
     def validate_prenom(self, field):
         valeur = field.data.strip()
@@ -526,6 +532,10 @@ class ParametresForm(FlaskForm):
         for char in valeur:
             if not (char.isalpha() or char in " -"):
                 raise ValidationError("Le prénom ne doit contenir que des lettres.")
+            
+        
+        if valeur.startswith('-') or valeur.endswith('-'):
+            raise ValidationError("Le prénom ne peut pas commencer ou finir par un tiret.")
 
         segments = valeur.split('-')
         for s in segments:
@@ -533,8 +543,6 @@ class ParametresForm(FlaskForm):
             if len(nettoyé) < 3:
                 raise ValidationError("Chaque partie du prénom doit avoir au moins 3 lettres.")
 
-        if valeur.startswith('-') or valeur.endswith('-'):
-            raise ValidationError("Le prénom ne peut pas commencer ou finir par un tiret.")
         
 
 class UpdateSinistreForm(FlaskForm):
@@ -569,11 +577,55 @@ class ModifierAssureForm(FlaskForm):
     email = StringField('Adresse e-mail', validators=[DataRequired(), Email()])
     submit = SubmitField('Enregistrer les modifications')
 
-    def validate_date_naissance(self, field):
-        date_str = field.data
+    def validate_nom(self, field):
+        valeur = field.data.strip()
+        
+        for char in valeur:
+            if not (char.isalpha() or char in " -"):
+                raise ValidationError("Le nom ne doit contenir que des lettres.")
+
+        segments = valeur.split('-')
+        for s in segments:
+            nettoyé = s.strip()
+            if len(nettoyé) < 2:
+                raise ValidationError("Chaque partie du nom doit avoir au moins 2 lettres.")
+        
+        if valeur.startswith('-') or valeur.endswith('-'):
+            raise ValidationError("Le nom ne peut pas commencer ou finir par un tiret.")
+
+    def validate_prenom(self, field):
+        valeur = field.data.strip()
+        
+        for char in valeur:
+            if not (char.isalpha() or char in " -"):
+                raise ValidationError("Le prénom ne doit contenir que des lettres.")
+
+        segments = valeur.split('-')
+        for s in segments:
+            nettoyé = s.strip()
+            if len(nettoyé) < 3:
+                raise ValidationError("Chaque partie du prénom doit avoir au moins 3 lettres.")
+
+        if valeur.startswith('-') or valeur.endswith('-'):
+            raise ValidationError("Le prénom ne peut pas commencer ou finir par un tiret.")
+
+    def validate_date_naissance(self, field): 
+        date_str = field.data 
         if not date_str:
             return
-        try:
-            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
-        except ValueError:
-            raise ValidationError("Format incorrect. Utilisez AAAA-MM-JJ.")
+
+        try: 
+            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date() 
+        except ValueError: 
+            raise ValidationError("Date invalide ou format incorrect. Utilisez AAAA-MM-JJ (ex: 2000-01-31).") 
+
+        if date_obj.year < 1900: 
+            raise ValidationError("Date de naissance invalide. (Incohérente)") 
+        
+        today = datetime.now().date()
+        if date_obj > today: 
+            raise ValidationError("La date de naissance ne peut pas être dans le futur.") 
+        
+        age_minimum = 18
+        if (today.year - date_obj.year - ((today.month, today.day) < (date_obj.month, date_obj.day))) < age_minimum:
+            raise ValidationError(f"Vous devez avoir au moins {age_minimum} ans.")

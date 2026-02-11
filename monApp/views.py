@@ -368,18 +368,22 @@ def parametres():
         flash("Profil d'assuré introuvable.", "danger")
         return redirect(url_for('tableau_de_bord'))
         
-    print("Assure utilisé :", assure.nom, assure.prenom, assure.email, assure.telephone)
     form = ParametresForm(obj=assure)
+    
+    form.email.render_kw = {'readonly': True}
+
     if form.validate_on_submit():
         assure.nom = form.nom.data
         assure.prenom = form.prenom.data
         assure.telephone = form.telephone.data
+        
         try:
             db.session.commit()
             flash("Paramètres modifiés avec succès.", "success")
         except Exception as e:
             db.session.rollback()
             flash(f"Erreur lors de la modification : {e}", "danger")
+            
     return render_template('parametres.html', form=form)
 
 
@@ -878,7 +882,7 @@ def liste_assures():
     return render_template('assureur/liste_assures.html', assures=assures)
 
 
-@app.route('/parametres_assureur/')
+@app.route('/parametres_assureur/', methods=['GET', 'POST'])
 @login_required
 def parametres_assureur():
     if not current_user.assureur_profile:
@@ -889,18 +893,31 @@ def parametres_assureur():
     form = ParametresForm(obj=assureur)
 
     if form.validate_on_submit():
+        nouvel_email = form.email.data
+        
+        if nouvel_email != assureur.email:
+            user_exist = User.query.filter_by(Login=nouvel_email).first()
+            if user_exist:
+                flash("Cet email est déjà utilisé.", "danger")
+                return render_template('assureur/parametres_assureur.html', form=form)
+            
+            current_user.Login = nouvel_email
+            assureur.email = nouvel_email
+
         assureur.nom = form.nom.data
         assureur.prenom = form.prenom.data
         assureur.telephone = form.telephone.data
+        
         try:
             db.session.commit()
             flash("Paramètres modifiés avec succès.", "success")
-            return redirect(url_for('parametres_assureur'))
         except Exception as e:
             db.session.rollback()
             flash(f"Erreur lors de la modification : {e}", "danger")
     
     return render_template('assureur/parametres_assureur.html', form=form)
+
+
 
 @app.route('/detail_sinistre/<int:id>', methods=['GET', 'POST'])
 @login_required
