@@ -9,12 +9,12 @@ RUN apt-get update && apt-get install -y \
     libharfbuzz0b libpangoft2-1.0-0 libpangocairo-1.0-0 \
     && apt-get clean
 
-# Installation des dépendances Python
 # On va chercher le requirements qui est dans monApp/
 COPY monApp/requirements.txt .
+
 RUN pip install --no-cache-dir -r requirements.txt
 
-# On copie tout le contenu (y compris config.py et le dossier monApp)
+# On copie tout le contenu
 COPY . .
 
 # Elle permet à 'import config' de fonctionner même si app.py est dans un sous-dossier
