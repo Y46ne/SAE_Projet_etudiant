@@ -19,11 +19,10 @@
 
     <form method="POST">
         {{ form.hidden_tag() }}
-
+        
         <div class="form-group {% if form.nom.errors %}has-error{% endif %}">
             {{ form.nom.label(class="form-label") }}
             {{ form.nom(class="form-control") }}
-            
             {% if form.nom.errors %}
                 {% for error in form.nom.errors %}
                     <span class="form-error">{{ error }}</span>
@@ -34,7 +33,6 @@
         <div class="form-group {% if form.prenom.errors %}has-error{% endif %}">
             {{ form.prenom.label(class="form-label") }}
             {{ form.prenom(class="form-control") }}
-            
             {% if form.prenom.errors %}
                 {% for error in form.prenom.errors %}
                     <span class="form-error">{{ error }}</span>
@@ -57,7 +55,6 @@
         <div class="form-group {% if form.telephone.errors %}has-error{% endif %}">
             {{ form.telephone.label(class="form-label") }}
             {{ form.telephone(class="form-control") }}
-            
             {% if form.telephone.errors %}
                 {% for error in form.telephone.errors %}
                     <span class="form-error">{{ error }}</span>
