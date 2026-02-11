@@ -14,8 +14,8 @@
         </a>
     {% elif current_user.is_assureur %}
         {% if logement.assures %}
-            <a href="{{ url_for('detail_assure', id=logement.assures[0].id_assure) }}" class="btn btn-danger mb-3">
-               ← Retour au détail du client
+            <a href="{{ url_for('logements_assure', id_assure=logement.assures[0].id_assure) }}" class="btn btn-danger mb-3">
+               ← Retour aux logements du client
             </a>
         {% else %}
             <a href="{{ url_for('liste_assures') }}" class="btn btn-danger mb-3">
@@ -35,9 +35,7 @@
         <p class="text-gray-600 mb-1"><strong>Adresse :</strong> {{ logement.adresse }}</p>
         <p class="text-gray-600 mb-4"><strong>Nombre de pièces :</strong> {{ logement.pieces|length }}</p>
 
-        {% if not current_user.is_assureur %}
-            <a href="{{ url_for('ajouter_piece', logement_id=logement.id_logement) }}" class="btn btn-success mb-3">Ajouter une pièce</a>
-        {% endif %}
+        <a href="{{ url_for('ajouter_piece', logement_id=logement.id_logement) }}" class="btn btn-success mb-3">Ajouter une pièce</a>
     </div>
 
     <div class="search-filter">
@@ -65,19 +63,17 @@
                             Voir biens <i class="fas fa-eye"></i>
                         </a>
                         
-                        {% if not current_user.is_assureur %}
-                            <a href="{{ url_for('ajouter_bien', piece_id=piece.id_piece) }}" class="btn btn-info" title="Ajouter un bien">
-                                Ajouter bien <i class="fas fa-plus"></i>
-                            </a>
-                            <a href="{{ url_for('modifier_piece', piece_id=piece.id_piece) }}" class="btn btn-warning">
-                                Modifier
-                            </a>
-                            <form action="{{ url_for('supprimer_piece', piece_id=piece.id_piece) }}" method="post" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette pièce ? Cela supprimera également tous les biens associés.');">
-                                <button type="submit" class="btn btn-danger">
-                                    Supprimer
-                                </button>
-                            </form>
-                        {% endif %}
+                        <a href="{{ url_for('ajouter_bien', piece_id=piece.id_piece) }}" class="btn btn-info" title="Ajouter un bien">
+                            Ajouter bien <i class="fas fa-plus"></i>
+                        </a>
+                        <a href="{{ url_for('modifier_piece', piece_id=piece.id_piece) }}" class="btn btn-warning">
+                            Modifier
+                        </a>
+                        <form action="{{ url_for('supprimer_piece', piece_id=piece.id_piece) }}" method="post" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr ?');">
+                            <button type="submit" class="btn btn-danger">
+                                Supprimer
+                            </button>
+                        </form>
                     </div>
                 </td>
             </tr>

@@ -20,9 +20,11 @@
         {% if current_user.is_assureur %}
             {% if assure_cible %}
                 <a href="{{ url_for('detail_assure', id=assure_cible.id_assure) }}" class="btn btn-danger mb-3">
-                   ← Retour au client
+                ← Retour au client
                 </a>
                 <h2>Logements de {{ assure_cible.prenom }} {{ assure_cible.nom }}</h2>
+                
+                <a href="{{ url_for('ajouter_logement', id_assure=assure_cible.id_assure) }}" class="btn btn-success mb-3">Ajouter un logement</a>
             {% else %}
                 <a href="{{ url_for('liste_assures') }}" class="btn btn-danger mb-3">
                    ← Retour liste assurés
@@ -30,11 +32,8 @@
                 <h2>Logements</h2>
             {% endif %}
         {% else %}
-            {% endif %}
-        
-        <p><strong>Nombre total de logements : {{ logements|length }}</strong></p>
-
-        {% if not current_user.is_assureur %}
+            <p><strong>Nombre total de logements : {{ logements|length }}</strong></p>
+            
             <a href="{{ url_for('ajouter_logement') }}" class="btn btn-success mb-3">Ajouter un logement</a>
         {% endif %}
     </div>
@@ -66,19 +65,17 @@
                             Consulter <i class="fas fa-eye"></i>
                         </a>
                         
-                        {% if not current_user.is_assureur %}
-                            <a href="{{ url_for('ajouter_piece', logement_id=row.logement.id_logement) }}" class="btn btn-info" title="Ajouter une pièce">
-                                Ajouter pièce <i class="fas fa-plus"></i>
-                            </a>
-                            <a href="{{ url_for('modifier_logement', logement_id=row.logement.id_logement) }}" class="btn btn-warning" title="Modifier">
-                                Modifier <i class="fas fa-pen"></i>
-                            </a>
-                            <form action="{{ url_for('delete_logement', id=row.logement.id_logement) }}" method="post" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce logement ? Cela supprimera également toutes les pièces et biens associés.');">
-                                <button type="submit" class="btn btn-danger">
-                                    Supprimer
-                                </button>
-                            </form>
-                        {% endif %}
+                        <a href="{{ url_for('ajouter_piece', logement_id=row.logement.id_logement) }}" class="btn btn-info" title="Ajouter une pièce">
+                            Ajouter pièce <i class="fas fa-plus"></i>
+                        </a>
+                        <a href="{{ url_for('modifier_logement', logement_id=row.logement.id_logement) }}" class="btn btn-warning" title="Modifier">
+                            Modifier <i class="fas fa-pen"></i>
+                        </a>
+                        <form action="{{ url_for('delete_logement', id=row.logement.id_logement) }}" method="post" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce logement ?');">
+                            <button type="submit" class="btn btn-danger">
+                                Supprimer
+                            </button>
+                        </form>
                     </div>
                 </td>
             </tr>
