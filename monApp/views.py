@@ -1054,6 +1054,7 @@ def parametres_assureur():
         return redirect(url_for('login'))
     
     assureur = current_user.assureur_profile
+    
     form = ParametresForm(obj=assureur)
 
     if form.validate_on_submit():
@@ -1079,6 +1080,9 @@ def parametres_assureur():
             db.session.rollback()
             flash(f"Erreur lors de la modification : {e}", "danger")
     
+    if form.errors:
+        print("Erreurs de validation Assureur :", form.errors)
+
     return render_template('assureur/parametres_assureur.html', form=form)
 
 
