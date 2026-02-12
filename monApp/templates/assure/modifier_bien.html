@@ -3,7 +3,7 @@
 {% block title %}Modifier le bien{% endblock %}
 
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/modifier_bien.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modifier.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -62,7 +62,8 @@
         </div>
 
         <div class="form-actions mt-3">
-            {{ form.submit(class="btn btn-primary") }}
+            <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
+            
             <a href="{{ url_for('gestion_bien', piece_id=bien.id_piece) }}" class="btn btn-secondary">Annuler</a>
         </div>
     </form>

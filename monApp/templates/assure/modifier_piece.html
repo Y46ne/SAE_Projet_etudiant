@@ -3,7 +3,7 @@
 {% block title %}Modifier la pièce{% endblock %}
 
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/modifier_piece.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modifier.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -28,8 +28,11 @@
             {% endfor %}
         </div>
 
-        <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
-        <a href="{{ url_for('mes_logements') }}" class="btn btn-secondary">Annuler</a>
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
+            
+            <a href="{{ url_for('view_logement_pieces', id=piece.id_logement) }}" class="btn btn-secondary">Annuler</a>
+        </div>
     </form>
 </div>
 {% endblock %}

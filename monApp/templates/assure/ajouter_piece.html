@@ -3,7 +3,7 @@
 {% block title %}Ajouter une Pièce{% endblock %}
 
 {% block head %}
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/ajouter_piece.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/ajout.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -16,7 +16,7 @@
 
         <section class="form-section">
             <div class="card">
-                <form action="{{ url_for('ajouter_piece') }}" method="POST" class="form">
+                <form method="POST" class="form">
                     {{ form.hidden_tag() }}
 
                     <div class="form-group {% if form.nom_piece.errors %}has-error{% endif %}">
@@ -39,14 +39,12 @@
                         {{ form.logement_id.label(class="form-label") }}
                         
                         <select name="{{ form.logement_id.name }}" id="{{ form.logement_id.id }}" class="form-input" required>
-                            <option value="" disabled {% if not form.logement_id.data and not request.args.get('logement_id') %}selected{% endif %}>
+                            <option value="" disabled {% if not form.logement_id.data %}selected{% endif %}>
                                 Sélectionner un logement
                             </option>
                             {% for value, label in form.logement_id.choices %}
                                 <option value="{{ value }}" 
-                                    {% if (form.logement_id.data and form.logement_id.data|string == value|string) or (not form.logement_id.data and request.args.get('logement_id') == value|string) %}
-                                        selected
-                                    {% endif %}>
+                                    {% if form.logement_id.data|string == value|string %}selected{% endif %}>
                                     {{ label }}
                                 </option>
                             {% endfor %}
@@ -59,7 +57,14 @@
 
                     <div class="form-actions">
                         {{ form.submit(class="btn-primary") }}
-                        <a href="{{ url_for('tableau_de_bord') }}" class="btn-secondary">Annuler</a>
+                        
+                        {% if logement_concerne %}
+                            <a href="{{ url_for('view_logement_pieces', id=logement_concerne.id_logement) }}" class="btn-secondary">Annuler</a>
+                        {% elif current_user.is_assureur %}
+                            <a href="{{ url_for('liste_assures') }}" class="btn-secondary">Annuler</a>
+                        {% else %}
+                            <a href="{{ url_for('mes_logements') }}" class="btn-secondary">Annuler</a>
+                        {% endif %}
                     </div>
                 </form>
             </div>

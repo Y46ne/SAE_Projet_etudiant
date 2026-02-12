@@ -3,7 +3,7 @@
 {% block title %}Modifier le logement{% endblock %}
 
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='../static/css/modifier_logement.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='../static/css/modifier.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -36,8 +36,19 @@
             {% endfor %}
         </div>
 
-        <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
-        <a href="{{ url_for('mes_logements') }}" class="btn btn-secondary">Annuler</a>
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
+            
+            {% if current_user.is_assureur %}
+                {% if logement.assures %}
+                    <a href="{{ url_for('logements_assure', id_assure=logement.assures[0].id_assure) }}" class="btn btn-secondary">Annuler</a>
+                {% else %}
+                    <a href="{{ url_for('liste_assures') }}" class="btn btn-secondary">Annuler</a>
+                {% endif %}
+            {% else %}
+                <a href="{{ url_for('mes_logements') }}" class="btn btn-secondary">Annuler</a>
+            {% endif %}
+        </div>
     </form>
 </div>
 {% endblock %}

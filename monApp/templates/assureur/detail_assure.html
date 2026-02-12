@@ -3,7 +3,7 @@
 {% block title %}{{ assure.nom }} {{ assure.prenom }} - Détails{% endblock %}
 
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/detail_assure.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/detail.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -58,7 +58,12 @@
 
     <div class="bottom-grid">
         <div class="media-card">
-            <h2>Logements de l'assuré</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="margin: 0;">Logements de l'assuré</h2>
+                <a href="{{ url_for('logements_assure', id_assure=assure.id_assure) }}" class="btn btn-primary" style="font-size: 0.9em; padding: 5px 10px;">
+                    Gérer les logements
+                </a>
+            </div>
             {% if assure.logements %}
                 <div class="logement-list">
                     {% for logement in assure.logements %}
