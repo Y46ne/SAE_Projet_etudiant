@@ -1,13 +1,55 @@
 version: '3.8'
 
 services:
+  db:
+    image: postgres:15
+    container_name: mobilist_db
+
+    # Ces identifiants permettent à Docker de créer l'utilisateur et la BDD au premier lancement.
+    environment:
+      POSTGRES_USER: yassine
+      POSTGRES_PASSWORD: yassine
+      POSTGRES_DB: sae_db
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    # Le système vérifie toutes les 5 secondes si la base est prête à accepter des connexions.
+    # Cela empêche le site web de démarrer trop tôt et de planter.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yassine -d sae_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
   web:
+    # Construit l'image Docker à partir du Dockerfile situé dans le dossier courant
     build: .
     container_name: mobilist_web
+
+    # L'application tourne sur le port 5000 dans Docker, mais sera accessible via le port 8088 sur les machine.
+    # Accès : http://localhost:8088
     ports:
       - "8088:5000"
+
+    # Permet de voir les modifications de code en temps réel sans devoir reconstruire l'image.
     volumes:
       - .:/app
+
+    # Variables d'environnement injectées dans Python
     environment:
       - FLASK_ENV=development
+      # Chaîne de connexion à la BDD. Notez que l'hôte est 'db'.
+      - DATABASE_URL=postgresql+psycopg2://yassine:yassine@db:5432/sae_db
+
+    # Le conteneur web attend que le conteneur db soit "healthy" (sain) avant de se lancer.
+    depends_on:
+      db:
+        condition: service_healthy
+
+    # Relance automatiquement le site en cas de crash ou de redémarrage du serveur.
     restart: always
+
+volumes:
+  postgres_data:

@@ -3,15 +3,15 @@ FROM python:3.11-slim
 # Le répertoire de travail est la racine du projet (/app)
 WORKDIR /app
 
-# Installation des dépendances système pour WeasyPrint
+# Installation des dépendances système pour WeasyPrint ET PostgreSQL (libpq-dev, gcc)
 RUN apt-get update && apt-get install -y \
     python3-pip python3-cffi python3-brotli libpango-1.0-0 \
     libharfbuzz0b libpangoft2-1.0-0 libpangocairo-1.0-0 \
+    libpq-dev gcc \
     && apt-get clean
 
-# On va chercher le requirements qui est dans monApp/
-COPY monApp/requirements.txt .
-
+# Installation des dépendances Python
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # On copie tout le contenu
@@ -25,9 +25,5 @@ ENV FLASK_APP=monApp/app.py
 EXPOSE 5000
 
 # Commande de lancement
-CMD python -m flask loaddb monApp/data/data.yml && python -m flask run --host=0.0.0.0
-
-#CMD ["python", "-m", "flask", "run", "--host=0.0.0.0"] # je la met en commentaire parce que je sais pas si c'est celle la qu'il faut garder a cause des conflit
-
-
-
+# Note: Le 'sh -c' permet d'enchaîner les commandes proprement
+CMD ["sh", "-c", "python -m flask loaddb monApp/data/data.yml && python -m flask run --host=0.0.0.0"]
