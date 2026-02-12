@@ -6,6 +6,7 @@ from hashlib import sha256
 from werkzeug.utils import secure_filename
 import os
 
+from PIL import Image
 from .app import app, db, login_manager
 from config import *
 from monApp.database import User, Assure, Assureur, Logement, Piece, Bien, Justificatif, Sinistre
@@ -583,7 +584,18 @@ def ajouter_bien():
                 user_folder = os.path.join(app.config['UPLOAD_FOLDER'], f"assure_{owner_id}")
                 os.makedirs(user_folder, exist_ok=True)
                 file_path = os.path.join(user_folder, f"bien_{nouveau_bien.id_bien}_{filename}")
-                fichier_facture.save(file_path)
+
+                if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
+                    try:
+                        img = Image.open(fichier_facture)
+                        img.thumbnail((800, 800))
+                        img.save(file_path)
+                    except Exception as e:
+                        db.session.rollback()
+                        flash(f"Erreur lors du redimensionnement de l'image : {e}", "danger")
+                        return render_template('assure/ajouter_bien.html', form=form, liste_logement=liste_logement_pour_template, liste_pieces=liste_pieces_pour_template)
+                else:
+                    fichier_facture.save(file_path)
                 
                 relative_path = os.path.join(f"assure_{owner_id}", f"bien_{nouveau_bien.id_bien}_{filename}")
                 nouveau_justificatif = Justificatif(
