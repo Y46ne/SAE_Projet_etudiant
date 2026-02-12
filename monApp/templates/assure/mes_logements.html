@@ -19,17 +19,21 @@
     <div style="margin-bottom: 20px;">
         {% if current_user.is_assureur %}
             {% if assure_cible %}
+
+
                 <a href="{{ url_for('detail_assure', id=assure_cible.id_assure) }}" class="btn btn-danger mb-3">
                 ← Retour au client
                 </a>
-                <h2>Logements de {{ assure_cible.prenom }} {{ assure_cible.nom }}</h2>
+
+                <h2 class="text-center font-bold text-2xl mb-4">Logements de {{ assure_cible.prenom }} {{ assure_cible.nom }}</h2>
+
                 
                 <a href="{{ url_for('ajouter_logement', id_assure=assure_cible.id_assure) }}" class="btn btn-success mb-3">Ajouter un logement</a>
             {% else %}
                 <a href="{{ url_for('liste_assures') }}" class="btn btn-danger mb-3">
                    ← Retour liste assurés
                 </a>
-                <h2>Logements</h2>
+                <h2 class="text-center font-bold text-2xl mb-4">Logements</h2>
             {% endif %}
         {% else %}
             <p><strong>Nombre total de logements : {{ logements|length }}</strong></p>

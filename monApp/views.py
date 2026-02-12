@@ -1232,6 +1232,12 @@ def modifier_infos_compte(id):
 
     assure = Assure.query.get_or_404(id)
     
+    if assure.date_naissance and isinstance(assure.date_naissance, str):
+        try:
+            assure.date_naissance = datetime.datetime.strptime(assure.date_naissance, '%Y-%m-%d').date()
+        except ValueError:
+            pass
+
     # Sécurité : vérifier que l'assureur gère bien cet assuré
     if assure.id_assureur != current_user.assureur_profile.id_assureur:
         flash("Vous n'avez pas les droits pour modifier cet assuré.", "danger")
@@ -1288,7 +1294,7 @@ def logements_assure(id_assure):
             'valeur': valeur_totale
         })
 
-    return render_template('mes_logements.html', logements=rows, assure_cible=assure_cible)
+    return render_template('assure/mes_logements.html', logements=rows, assure_cible=assure_cible)
 
 # ------------------- MAIN -------------------
 if __name__ == '__main__':

@@ -121,7 +121,11 @@
 
                     <div class="form-actions">
                         {{ form.submit(class="btn-primary") }}
-                        <a href="{{ url_for('tableau_de_bord') }}" class="btn-secondary">Annuler</a>
+                        {% if current_user.is_assureur %}
+                            <a href="{{ url_for('tableau_de_bord_assureur') }}" class="btn-secondary">Annuler</a>
+                        {% else %}
+                            <a href="{{ url_for('tableau_de_bord') }}" class="btn-secondary">Annuler</a>
+                        {% endif %}
                     </div>
                 </form>
             </div>
