@@ -1,4 +1,3 @@
-/* Styles spécifiques pour l'impression */
 @media print {
     .no-print { display: none !important; }
     .card { border: none !important; }

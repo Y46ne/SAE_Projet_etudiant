@@ -8,7 +8,7 @@ from monApp.database.assure import get_tous_les_assures
 from flask_wtf.file import FileField, FileAllowed
 from datetime import datetime, timedelta
 
-# --- Fonctions de validation réutilisables (Refactoring) ---
+# Fonctions de validation réutilisables 
 
 def check_name_format(valeur, field_name="Ce champ", min_segment=2):
     """Valide le format d'un nom ou prénom (lettres, tirets, longueur)."""

@@ -19,7 +19,7 @@ from monApp.utils import verifier_droit_logement, verifier_droit_piece
 try:
     from weasyprint import HTML
 except ImportError:
-    HTML = None  # Gestion du cas où la librairie n'est pas installée
+    HTML = None 
 import datetime
 import random
 
@@ -862,7 +862,6 @@ def supprimer_bien(bien_id):
                         os.remove(full_path)
                     except Exception as e:
                         print(f"Erreur suppression fichier : {e}")
-            # -----------------------------------------------
 
             db.session.delete(j)
         
@@ -920,7 +919,7 @@ def get_rapport_data(logements):
                 piece_data['categories'][cat]['total'] += valeur
                 piece_data['total_piece'] += valeur
             
-            # On n'ajoute la pièce que si elle contient quelque chose
+            # On ajoute la pièce que si elle contient quelque chose
             if piece_data['categories']:
                  logement_data['pieces'].append(piece_data)
                  logement_data['total_logement'] += piece_data['total_piece']
@@ -1181,7 +1180,6 @@ def creer_compte_assureur():
             db.session.rollback()
             flash(f'Erreur lors de la création du compte : {e}', 'danger')
     elif request.method == 'POST':
-        # Useful for debugging why validation failed
         print(form.errors)
         
     return render_template('assureur/creer_compte_assureur.html', form=form)

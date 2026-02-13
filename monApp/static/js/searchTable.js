@@ -1,7 +1,3 @@
-/**
- * @param {string} inputId - L'ID du champ de recherche (input text).
- * @param {string} tableId - L'ID du tableau à filtrer.
- */
 function setupTableSearch(inputId, tableId) {
     const input = document.getElementById(inputId);
     const table = document.getElementById(tableId);

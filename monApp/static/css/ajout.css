@@ -124,7 +124,6 @@ select:focus {
   background-color: #c9cbcf;
 }
 
-/* --- Responsive --- */
 @media (max-width: 768px) {
   .main-content {
     padding: 20px;

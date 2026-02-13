@@ -9,13 +9,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const summaryTbody = document.getElementById('summary-tbody');
     let isDirty = false;
 
-    // --- Accessibilité RGAA ---
+    // Accessibilité RGAA
     // On ajoute aria-live pour que les changements de total soient annoncés
     if (totalDisplay) {
         totalDisplay.setAttribute('aria-live', 'polite');
     }
 
-    // --- Gestion Saleté formulaire ---
     const form = document.querySelector('.sinistre-form');
     if(form){
         form.addEventListener('change', () => isDirty = true);
@@ -28,22 +27,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // --- LOGIQUE PRINCIPALE ---
 
-    // 1. Fonction déclenchée UNIQUEMENT quand on change de Logement
+    // Fonction déclenchée uniquement quand on change de Logement
     function onLogementChange() {
         const selectedLogementId = residenceSelect.value;
 
-        // A. IMPORTANT : On décoche TOUT car on change de maison
+        // On décoche tout car on change de maison
         checkboxes.forEach(cb => {
             cb.checked = false;
         });
 
-        // B. Réinitialiser la pièce
         pieceSelect.value = ""; 
         pieceSelect.disabled = false;
-
-        // C. Filtrer les options du menu "Pièce"
         Array.from(pieceSelect.options).forEach(opt => {
             if (opt.value === "") return;
             if (opt.dataset.logement === selectedLogementId) {
@@ -52,12 +47,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 opt.hidden = true;
             }
         });
-
-        // D. Appeler le filtre d'affichage
         applyFilters();
     }
 
-    // 2. Fonction qui gère l'affichage (Visuel uniquement)
+    // Fonction qui gère l'affichage
     function applyFilters() {
         const residenceId = residenceSelect.value;
         const pieceId = pieceSelect.value;
@@ -116,13 +109,11 @@ document.addEventListener('DOMContentLoaded', function() {
         totalDisplay.textContent = total.toFixed(2) + '€';
     }
 
-    // --- ÉCOUTEURS ---
     residenceSelect.addEventListener('change', onLogementChange);
     pieceSelect.addEventListener('change', applyFilters);
     checkboxes.forEach(cb => cb.addEventListener('change', calculateTotal));
     etatSelects.forEach(select => select.addEventListener('change', calculateTotal));
 
-    // Init
     if (residenceSelect.value === "") {
         pieceSelect.disabled = true;
         rows.forEach(r => r.style.display = 'none');
