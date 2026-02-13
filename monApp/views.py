@@ -537,6 +537,12 @@ def ajouter_bien():
     target_piece_id = request.args.get('piece_id')
     target_logement_id = request.args.get('logement_id')
     
+    if request.method == 'POST':
+        if form.piece_id.data:
+            target_piece_id = form.piece_id.data
+        if form.logement_id.data:
+            target_logement_id = form.logement_id.data
+
     if current_user.is_assureur:
         if target_piece_id:
             piece = Piece.query.get(target_piece_id)
@@ -546,6 +552,7 @@ def ajouter_bien():
             logement = Logement.query.get(target_logement_id)
             if logement:
                 user_logements = [logement]
+
     elif current_user.assure_profile:
         user_logements = current_user.assure_profile.logements
     
@@ -585,17 +592,7 @@ def ajouter_bien():
                 os.makedirs(user_folder, exist_ok=True)
                 file_path = os.path.join(user_folder, f"bien_{nouveau_bien.id_bien}_{filename}")
 
-                if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
-                    try:
-                        img = Image.open(fichier_facture)
-                        img.thumbnail((800, 800))
-                        img.save(file_path)
-                    except Exception as e:
-                        db.session.rollback()
-                        flash(f"Erreur lors du redimensionnement de l'image : {e}", "danger")
-                        return render_template('assure/ajouter_bien.html', form=form, liste_logement=liste_logement_pour_template, liste_pieces=liste_pieces_pour_template)
-                else:
-                    fichier_facture.save(file_path)
+                fichier_facture.save(file_path) 
                 
                 relative_path = os.path.join(f"assure_{owner_id}", f"bien_{nouveau_bien.id_bien}_{filename}")
                 nouveau_justificatif = Justificatif(
@@ -612,16 +609,23 @@ def ajouter_bien():
         except Exception as e:
             db.session.rollback()
             flash(f"Erreur ajout bien : {e}", "danger")
+    
+    if form.errors:
+        print("Erreurs formulaire:", form.errors)
 
     liste_logement_pour_template = [{'id': l.id_logement, 'nom': l.nom_logement, 'adresse': l.adresse} for l in user_logements]
     liste_pieces_pour_template = [{'id': p.id_piece, 'nom_piece': p.nom_piece, 'id_logement': p.id_logement} for p in user_pieces]
     
     return render_template(
-        'assure/ajouter_bien.html', 
+        'assure/ajouter_bien.html',
         form=form, 
         liste_logement=liste_logement_pour_template, 
-        liste_pieces=liste_pieces_pour_template
+        liste_pieces=liste_pieces_pour_template,
+        target_piece_id=target_piece_id,
+        target_logement_id=target_logement_id
     )
+
+
 
 @app.route('/bien/<int:bien_id>/')
 @login_required
