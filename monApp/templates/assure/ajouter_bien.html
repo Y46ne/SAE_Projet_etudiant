@@ -49,9 +49,6 @@
                         {% endif %}
                     </div>
 
-                    <div class="form-group">
-                    </div>
-
                     <div class="form-group {% if form.categorie.errors %}has-error{% endif %}">
                         {{ form.categorie.label(class="form-label") }}
                         <select name="{{ form.categorie.name }}" id="{{ form.categorie.id }}" class="form-input" required>
@@ -85,26 +82,49 @@
                         {% endif %}
                     </div>
                     
-                    <div class="form-group">
-                        <label for="logement_id" class="form-label">Logement</label>
+                    <div class="form-group {% if form.logement_id.errors %}has-error{% endif %}">
+                        <label for="logement_id" class="form-label">Logement 
+
+[Image of house icon]
+</label>
                         <select name="logement_id" id="logement_id" class="form-input" required>
                             <option value="" disabled {% if not form.logement_id.data and not ns.target_logement_id and not request.args.get('logement_id') %}selected{% endif %}>Sélectionner un logement</option>
+                            
                             {% for logement in liste_logement %}
-                                <option value="{{ logement.id }}" {% if (form.logement_id.data and form.logement_id.data|string == logement.id|string) or (not form.logement_id.data and ((ns.target_logement_id and ns.target_logement_id|string == logement.id|string) or (request.args.get('logement_id') == logement.id|string))) %}selected{% endif %}>{{ logement.nom or logement.adresse }}</option>
+                                <option value="{{ logement.id }}" 
+                                    {% if (form.logement_id.data and form.logement_id.data|string == logement.id|string) or (not form.logement_id.data and ((ns.target_logement_id and ns.target_logement_id|string == logement.id|string) or (request.args.get('logement_id') == logement.id|string))) %}
+                                        selected
+                                    {% endif %}>
+                                    {{ logement.nom or logement.adresse }}
+                                </option>
                             {% endfor %}
                         </select>
+                        
+                        {% if form.logement_id.errors %}
+                            {% for error in form.logement_id.errors %}
+                                <span class="form-error">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
                     </div>
 
-                    <div class="form-group">
-                        <label for="piece_id" class="form-label">Pièce</label>
-                        <select name="piece_id" id="piece_id" class="form-input" required {% if not target_piece_id %}disabled{% endif %}>
+                    <div class="form-group {% if form.piece_id.errors %}has-error{% endif %}">
+                        <label for="piece_id" class="form-label">Pièce </label>
+                        <select name="piece_id" id="piece_id" class="form-input" required>
                             <option value="" disabled {% if not target_piece_id %}selected{% endif %}>Sélectionner d'abord un logement</option>
+                            
                             {% for piece in liste_pieces %}
-                                <option value="{{ piece.id }}" data-logement-id="{{ piece.id_logement }}" class="piece-option" {% if target_piece_id and piece.id|string == target_piece_id|string %}selected{% endif %}>
+                                <option value="{{ piece.id }}" data-logement-id="{{ piece.id_logement }}" class="piece-option" 
+                                    {% if target_piece_id and piece.id|string == target_piece_id|string %}selected{% endif %}>
                                     {{ piece.nom_piece }}
                                 </option>
                             {% endfor %}
                         </select>
+
+                        {% if form.piece_id.errors %}
+                            {% for error in form.piece_id.errors %}
+                                <span class="form-error">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
                     </div>
                     
                     <div class="form-group {% if form.facture.errors %}has-error{% endif %}">
@@ -121,10 +141,20 @@
 
                     <div class="form-actions">
                         {{ form.submit(class="btn-primary") }}
-                        {% if current_user.is_assureur %}
-                            <a href="{{ url_for('tableau_de_bord_assureur') }}" class="btn-secondary">Annuler</a>
+                        
+                        {# Logique intelligente pour le bouton Annuler #}
+                        {% if target_piece_id %}
+                            <a href="{{ url_for('gestion_bien', piece_id=target_piece_id) }}" class="btn-secondary">Annuler</a>
+                        
+                        {% elif target_logement_id %}
+                            <a href="{{ url_for('view_logement_pieces', id=target_logement_id) }}" class="btn-secondary">Annuler</a>
+                        
                         {% else %}
-                            <a href="{{ url_for('tableau_de_bord') }}" class="btn-secondary">Annuler</a>
+                            {% if current_user.is_assureur %}
+                                <a href="{{ url_for('tableau_de_bord_assureur') }}" class="btn-secondary">Annuler</a>
+                            {% else %}
+                                <a href="{{ url_for('tableau_de_bord') }}" class="btn-secondary">Annuler</a>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </form>
