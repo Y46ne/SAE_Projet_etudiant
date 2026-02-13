@@ -3,22 +3,12 @@
 {% block title %}Mes Biens{% endblock %}
 
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/logement_piece_bien.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/listes.css') }}">
 {% endblock %}
 
 {% block content %}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-
-
-
-    <div class="p-8">
+<div class="p-8">
         <a href="{{ url_for('view_logement_pieces', id=piece.id_logement) }}" class="btn btn-danger">
             ← Retour aux pièces
         </a>
@@ -29,12 +19,11 @@
 
         <p class="text-gray-600 mb-6">Gérez les biens immobiliers de cette pièce</p>
 
-        {% if not current_user.is_assureur %}
-            {% if current_user.is_authenticated %}
-                <a href="{{ url_for('ajouter_bien', piece_id=piece.id_piece) }}" class="btn btn-success mb-3">Ajouter un bien</a>
-            {% endif %}
+        {% if current_user.is_assureur %}
+             <a href="{{ url_for('ajouter_bien', piece_id=piece.id_piece) }}" class="btn btn-success mb-3">Ajouter un bien</a>
+        {% elif current_user.is_authenticated %}
+             <a href="{{ url_for('ajouter_bien', piece_id=piece.id_piece) }}" class="btn btn-success mb-3">Ajouter un bien</a>
         {% endif %}
-
 
         <div class="main-content">
             <div class="search-filter">
@@ -62,19 +51,18 @@
                         <td>{{ '%.2f' % (bien.valeur_actuelle or bien.calculer_valeur_actuelle() or 0) }}</td>
                         <td>
                         <div class="task-controls">
-                        <a href="{{ url_for('detail_bien', id=bien.id_bien) }}" class="btn btn-info" title="Voir détails">
-                                    Voir
-                                </a>
-                                <a href="{{ url_for('modifier_bien', bien_id=bien.id_bien) }}" class="btn btn-warning" title="Modifier">
-                                    Modifier
-                                </a>
-                            {% if not current_user.is_assureur %}
+                            <a href="{{ url_for('detail_bien', id=bien.id_bien) }}" class="btn btn-info" title="Voir détails">
+                                Voir
+                            </a>
+                            <a href="{{ url_for('modifier_bien', bien_id=bien.id_bien) }}" class="btn btn-warning" title="Modifier">
+                                Modifier
+                            </a>
+                            
                             <form action="{{ url_for('supprimer_bien', bien_id=bien.id_bien) }}" method="post" style="display:inline;">
-                                <button type="submit" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette pièce ? Cela supprimera également tous les biens associés.');">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce bien ?');">
                                     Supprimer
                                 </button>
                             </form>
-                            {% endif %}
                         </div>
                         </td>
                     </tr>
@@ -90,14 +78,9 @@
         </div>
     </div>
 
-
-
 <script src="{{ url_for('static', filename='js/searchTable.js') }}"></script>
-
 <script>
-    // Attend que le contenu du DOM soit entièrement chargé avant d'exécuter le script
     document.addEventListener('DOMContentLoaded', function() {
-        // Appelle la fonction setupTableSearch avec l'ID de l'input de recherche et l'ID de la table
         setupTableSearch('searchInput', 'piecesTable');
     });
 </script>

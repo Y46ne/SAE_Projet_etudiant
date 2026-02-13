@@ -3,7 +3,7 @@
 {% block title %}Ajouter un Bien{% endblock %}
 
 {% block head %}
-  <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/ajouter_bien.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/ajout.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -26,25 +26,33 @@
                     {% endif %}
 
                     {{ form.hidden_tag() }}
-                    <div class="form-group">
+                    
+                    <div class="form-group {% if form.nom_bien.errors %}has-error{% endif %}">
                         {{ form.nom_bien.label(class="form-label") }}
                         {{ form.nom_bien(class="form-input", placeholder="Ex : Télévision 4K") }}
+                        
+                        {% if form.nom_bien.errors %}
+                            {% for error in form.nom_bien.errors %}
+                                <span class="form-error">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group {% if form.prix_achat.errors %}has-error{% endif %}">
                         {{ form.prix_achat.label(class="form-label") }}
                         {{ form.prix_achat(class="form-input", placeholder="Prix d'achat en €") }}
+                        
                         {% if form.prix_achat.errors %}
-                            <div class="text-red-500 text-sm mt-1">
-                                {% for error in form.prix_achat.errors %}<span>{{ error }}</span>{% endfor %}
-                            </div>
+                            {% for error in form.prix_achat.errors %}
+                                <span class="form-error">{{ error }}</span>
+                            {% endfor %}
                         {% endif %}
                     </div>
 
                     <div class="form-group">
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group {% if form.categorie.errors %}has-error{% endif %}">
                         {{ form.categorie.label(class="form-label") }}
                         <select name="{{ form.categorie.name }}" id="{{ form.categorie.id }}" class="form-input" required>
                             <option value="" disabled selected>Sélectionner une catégorie</option>
@@ -57,18 +65,24 @@
                             <option value="Vaisselle" {% if form.categorie.data == 'Vaisselle' %}selected{% endif %}>Vaisselle</option>
                             <option value="Outillage" {% if form.categorie.data == 'Outillage' %}selected{% endif %}>Outillage</option>
                             <option value="Autre" {% if form.categorie.data == 'Autre' %}selected{% endif %}>Autre</option>
-                            {# {% for value, label in form.categorie.choices %}
-                                <option value="{{ value }}" {% if form.categorie.data == value %}selected{% endif %}>{{ label }}</option>
-                            {% endfor %} #}
                         </select>
+                        
                         {% if form.categorie.errors %}
-                            <div class="invalid-feedback">{{ form.categorie.errors[0] }}</div>
+                            {% for error in form.categorie.errors %}
+                                <span class="form-error">{{ error }}</span>
+                            {% endfor %}
                         {% endif %}
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group {% if form.date_achat.errors %}has-error{% endif %}">
                         {{ form.date_achat.label(class="form-label") }}
                         {{ form.date_achat(class="form-input", type="date") }}
+                        
+                        {% if form.date_achat.errors %}
+                            {% for error in form.date_achat.errors %}
+                                <span class="form-error">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
                     </div>
                     
                     <div class="form-group">
@@ -93,16 +107,25 @@
                         </select>
                     </div>
                     
-                    <div class="form-group">
+                    <div class="form-group {% if form.facture.errors %}has-error{% endif %}">
                         {{ form.facture.label(class="form-label") }}
                         {{ form.facture(class="form-input-file", required=True) }}
                         <small class="form-text" style="color: #d9534f;">* Justificatif obligatoire (PDF, JPG, PNG).</small>
+                        
+                        {% if form.facture.errors %}
+                            {% for error in form.facture.errors %}
+                                <span class="form-error">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
                     </div>
-
 
                     <div class="form-actions">
                         {{ form.submit(class="btn-primary") }}
-                        <a href="{{ url_for('tableau_de_bord') }}" class="btn-secondary">Annuler</a>
+                        {% if current_user.is_assureur %}
+                            <a href="{{ url_for('tableau_de_bord_assureur') }}" class="btn-secondary">Annuler</a>
+                        {% else %}
+                            <a href="{{ url_for('tableau_de_bord') }}" class="btn-secondary">Annuler</a>
+                        {% endif %}
                     </div>
                 </form>
             </div>
@@ -110,30 +133,5 @@
     </main>
 </div> 
 
-    
-
-<script>
-    //Script généré par IA
-    document.addEventListener('DOMContentLoaded', function() {
-        const logementSelect = document.getElementById('logement_id');
-        const pieceSelect = document.getElementById('piece_id');
-        // Stocke toutes les options de pièces
-        const allPieceOptions = pieceSelect.querySelectorAll('.piece-option');
-
-        logementSelect.addEventListener('change', function() {
-            const selectedLogementId = this.value;
-            
-            // Réinitialise le menu des pièces
-            pieceSelect.innerHTML = '<option value="" disabled selected>Sélectionner une pièce</option>';
-            pieceSelect.disabled = false;
-
-            // Ajoute seulement les pièces qui correspondent au logement choisi
-            allPieceOptions.forEach(function(option) {
-                if (option.dataset.logementId === selectedLogementId) {
-                    pieceSelect.appendChild(option.cloneNode(true));
-                }
-            });
-        });
-    });
-</script>
+<script src="{{ url_for('static', filename='js/ajouter_bien.js') }}"></script>
 {% endblock %}

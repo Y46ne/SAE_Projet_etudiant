@@ -3,11 +3,16 @@
 {% block title %}{{ bien.nom_bien or 'Bien sans nom' }} - Détails{% endblock %}
 
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/detail_bien.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/detail.css') }}">
 {% endblock %}
 
 {% block content %}
 <div class="container">
+
+    <a href="{{ url_for('gestion_bien', piece_id=bien.id_piece) }}" class="btn btn-danger" style="margin-bottom: 1rem;">
+        ← Retour à la liste des biens
+    </a>
+    
     <div class="header-card">
         <div class="header-top">
             <div class="title-section">

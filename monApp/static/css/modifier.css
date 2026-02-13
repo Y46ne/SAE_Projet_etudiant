@@ -131,3 +131,21 @@ h1 {
     margin-top: 0.3em;
     margin-bottom: 0.5em;
 }
+
+
+.form-error {
+        color: #e74c3c;
+        font-size: 0.85em;
+        margin-top: 5px;
+        display: block;
+    }
+
+.has-error input {
+    border-color: #e74c3c;
+}
+
+
+input:disabled {
+        background-color: #e9ecef;
+        cursor: not-allowed;
+}

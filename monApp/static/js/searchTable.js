@@ -1,5 +1,4 @@
 /**
- * Active la recherche dynamique sur un tableau HTML.
  * @param {string} inputId - L'ID du champ de recherche (input text).
  * @param {string} tableId - L'ID du tableau à filtrer.
  */
@@ -9,14 +8,18 @@ function setupTableSearch(inputId, tableId) {
 
     if (!input || !table) return;
 
-    input.addEventListener('keyup', function () {
-        const filter = this.value.toLowerCase();
-        // On cible uniquement les lignes du corps du tableau (tbody)
-        const rows = table.querySelectorAll('tbody tr');
+    let timeout = null;
 
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(filter) ? '' : 'none';
-        });
+    input.addEventListener('keyup', function () {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            const filter = input.value.toLowerCase();
+            const rows = table.querySelectorAll('tbody tr');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
+            });
+        }, 200); // On attend 200ms de pause avant de filtrer
     });
 }

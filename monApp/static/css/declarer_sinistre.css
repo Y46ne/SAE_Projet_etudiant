@@ -393,3 +393,15 @@ header p {
     background: #fef9c3;
     color: #92400e;
 }
+
+
+.form-error {
+        color: #e74c3c;
+        font-size: 0.85em;
+        margin-top: 5px;
+        display: block;
+    }
+
+.has-error input {
+    border-color: #e74c3c;
+}

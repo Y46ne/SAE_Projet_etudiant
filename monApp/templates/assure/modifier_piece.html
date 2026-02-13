@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Modifier la pièce{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modifier.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Modifier la pièce</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group {% if form.nom_piece.errors %}has-error{% endif %}">
+            {{ form.nom_piece.label(class="form-label") }}
+            {{ form.nom_piece(class="form-control") }}
+            {% for error in form.nom_piece.errors %}
+                <span class="form-error">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="form-group {% if form.surface.errors %}has-error{% endif %}">
+            {{ form.surface.label(class="form-label") }}
+            {{ form.surface(class="form-control") }}
+            {% for error in form.surface.errors %}
+                <span class="form-error">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
+            
+            <a href="{{ url_for('view_logement_pieces', id=piece.id_logement) }}" class="btn btn-secondary">Annuler</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
