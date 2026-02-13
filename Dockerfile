@@ -25,5 +25,4 @@ ENV FLASK_APP=monApp/app.py
 EXPOSE 5000
 
 # Commande de lancement
-# Note: Le 'sh -c' permet d'enchaîner les commandes proprement
 CMD ["sh", "-c", "python -m flask loaddb monApp/data/data.yml && python -m flask run --host=0.0.0.0"]

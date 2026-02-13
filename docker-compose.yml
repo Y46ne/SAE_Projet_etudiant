@@ -40,10 +40,10 @@ services:
     # Variables d'environnement injectées dans Python
     environment:
       - FLASK_ENV=development
-      # Chaîne de connexion à la BDD. Notez que l'hôte est 'db'.
+      # Chaîne de connexion à la BDD.
       - DATABASE_URL=postgresql+psycopg2://yassine:yassine@db:5432/sae_db
 
-    # Le conteneur web attend que le conteneur db soit "healthy" (sain) avant de se lancer.
+    # Le conteneur web attend que le conteneur db soit sain avant de se lancer.
     depends_on:
       db:
         condition: service_healthy
