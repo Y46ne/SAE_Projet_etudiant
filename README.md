@@ -33,3 +33,11 @@ Suivez ces étapes pour exécuter l'application sur votre machine :
 
 5. **Se connecter**  
    Utilisez les identifiants fournis en haut du README pour accéder à l’application.
+
+## Lancement avec Docker
+
+1. **Construire et lancer les conteneurs**  
+   `docker-compose up --build`
+
+2. **Accéder à l'application**  
+   L'application est accessible à l'adresse `http://localhost:8088`.
